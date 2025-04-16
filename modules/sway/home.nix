@@ -18,10 +18,10 @@ let
       }
     '')
     appleKeyboardIdentifiers;
-  cycle-sway-output = pkgs.writeBabashkaScript {
-    name = "cycle-sway-output";
-    text = builtins.readFile ../../misc/cycle-sway-output.clj;
-  };
+  cycle-sway-output = pkgs.writers.writePython3Bin
+    "cycle-sway-output"
+    { doCheck = false; }
+    (builtins.readFile ../../misc/cycle-sway-output.py);
   cycle-sway-scale = pkgs.writeBabashkaScript {
     name = "cycle-sway-scale";
     text = builtins.readFile ../../misc/cycle-sway-scale.clj;
