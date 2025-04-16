@@ -23,6 +23,41 @@
     jamming = false;
   };
 
+  services = {
+    displayManager.ly = {
+      enable = true;
+      # https://github.com/fairyglade/ly/blob/master/res/config.ini
+      settings = {
+        animation = "matrix"; # doom matrix colormix
+      };
+    };
+    xserver = {
+      enable = true;
+      autorun = true;
+      desktopManager = {
+        gnome.enable = true;
+      };
+    };
+  };
+
+  environment.gnome.excludePackages = (with pkgs; [
+    atomix # puzzle game
+    cheese # webcam tool
+    epiphany # web browser
+    evince # document viewer
+    geary # email reader
+    gedit # text editor
+    gnome-characters
+    gnome-music
+    gnome-photos
+    gnome-terminal
+    gnome-tour
+    hitori # sudoku game
+    iagno # go game
+    tali # poker game
+    totem # video player
+  ]);
+
   # Needed to create Rasp Pi SD images
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
@@ -38,6 +73,6 @@
     };
   };
 
-  system.stateVersion = "23.11";
+  system.stateVersion = "24.11";
 
 }

@@ -31,7 +31,7 @@
     };
 
     # As of 24.05 this is required to avoid having lightdm start automatically when services.xserver.enable = true
-    systemd.services.display-manager.enable = false;
+    systemd.services.display-manager.enable = config.services.xserver.autorun;
 
     programs = {
 
