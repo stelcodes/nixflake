@@ -21,6 +21,7 @@ in
       pkgs.nil
       pkgs.nixpkgs-fmt
       pkgs.ruff
+      pkgs.pyright
       pkgs.typescript-language-server
       pkgs.rust-analyzer
       pkgs.java-language-server

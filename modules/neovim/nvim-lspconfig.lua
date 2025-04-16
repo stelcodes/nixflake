@@ -31,6 +31,7 @@ lspconfig.jsonls.setup {
 }
 lspconfig.clojure_lsp.setup {}
 lspconfig.ruff.setup {}
+lspconfig.pyright.setup {}
 lspconfig.gopls.setup {}
 lspconfig.ts_ls.setup {
   on_attach = function(client, bufnr)
