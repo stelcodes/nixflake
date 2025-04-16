@@ -7,15 +7,14 @@
 
     hardware.graphics.enable = true;
 
-    # As of 24.05 this is required to avoid having lightdm start automatically when services.xserver.enable = true
-    systemd.services.display-manager.enable = config.services.xserver.autorun;
-
     programs = {
 
       # Need this for font-manager or any other gtk app to work I guess
       dconf.enable = true;
 
       sway.enable = true;
+
+      niri.enable = true;
 
       steam.enable = lib.mkIf config.activities.gaming true;
 
@@ -25,16 +24,23 @@
 
       # Enable CUPS to print documents.
       printing = {
-        enable = true;
+        enable = false; # Security nightmare, only enable if necessary
         drivers = [
           pkgs.hplip
         ];
       };
 
+      displayManager.ly = {
+        enable = true;
+        # https://github.com/fairyglade/ly/blob/master/res/config.ini
+        settings = {
+          animation = "matrix"; # doom matrix colormix
+        };
+      };
+
       # Configure keymap in X11
       xserver = {
         enable = true;
-        autorun = lib.mkDefault false;
         xkb = {
           layout = pkgs.lib.mkDefault "us";
           variant = pkgs.lib.mkDefault "";
@@ -73,6 +79,29 @@
         };
       };
     };
+
+    # xserver.desktopManager.gnome.enable = true;
+    environment.gnome.excludePackages = (with pkgs; [
+      seahorse
+      gnome-backgrounds
+      gnome-shell-extensions
+      gnome-tour # GNOME Shell detects the .desktop file on first log-in.
+      gnome-user-docs
+      epiphany
+      gnome-text-editor
+      gnome-calendar
+      gnome-characters
+      gnome-console
+      gnome-contacts
+      gnome-maps
+      gnome-music
+      gnome-connections
+      simple-scan
+      snapshot
+      totem
+      yelp
+      gnome-software
+    ]);
 
   };
 }
