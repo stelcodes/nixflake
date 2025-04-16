@@ -166,7 +166,7 @@ Values can be defined with Home Manager's `dconf.settings` option.
 
 ```
 dconf dump /org/cinnamon/ | dconf2nix | nvim -R
-pkgs.gnome.dconf-editor for GUI
+pkgs.dconf-editor for GUI
 ```
 
 ## Messaging
