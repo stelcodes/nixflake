@@ -30,6 +30,7 @@ for output in outputs:
         next_output = output
         break
     found_active = output["focused"]
+print(f"Switching to output: {next_output['name']}")
 command = ["swaymsg", "focus", "output", next_output["name"]]
 result = subprocess.run(command, capture_output=True, text=True)
 if result.returncode != 0:
