@@ -1,5 +1,6 @@
 { pkgs, inputs, config, lib, ... }: {
 
+
   config = lib.mkIf config.profile.graphical {
 
     # Supposedly not needed for xpadneo with newer kernels but on 6.6.7 this immediately fixed all issues so :shrug:

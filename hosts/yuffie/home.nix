@@ -19,8 +19,7 @@
       # pkgs.rembg
     ];
   };
-  wayland.windowManager.sway = {
-    enable = true;
+  wayland.windowManager = {
     mainDisplay = "eDP-1";
     sleep = {
       preferredType = "suspend-then-hibernate";

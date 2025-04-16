@@ -1,6 +1,7 @@
 { pkgs, lib, inputs, config, systemConfig, ... }:
 let
   cfg = config.wayland.windowManager.sway;
+  waycfg = config.wayland.windowManager;
   theme = config.theme.set;
   viewRebuildLogCmd = "kitty --app-id=nixos_rebuild_log -- journalctl -efo cat -u nixos-rebuild.service";
   mod = "Mod4";
@@ -37,7 +38,7 @@ let
     else
       swaymsg output eDP-1 power off
       playerctl --all-players pause
-      systemctl ${cfg.sleep.preferredType}
+      systemctl ${waycfg.sleep.preferredType}
     fi
   '';
   handle-sway-lid-off = pkgs.writers.writeBash "handle-sway-lid-off" ''
@@ -94,40 +95,7 @@ let
 in
 {
 
-  options = {
-    wayland.windowManager.sway = {
-      mainDisplay = lib.mkOption {
-        type = lib.types.str;
-        default = "eDP-1";
-      };
-      sleep = {
-        preferredType = lib.mkOption {
-          type = lib.types.enum [ "suspend" "hibernate" "hybrid-sleep" "suspend-then-hibernate" "poweroff" ];
-          default = "suspend-then-hibernate";
-        };
-        lockBefore = lib.mkOption {
-          type = lib.types.bool;
-          default = true;
-        };
-        auto = {
-          enable = lib.mkOption {
-            type = lib.types.bool;
-            default = false;
-          };
-          idleMinutes = lib.mkOption {
-            type = lib.types.int;
-            default = 30;
-          };
-        };
-      };
-      wallpaper = lib.mkOption {
-        type = lib.types.nullOr lib.types.package;
-        default = null;
-      };
-    };
-  };
-
-  config = lib.mkIf (config.profile.graphical && config.wayland.windowManager.sway.enable && pkgs.stdenv.isLinux) {
+  config = lib.mkIf (config.profile.graphical && pkgs.stdenv.isLinux) {
 
     home = {
       packages = [
@@ -174,6 +142,7 @@ in
     };
 
     wayland.windowManager.sway = {
+      enable = true;
       wrapperFeatures.gtk = true;
       extraSessionCommands = ''
         export SDL_VIDEODRIVER=wayland
@@ -290,9 +259,9 @@ in
           "${mod}+shift+r" = "reload; exec systemctl --user restart waybar";
           "${mod}+shift+e" = "exec swaynag -t warning -m 'Do you really want to exit sway?' -b 'Yes, exit sway' 'swaymsg exit'";
           "${mod}+shift+s" = "sticky toggle";
-          "--locked ${mod}+shift+delete" = "exec systemctl ${cfg.sleep.preferredType}";
-          "--locked ${mod}+o" = "output ${cfg.mainDisplay} power toggle";
-          "--locked ${mod}+shift+o" = "output ${cfg.mainDisplay} toggle";
+          "--locked ${mod}+shift+delete" = "exec systemctl ${waycfg.sleep.preferredType}";
+          "--locked ${mod}+o" = "output ${waycfg.mainDisplay} power toggle";
+          "--locked ${mod}+shift+o" = "output ${waycfg.mainDisplay} toggle";
 
           # Custom external program keymaps
           "${mod}+return" = "exec ${terminal} ${launch-tmux}";
@@ -379,7 +348,7 @@ in
         };
         output = {
           "*" = {
-            background = if (cfg.wallpaper != null) then "${cfg.wallpaper} fill ${theme.bg}" else "${theme.bg} solid_color";
+            background = if (waycfg.wallpaper != null) then "${waycfg.wallpaper} fill ${theme.bg}" else "${theme.bg} solid_color";
           };
           # Framework screen
           "BOE 0x095F Unknown" = {
@@ -476,20 +445,6 @@ in
         };
       };
 
-      pomo-notify = {
-        Unit = {
-          Description = "pomo.sh notify daemon";
-        };
-        Service = {
-          Type = "simple";
-          ExecStart = "${pkgs.pomo}/bin/pomo notify";
-          Restart = "always";
-        };
-        Install = {
-          WantedBy = [ "default.target" ];
-        };
-      };
-
       nixos-rebuild = {
         Service = {
           Type = "exec";
@@ -538,29 +493,16 @@ in
         };
       };
 
-      swayidle.Service.ExecStop = lib.getExe (pkgs.writeShellApplication {
-        name = "swayidle-cleanup";
-        runtimeInputs = [ pkgs.coreutils ];
-        text = ''
-          BLOCKFILE="$HOME/.local/share/idle-sleep-block"
-          if test -f "$BLOCKFILE"; then
-            rm "$BLOCKFILE"
-          fi
-        '';
-      });
-
-      polkit-gnome = {
-        Unit = {
-          Description = "GNOME polkit authentication agent";
-        };
-        Service = {
-          ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-          Restart = "always";
-        };
-        Install = {
-          WantedBy = [ "sway-session.target" ];
-        };
-      };
+      # swayidle.Service.ExecStop = lib.getExe (pkgs.writeShellApplication {
+      #   name = "swayidle-cleanup";
+      #   runtimeInputs = [ pkgs.coreutils ];
+      #   text = ''
+      #     BLOCKFILE="$HOME/.local/share/idle-sleep-block"
+      #     if test -f "$BLOCKFILE"; then
+      #       rm "$BLOCKFILE"
+      #     fi
+      #   '';
+      # });
 
       syncthing-tray = lib.mkIf systemConfig.services.syncthing.enable {
         Unit = {
@@ -568,19 +510,6 @@ in
         };
         Service = {
           ExecStart = "${lib.getExe pkgs.syncthing-tray} -api '${systemConfig.services.syncthing.settings.gui.apikey}'";
-          Restart = "always";
-        };
-        Install = {
-          WantedBy = [ "sway-session.target" ];
-        };
-      };
-
-      nm-applet = {
-        Unit = {
-          Description = "Network manager applet";
-        };
-        Service = {
-          ExecStart = "${pkgs.networkmanagerapplet}/bin/nm-applet";
           Restart = "always";
         };
         Install = {
@@ -628,336 +557,7 @@ in
         };
       };
 
-      blueman-applet = lib.mkIf config.profile.bluetooth {
-        Unit = {
-          Description = "Blueman applet";
-        };
-        Service = {
-          ExecStart = "${pkgs.blueman}/bin/blueman-applet";
-        };
-        Install = {
-          WantedBy = [ "sway-session.target" ];
-        };
-      };
-
     };
-
-    services = {
-      swayidle = {
-        enable = true;
-        # Waits for commands to finish (-w) by default
-        events = [
-          {
-            event = "before-sleep";
-            command = lib.getExe (pkgs.writeShellApplication {
-              runtimeInputs = [ pkgs.coreutils-full pkgs.sway pkgs.swaylock ];
-              name = "swayidle-before-sleep";
-              text = ''
-                if ${if cfg.sleep.lockBefore then "true" else "false"}; then
-                  swaylock --daemonize
-                fi
-                ${lib.getExe pkgs.tmux-snapshot}
-                swaymsg 'output * power off'
-              '';
-            });
-          }
-          {
-            event = "after-resume";
-            command = lib.getExe (pkgs.writeShellApplication {
-              name = "swayidle-after-resume";
-              runtimeInputs = [ pkgs.coreutils-full pkgs.sway pkgs.pomo ];
-              text = ''
-                if [ -f "$HOME/.local/share/pomo" ]; then pomo start || true; fi
-                ${pkgs.sway}/bin/swaymsg 'output * power on'
-              '';
-            });
-          }
-        ];
-        timeouts = lib.mkIf cfg.sleep.auto.enable [
-          {
-            timeout = cfg.sleep.auto.idleMinutes * 60;
-            command = lib.getExe (pkgs.writeShellApplication {
-              name = "swayidle-sleepy-sleep";
-              runtimeInputs = [ pkgs.coreutils-full pkgs.systemd pkgs.playerctl pkgs.gnugrep pkgs.acpi pkgs.swaylock ];
-              text = ''
-                set -x
-                if test -f "$HOME/.local/share/idle-sleep-block"; then
-                  echo "Restarting service because of idle-sleep-block file"
-                  systemctl --restart swayidle.service
-                elif acpi --ac-adapter | grep -q "on-line"; then
-                  echo "Restarting service because laptop is plugged in"
-                  systemctl --restart swayidle.service
-                else
-                  echo "Idle timeout reached. Night night."
-                  systemctl ${cfg.sleep.preferredType}
-                fi
-              '';
-            });
-          }
-        ];
-        systemdTarget = "sway-session.target";
-      };
-
-      wlsunset = {
-        enable = true;
-        systemdTarget = "null.target";
-        latitude = "38";
-        longitude = "-124";
-        temperature = {
-          day = 7000;
-          night = 4000;
-        };
-      };
-
-      mako = {
-        enable = true;
-        anchor = "bottom-right";
-        font = "FiraMono Nerd Font 10";
-        extraConfig = ''
-          sort=-time
-          layer=overlay
-          width=280
-          height=110
-          border-radius=5
-          icons=1
-          max-icon-size=64
-          default-timeout=7000
-          ignore-timeout=1
-          padding=14
-          margin=20
-          outer-margin=0,0,45,0
-          background-color=${theme.bg}
-
-          [urgency=low]
-          border-color=${theme.blue}
-
-          [urgency=normal]
-          border-color=${theme.bg3}
-
-          [urgency=high]
-          border-color=${theme.red}
-
-          [mode=hidden]
-          invisible=1
-        '';
-      };
-
-      wayland-pipewire-idle-inhibit = {
-        enable = config.profile.audio;
-        package = pkgs.wayland-pipewire-idle-inhibit;
-        systemdTarget = "sway-session.target";
-        settings = {
-          verbosity = "INFO";
-          media_minimum_duration = 30;
-          sink_whitelist = [ ];
-          node_blacklist = [
-            # Always seen as playing audio when open so just ignore these
-            { name = "Bitwig Studio"; }
-            { name = "Mixxx"; }
-          ];
-        };
-      };
-    };
-
-    programs = {
-      swaylock = {
-        enable = true;
-        settings = {
-          color = theme.bgx;
-          image = lib.mkIf (cfg.wallpaper != null) "${cfg.wallpaper}";
-          font-size = 24;
-          indicator-idle-visible = false;
-          indicator-radius = 100;
-          show-failed-attempts = true;
-        };
-      };
-
-      waybar = {
-        enable = true;
-        style = ''
-          @define-color bg ${theme.bg};
-          @define-color bgOne ${theme.bg1};
-          @define-color bgTwo ${theme.bg2};
-          @define-color bgThree ${theme.bg3};
-          @define-color red ${theme.red};
-          ${builtins.readFile ./waybar.css}
-        '';
-        # Stopped working when switching between Cinnamon and Sway
-        # [error] Bar need to run under Wayland
-        # GTK4 get_default_display was saying it was still X11
-        systemd = {
-          enable = true;
-          target = "sway-session.target";
-        };
-        settings = [{
-          layer = "top";
-          position = "bottom";
-          height = 20;
-          modules-left = [
-            "sway/workspaces"
-            "tray"
-            "custom/pomo"
-            "custom/wlsunset"
-            "custom/idlesleep"
-          ];
-          modules-center = [ "sway/mode" ];
-          modules-right = [
-            "custom/rebuild"
-            "cpu"
-            "backlight"
-            "battery"
-          ] ++ (lib.lists.optionals config.profile.audio [
-            "custom/recordplayback"
-            "wireplumber"
-          ]) ++ [
-            "clock"
-          ];
-          "custom/pomo" = {
-            format = "{} 󱎫";
-            exec = "${pkgs.pomo}/bin/pomo clock";
-            interval = 1;
-            on-click = "${pkgs.pomo}/bin/pomo pause";
-            on-click-right = "${pkgs.pomo}/bin/pomo stop";
-          };
-          "custom/rebuild" = {
-            format = "{}";
-            max-length = 12;
-            interval = 2;
-            exec = lib.getExe (pkgs.writeShellApplication {
-              name = "waybar-rebuild-exec";
-              runtimeInputs = [ pkgs.coreutils-full pkgs.systemd pkgs.gnugrep ];
-              text = ''
-                status="$(systemctl is-active nixos-rebuild.service || true)"
-                if grep -q "inactive" <<< "$status"; then
-                  printf "rebuild: "
-                elif grep -q "active" <<< "$status"; then
-                  printf "rebuild: "
-                elif grep -q "failed" <<< "$status"; then
-                  printf "rebuild: "
-                fi
-              '';
-            });
-            on-click = viewRebuildLogCmd;
-          };
-          "custom/recordplayback" = {
-            format = "{}";
-            max-length = 3;
-            interval = 2;
-            exec = lib.getExe (pkgs.writeShellApplication {
-              name = "waybar-record-playback";
-              text = ''
-                if systemctl --user is-active --quiet record-playback.service; then
-                  echo "🔴";
-                fi
-              '';
-            });
-          };
-          "custom/idlesleep" = {
-            format = "{}";
-            max-length = 2;
-            interval = 2;
-            exec = ''if test -f "$HOME/.local/share/idle-sleep-block"; then echo '🐝'; else echo '🕸️'; fi'';
-            on-click = lib.getExe (pkgs.writeShellApplication {
-              name = "toggle-idle-sleep-block";
-              runtimeInputs = [ pkgs.coreutils ];
-              text = ''
-                BLOCKFILE="$HOME/.local/share/idle-sleep-block"
-                if test -f "$BLOCKFILE"; then
-                  rm "$BLOCKFILE"
-                else
-                  touch "$BLOCKFILE"
-                fi
-              '';
-            });
-          };
-          "custom/wlsunset" = {
-            exec = "if systemctl --user --quiet is-active wlsunset.service; then echo ''; else echo ''; fi";
-            interval = 2;
-            on-click = "${lib.getExe pkgs.toggle-service} wlsunset";
-            # This doesn't actually work because the only way to have dynamic tooltips is to use json mode
-            # tooltip-format = "${pkgs.writers.writeFish "wlsunset-temp" ''
-            #   journalctl --user -ex --unit wlsunset.service | tail | string match --regex "\d{4} K" | tail -1
-            # ''}";
-          };
-          "sway/workspaces" = {
-            disable-scroll = true;
-            all-outputs = true;
-            format = "{icon}";
-            format-icons = {
-              "1" = "term";
-              "2" = "www";
-              "3" = "notes";
-              "4" = "arts";
-              "5" = "media";
-            };
-            persistent-workspaces = {
-              "1" = [ ];
-              "2" = [ ];
-              "3" = [ ];
-              "4" = [ ];
-              "5" = [ ];
-            };
-          };
-          cpu = {
-            interval = 10;
-            format = "{usage} ";
-            on-click = "kitty --app-id=system_monitor btop";
-          };
-          memory = {
-            interval = 30;
-            format = "{} ";
-          };
-          disk = {
-            interval = 30;
-            format = "{percentage_used} ";
-          };
-          wireplumber = {
-            format = "{node_name} {volume} {icon}";
-            format-muted = "{volume} ";
-            format-icons = { default = [ "" "" ]; };
-            on-click = "pavucontrol";
-            on-click-right = "cycle-pulse-sink";
-            on-click-middle = "helvum";
-            max-volume = 100;
-            scroll-step = 5;
-          };
-          clock = {
-            format = "{:%I:%M %p %b %d} 󱛡";
-            format-alt = "{:%A} 󱛡";
-            tooltip-format = "<tt><small>{calendar}</small></tt>";
-          };
-          battery = {
-            format = "{capacity} {icon}";
-            format-charging = "{capacity} ";
-            format-icons = [ "" "" "" "" "" ];
-            max-length = 40;
-          };
-          idle_inhibitor = {
-            format = "{icon}";
-            format-icons = {
-              activated = "";
-              deactivated = "";
-            };
-          };
-          backlight = {
-            interval = 5;
-            format = "{percent} {icon}";
-            format-icons = [ "" "" "" ];
-          };
-        }];
-      };
-
-      zathura = {
-        enable = true;
-        options = {
-          default-fg = theme.fg;
-          default-bg = theme.bg;
-          statusbar-bg = theme.bg1;
-          statusbar-fg = theme.fg;
-        };
-      };
-    };
-
 
     xdg = {
       desktopEntries = {
@@ -980,46 +580,6 @@ in
       };
 
       configFile = {
-        "pomo.cfg" = {
-          onChange = ''
-            ${pkgs.systemd}/bin/systemctl --user restart pomo-notify.service
-          '';
-          source = pkgs.writeShellScript "pomo-cfg" ''
-            # This file gets sourced by pomo.sh at startup
-            # I'm only caring about linux atm
-            function lock_screen {
-              if ${pkgs.procps}/bin/pgrep sway 2>&1 > /dev/null; then
-                echo "Sway detected"
-                # Only lock if pomo is still running
-                test -f "$HOME/.local/share/pomo" && ${pkgs.swaylock}/bin/swaylock
-                # Only restart pomo if pomo is still running
-                test -f "$HOME/.local/share/pomo" && ${pkgs.pomo}/bin/pomo start
-              fi
-            }
-
-            function custom_notify {
-                # send_msg is defined in the pomo.sh source
-                block_type=$1
-                if [[ $block_type -eq 0 ]]; then
-                    echo "End of work period"
-                    send_msg 'End of a work period. Locking Screen!'
-                    ${pkgs.playerctl}/bin/playerctl --all-players pause
-                    ${pkgs.mpv}/bin/mpv ${pkgs.pomo-alert} || sleep 10
-                    lock_screen &
-                elif [[ $block_type -eq 1 ]]; then
-                    echo "End of break period"
-                    send_msg 'End of a break period. Time for work!'
-                    ${pkgs.mpv}/bin/mpv ${pkgs.pomo-alert}
-                else
-                    echo "Unknown block type"
-                    exit 1
-                fi
-            }
-            POMO_MSG_CALLBACK="custom_notify"
-            POMO_WORK_TIME=30
-            POMO_BREAK_TIME=5
-          '';
-        };
         "gajim/theme/nord.css".text = ''
           .gajim-outgoing-nickname {
               color: ${theme.magenta};
