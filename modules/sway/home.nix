@@ -22,10 +22,10 @@ let
     "cycle-sway-output"
     { doCheck = false; }
     (builtins.readFile ../../misc/cycle-sway-output.py);
-  cycle-sway-scale = pkgs.writeBabashkaScript {
-    name = "cycle-sway-scale";
-    text = builtins.readFile ../../misc/cycle-sway-scale.clj;
-  };
+  cycle-sway-scale = pkgs.writers.writePython3Bin
+    "cycle-sway-scale"
+    { doCheck = false; }
+    (builtins.readFile ../../misc/cycle-sway-scale.py);
   toggle-sway-window = pkgs.writeBabashkaScript {
     name = "toggle-sway-window";
     text = builtins.readFile ../../misc/toggle-sway-window.clj;
