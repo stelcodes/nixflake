@@ -105,9 +105,9 @@
   everforest = rec {
     name = "everforest";
 
-    base00 = "#272e33";
+    base00 = "#333c43";
     # original base00 = "#2f383e";
-    base01 = "#2e383c";
+    base01 = "#374247";
     # original base01 = "#374247";
     base02 = "#414b50";
     # original base02 = "#4a555b";

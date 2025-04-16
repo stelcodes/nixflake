@@ -23,7 +23,7 @@ input {
 
 layout {
     // Unitless space values are logical pixels with scaling applied
-    gaps 12
+    gaps 8
     preset-column-widths {
         proportion 0.33333
         proportion 0.5
