@@ -162,7 +162,7 @@
     black = "#15191c";
 
     gtkThemeName = "Everforest-Dark-BL";
-    gtkThemePackage = pkgs.callPackage ../packages/everforest-gtk-theme.nix { };
+    gtkThemePackage = pkgs.everforest-gtk-theme;
     iconThemeName = "Everforest-Dark";
     iconThemePackage = gtkThemePackage;
     cursorThemeName = "Nordzy-cursors";
