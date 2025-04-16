@@ -97,9 +97,77 @@ in
           macos_quit_when_last_window_closed = "yes";
           kitty_mod = "ctrl+alt";
           clear_all_shortcuts = "yes";
+          wayland_titlebar_color = "background";
+        };
+      };
+
+      gnome-shell = {
+        theme = {
+          name = theme.gtkThemeName;
+          package = theme.gtkThemePackage;
         };
       };
     };
+
+    dconf.settings =
+      # dconf dump /org/cinnamon/ | dconf2nix | nvim -R
+      # nix shell nixpkgs#dconf2nix nixpkgs#dconf-editor
+      {
+        "org/virt-manager/virt-manager/connections" = {
+          autoconnect = [ "qemu:///system" ];
+          uris = [ "qemu:///system" ];
+        };
+        "org/gnome/desktop/interface" = {
+          color-scheme = "prefer-dark";
+        };
+        "org/gnome/desktop/wm/preferences" = {
+          # button-layout = "appmenu:close"; # Only show close button
+        };
+        "org/gnome/desktop/wm/keybindings" = {
+          minimize = [ "<Super>m" ];
+          move-to-workspace-1 = [ "<Shift><Super>1" ];
+          move-to-workspace-2 = [ "<Shift><Super>2" ];
+          move-to-workspace-3 = [ "<Shift><Super>3" ];
+          move-to-workspace-4 = [ "<Shift><Super>4" ];
+          move-to-workspace-left = [ "<Shift><Super>h" ];
+          move-to-workspace-right = [ "<Shift><Super>l" ];
+          switch-to-workspace-1 = [ "<Super>1" ];
+          switch-to-workspace-2 = [ "<Super>2" ];
+          switch-to-workspace-3 = [ "<Super>3" ];
+          switch-to-workspace-4 = [ "<Super>4" ];
+          switch-to-workspace-left = [ "<Super>h" ];
+          switch-to-workspace-right = [ "<Super>l" ];
+        };
+        "org/gnome/desktop/background" = {
+          picture-uri = "file://${pkgs.wallpaper.anime-girl-coffee}";
+          picture-uri-dark = "file://${pkgs.wallpaper.anime-girl-coffee}";
+        };
+      };
+
+    qt = {
+      # Necessary for keepassxc, qpwgrapgh, etc to theme correctly
+      enable = true;
+      platformTheme.name = "gtk";
+      style.name = "gtk2";
+    };
+
+    gtk = {
+      enable = true;
+      font = {
+        name = "FiraMono Nerd Font";
+        size = 10;
+      };
+      theme = {
+        name = theme.gtkThemeName;
+        package = theme.gtkThemePackage;
+      };
+      iconTheme = {
+        name = theme.iconThemeName;
+        package = theme.iconThemePackage;
+      };
+      gtk4.extraConfig.gtk-application-prefer-dark-theme = 1;
+    };
+
 
   };
 }
