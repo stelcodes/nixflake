@@ -6,14 +6,36 @@ in
   config = lib.mkIf config.profile.graphical {
 
     home = {
-      packages = lib.mkIf pkgs.stdenv.isLinux [
-        # pkgs.material-icons # for mpv uosc
+      packages = lib.mkIf pkgs.stdenv.isLinux ([
+        pkgs.material-icons # for mpv uosc
         # pkgs.mpv-unify # custom mpv python wrapper
         pkgs.keepassxc
         pkgs.ungoogled-chromium
         pkgs.librewolf
-        pkgs.vlc
-      ];
+        pkgs.gnome-disk-utility
+        pkgs.eog
+        pkgs.qalculate-gtk
+        pkgs.gnome-weather
+        pkgs.font-manager
+
+        pkgs.xwayland-satellite
+        pkgs.swaybg
+        pkgs.swaylock
+        pkgs.swayidle
+        pkgs.brightnessctl
+        pkgs.wev
+        pkgs.wl-clipboard
+        pkgs.wofi
+        pkgs.adwaita-icon-theme # for the two icons in the default wofi setup
+        pkgs.rofimoji # Great associated word hints with extensive symbol lists to choose from
+        pkgs.wdisplays
+        # pkgs.wl-screenrec # https://github.com/russelltg/wl-screenrec
+        # pkgs.wlogout
+      ] ++ (lib.lists.optionals config.profile.audio [
+        pkgs.playerctl
+        pkgs.helvum # better looking than qpwgraph
+        pkgs.pavucontrol
+      ]));
 
       # Need to create aliases because Launchbar doesn't look through symlinks.
       # Enable Other in Spotlight to see Nix apps
@@ -39,10 +61,28 @@ in
       };
     };
 
+    xdg.configFile = {
+      "niri/config.kdl".source = ./niri.kdl;
+      "rofimoji.rc".text = /* ini */ ''
+        action = copy
+        selector = wofi
+        files = [emojis]
+        skin-tone = neutral
+      '';
+      "wofi/config".text = /* ini */ ''
+        allow_images=true
+        width=800
+        height=400
+        term=kitty
+        show=drun
+      '';
+      "wofi/style.css".source = ./wofi.css;
+    };
+
     programs = {
 
       mpv = {
-        enable = false;
+        enable = true;
         config = {
           # turn off default interface, use uosc instead
           osd-bar = "no";
@@ -104,7 +144,7 @@ in
         };
       };
 
-      gnome-shell = {
+      gnome-shell = lib.mkIf pkgs.stdenv.isLinux {
         theme = {
           name = theme.gtkThemeName;
           package = theme.gtkThemePackage;
@@ -112,7 +152,7 @@ in
       };
     };
 
-    dconf.settings =
+    dconf.settings = lib.mkIf pkgs.stdenv.isLinux
       # dconf dump /org/cinnamon/ | dconf2nix | nvim -R
       # nix shell nixpkgs#dconf2nix nixpkgs#dconf-editor
       {
@@ -126,8 +166,13 @@ in
         "org/gnome/desktop/wm/preferences" = {
           # button-layout = "appmenu:close"; # Only show close button
         };
+        "org/gnome/settings-daemon/plugins/media-keys" = {
+          screensaver = [ "<Super>Delete" ];
+        };
         "org/gnome/desktop/wm/keybindings" = {
-          minimize = [ "<Super>m" ];
+          minimize = [ "<Shift><Super>m" ];
+          maximize = [ "<Super>m" ];
+          toggle-fullscreen = [ "<Super>f" ];
           move-to-workspace-1 = [ "<Shift><Super>1" ];
           move-to-workspace-2 = [ "<Shift><Super>2" ];
           move-to-workspace-3 = [ "<Shift><Super>3" ];
@@ -147,14 +192,14 @@ in
         };
       };
 
-    qt = {
+    qt = lib.mkIf pkgs.stdenv.isLinux {
       # Necessary for keepassxc, qpwgrapgh, etc to theme correctly
       enable = true;
       platformTheme.name = "gtk";
       style.name = "gtk2";
     };
 
-    gtk = {
+    gtk = lib.mkIf pkgs.stdenv.isLinux {
       enable = true;
       font = {
         name = "FiraMono Nerd Font";
@@ -170,7 +215,6 @@ in
       };
       gtk4.extraConfig.gtk-application-prefer-dark-theme = 1;
     };
-
 
   };
 }

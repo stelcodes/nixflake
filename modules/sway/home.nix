@@ -980,8 +980,6 @@ in
       };
 
       configFile = {
-        "wofi/config".text = "allow_images=true";
-        "wofi/style.css".source = ../../misc/wofi.css;
         "pomo.cfg" = {
           onChange = ''
             ${pkgs.systemd}/bin/systemctl --user restart pomo-notify.service
@@ -1050,12 +1048,6 @@ in
           paint_mode=brush
           early_exit=true
           fill_shape=false
-        '';
-        "rofimoji.rc".text = ''
-          action = copy
-          selector = wofi
-          files = [emojis]
-          skin-tone = neutral
         '';
 
       } // (if config.theme.set ? gtkConfigFiles then config.theme.set.gtkConfigFiles else { });
