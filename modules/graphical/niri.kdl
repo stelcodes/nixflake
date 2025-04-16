@@ -1,0 +1,134 @@
+// This config is in the KDL format: https://kdl.dev
+// https://github.com/YaLTeR/niri/wiki/Configuration
+
+// https://github.com/YaLTeR/niri/wiki/Xwayland
+spawn-at-startup "xwayland-satellite"
+spawn-at-startup "swaybg"
+prefer-no-csd
+screenshot-path "~/pictures/screenshots/screenshot-%Y-%m-%d-%H-%M-%S.png"
+
+input {
+    keyboard {
+        xkb {
+            layout "us"
+            options "caps:escape_shifted_capslock,altwin:swap_alt_win"
+        }
+    }
+    touchpad {
+        tap
+        natural-scroll
+    }
+    focus-follows-mouse max-scroll-amount="10%"
+}
+
+layout {
+    // Unitless space values are logical pixels with scaling applied
+    gaps 12
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+        proportion 1.0
+    }
+    preset-window-heights {
+        proportion 0.5
+        proportion 0.66667
+        proportion 1.0
+    }
+    default-column-width { proportion 1.0; }
+    focus-ring {
+        width 1
+        active-color "#a7c080"
+        inactive-color "#505050"
+    }
+}
+
+// Open picture-in-picture player as floating by default.
+window-rule {
+    match title="^Picture-in-Picture$"
+    open-floating true
+    default-column-width { proportion 0.3; }
+    default-window-height { proportion 0.3; }
+    opacity 0.8
+    default-floating-position x=10 y=10 relative-to="bottom-right"
+}
+// Block out password managers from screen capture.
+window-rule {
+    match app-id=r#"^org\.keepassxc\.KeePassXC$"#
+    block-out-from "screen-capture"
+}
+// Enable rounded corners for all windows.
+window-rule {
+    geometry-corner-radius 8
+    clip-to-geometry true
+}
+
+binds {
+    // Use wev to find key names
+    Super+Shift+Slash { show-hotkey-overlay; }
+    Super+Return { spawn "kitty"; }
+    Super+D { spawn "wofi"; }
+    Super+Shift+D { spawn "wofi" "--show" "run"; }
+    Super+Escape { spawn "swaylock"; }
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-"; }
+    XF86AudioMute        allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+    Super+Shift+Q { close-window; }
+    Super+H     { focus-column-left; }
+    Super+J     { focus-window-or-workspace-down; }
+    Super+K     { focus-window-or-workspace-up; }
+    Super+L     { focus-column-right; }
+    Super+Shift+H     { move-column-left; }
+    Super+Shift+J     { move-window-down; }
+    Super+Shift+K     { move-window-up; }
+    Super+Shift+L     { move-column-right; }
+    Super+Left  { focus-monitor-left; }
+    Super+Down  { focus-monitor-down; }
+    Super+Up    { focus-monitor-up; }
+    Super+Right { focus-monitor-right; }
+    Super+Shift+Left  { move-column-to-monitor-left; }
+    Super+Shift+Down  { move-column-to-monitor-down; }
+    Super+Shift+Up    { move-column-to-monitor-up; }
+    Super+Shift+Right { move-column-to-monitor-right; }
+    // With 2 workspaces + 1 empty, indices 3, 4, 5 and so on will all refer to the 3rd workspace.
+    Super+1 { focus-workspace 1; }
+    Super+2 { focus-workspace 2; }
+    Super+3 { focus-workspace 3; }
+    Super+4 { focus-workspace 4; }
+    Super+5 { focus-workspace 5; }
+    Super+6 { focus-workspace 6; }
+    Super+7 { focus-workspace 7; }
+    Super+8 { focus-workspace 8; }
+    Super+9 { focus-workspace 9; }
+    Super+Shift+1 { move-column-to-workspace 1; }
+    Super+Shift+2 { move-column-to-workspace 2; }
+    Super+Shift+3 { move-column-to-workspace 3; }
+    Super+Shift+4 { move-column-to-workspace 4; }
+    Super+Shift+5 { move-column-to-workspace 5; }
+    Super+Shift+6 { move-column-to-workspace 6; }
+    Super+Shift+7 { move-column-to-workspace 7; }
+    Super+Shift+8 { move-column-to-workspace 8; }
+    Super+Shift+9 { move-column-to-workspace 9; }
+    Super+Tab { focus-workspace-previous; }
+    Super+BracketLeft  { consume-or-expel-window-left; }
+    Super+BracketRight { consume-or-expel-window-right; }
+    Super+Comma  { consume-window-into-column; }
+    Super+Period { expel-window-from-column; }
+    Super+R { switch-preset-column-width; }
+    Super+Shift+R { switch-preset-window-height; }
+    Super+Ctrl+R { reset-window-height; }
+    Super+F { maximize-column; }
+    Super+Shift+F { fullscreen-window; }
+    Super+Ctrl+F { expand-column-to-available-width; }
+    Super+C { center-column; }
+    Super+Space { switch-focus-between-floating-and-tiling; }
+    Super+Shift+Space { toggle-window-floating; }
+    Print { screenshot; }
+    Super+Print { screenshot-window; }
+    Ctrl+Print { screenshot-screen; }
+    // The quit action will show a confirmation dialog to avoid accidental exits.
+    Super+Ctrl+Escape { quit; }
+    // Powers off the monitors. To turn them back on, do any input like moving the mouse or pressing any other key.
+    Super+Shift+P { power-off-monitors; }
+}
