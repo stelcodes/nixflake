@@ -297,8 +297,8 @@ in
           # Custom external program keymaps
           "${mod}+return" = "exec ${terminal} ${launch-tmux}";
           "${mod}+shift+return" = "exec ${terminal}";
-          "${mod}+d" = "exec wofi --show run --width 800 --height 400 --term kitty";
-          "${mod}+shift+d" = "exec wofi --show drun --width 800 --height 400 --term kitty";
+          "${mod}+shift+d" = "exec wofi --show run --width 800 --height 400 --term kitty";
+          "${mod}+d" = "exec wofi --show drun --width 800 --height 400 --term kitty";
           "${mod}+backspace" = "exec ${browser}";
           "${mod}+shift+backspace" = "exec ${browser} --private-window";
           "${mod}+grave" = "exec rofimoji";
