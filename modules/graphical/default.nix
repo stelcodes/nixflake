@@ -7,29 +7,6 @@
 
     hardware.graphics.enable = true;
 
-    security.polkit = {
-      debug = true;
-      extraConfig = /* javascript */ ''
-        // Log authorization checks
-        polkit.addRule(function(action, subject) {
-         polkit.log("user " +  subject.user + " is attempting action " + action.id + " from PID " + subject.pid);
-        });
-        // Allow rebuilds for admin user without password
-        polkit.addRule(function(action, subject) {
-          polkit.log("action=" + action);
-          polkit.log("subject=" + subject);
-          var wheel = subject.isInGroup("wheel");
-          var systemd = (action.id == "org.freedesktop.systemd1.manage-unit-files");
-          var rebuild = (action.lookup("unit") == "nixos-rebuild.service");
-          var verb = action.lookup("verb");
-          var acceptedVerb = (verb == "start" || verb == "stop" || verb == "restart");
-          if (wheel && systemd && rebuild && acceptedVerb) {
-            return polkit.Result.YES;
-          }
-        });
-      '';
-    };
-
     # As of 24.05 this is required to avoid having lightdm start automatically when services.xserver.enable = true
     systemd.services.display-manager.enable = config.services.xserver.autorun;
 
