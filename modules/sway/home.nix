@@ -197,6 +197,10 @@ in
             text = theme.fg;
           };
         };
+        gaps = {
+          inner = 2;
+          outer = 2;
+        };
         window = {
           hideEdgeBorders = "none";
           border = 1;

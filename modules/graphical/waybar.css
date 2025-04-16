@@ -37,7 +37,7 @@ window#waybar {
   background-color: @bgThree;
 }
 
-#workspaces button.active * {
+#workspaces button.current_output.visible.focused * , #workspaces button.active * {
   color: @bg;
 }
 

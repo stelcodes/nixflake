@@ -2,8 +2,11 @@
 // https://github.com/YaLTeR/niri/wiki/Configuration
 
 // https://github.com/YaLTeR/niri/wiki/Xwayland
-spawn-at-startup "xwayland-satellite"
-spawn-at-startup "swaybg"
+// Restart in case it's not the first session for this boot
+spawn-at-startup "systemctl" "--user" "restart" "swaybg.service"
+spawn-at-startup "systemctl" "--user" "restart" "waybar.service"
+spawn-at-startup "systemctl" "--user" "restart" "xwayland-satellite.service"
+
 prefer-no-csd
 screenshot-path "~/pictures/screenshots/screenshot-%Y-%m-%d-%H-%M-%S.png"
 
@@ -118,8 +121,8 @@ binds {
     Super+R { switch-preset-column-width; }
     Super+Shift+R { switch-preset-window-height; }
     Super+Ctrl+R { reset-window-height; }
-    Super+F { maximize-column; }
-    Super+Shift+F { fullscreen-window; }
+    Super+F { fullscreen-window; }
+    Super+Shift+F { maximize-column; }
     Super+Ctrl+F { expand-column-to-available-width; }
     Super+C { center-column; }
     Super+Space { switch-focus-between-floating-and-tiling; }
@@ -128,7 +131,7 @@ binds {
     Super+Print { screenshot-window; }
     Ctrl+Print { screenshot-screen; }
     // The quit action will show a confirmation dialog to avoid accidental exits.
-    Super+Ctrl+Escape { quit; }
+    Super+Shift+E { quit; }
     // Powers off the monitors. To turn them back on, do any input like moving the mouse or pressing any other key.
     Super+Shift+P { power-off-monitors; }
 }

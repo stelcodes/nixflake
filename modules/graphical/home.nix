@@ -268,7 +268,7 @@ in
         # GTK4 get_default_display was saying it was still X11
         systemd.enable = true;
         settings = [{
-          layer = "top";
+          layer = "bottom";
           position = "bottom";
           height = 20;
           margin = "0px 5px 5px 5px";
