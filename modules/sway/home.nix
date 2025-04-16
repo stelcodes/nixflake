@@ -89,6 +89,8 @@ let
       fi
     fi
   '';
+  browser = "${pkgs.librewolf}/bin/librewolf";
+  terminal = "${pkgs.kitty}/bin/kitty";
 in
 {
 
@@ -163,9 +165,6 @@ in
         pkgs.pavucontrol
         pkgs.audacious
       ]);
-      sessionVariables = {
-        GTK_THEME = theme.gtkThemeName; # For gnome calculator and nautilus on sway
-      };
       pointerCursor = {
         package = theme.cursorThemePackage;
         name = theme.cursorThemeName;
@@ -193,8 +192,9 @@ in
         # Forgot what graphical program is being run from systemd user service
         # Could use systemd.user.extraConfig = '''DefaultEnvironment="GDK_DPI_SCALE=-1"'''
         # systemctl --user import-environment GDK_DPI_SCALE
-        export TERMINAL=kitty
-        export BROWSER=firefox;
+        export TERMINAL=${terminal}
+        export BROWSER=${browser};
+        export GTK_THEME=${theme.gtkThemeName}; # For gnome calculator and nautilus on sway
       '';
       config = {
         fonts = {
@@ -295,12 +295,12 @@ in
           "--locked ${mod}+shift+o" = "output ${cfg.mainDisplay} toggle";
 
           # Custom external program keymaps
-          "${mod}+return" = "exec kitty ${launch-tmux}";
-          "${mod}+shift+return" = "exec kitty";
+          "${mod}+return" = "exec ${terminal} ${launch-tmux}";
+          "${mod}+shift+return" = "exec ${terminal}";
           "${mod}+d" = "exec wofi --show run --width 800 --height 400 --term kitty";
           "${mod}+shift+d" = "exec wofi --show drun --width 800 --height 400 --term kitty";
-          "${mod}+backspace" = "exec firefox";
-          "${mod}+shift+backspace" = "exec firefox --private-window";
+          "${mod}+backspace" = "exec ${browser}";
+          "${mod}+shift+backspace" = "exec ${browser} --private-window";
           "${mod}+grave" = "exec rofimoji";
           "${mod}+c" = "exec ${lib.getExe toggle-sway-window} --id nixos_rebuild_log --width 80 --height 80 -- ${viewRebuildLogCmd}";
           "${mod}+shift+c" = "exec systemctl --user start nixos-rebuild";
@@ -705,7 +705,7 @@ in
         longitude = "-124";
         temperature = {
           day = 7000;
-          night = 3000;
+          night = 4000;
         };
       };
 
@@ -1211,48 +1211,6 @@ in
         "audacious/internet-radio-stations.audpl".source = ../../misc/internet-radio-stations.audpl;
       };
     };
-
-    qt = {
-      # Necessary for keepassxc, qpwgrapgh, etc to theme correctly
-      enable = true;
-      platformTheme.name = "gtk";
-      style.name = "gtk2";
-    };
-
-    gtk = {
-      enable = true;
-      font = {
-        name = "FiraMono Nerd Font";
-        size = 10;
-      };
-      theme = {
-        name = theme.gtkThemeName;
-        package = theme.gtkThemePackage;
-      };
-      iconTheme = {
-        name = theme.iconThemeName;
-        package = theme.iconThemePackage;
-      };
-      gtk4.extraConfig.gtk-application-prefer-dark-theme = 1;
-    };
-
-    dconf.settings =
-      with lib.hm.gvariant;
-      let bind = x: mkArray type.string [ x ];
-      in
-      # dconf dump /org/cinnamon/ | dconf2nix | nvim -R
-      {
-        "org/virt-manager/virt-manager/connections" = {
-          autoconnect = [ "qemu:///system" ];
-          uris = [ "qemu:///system" ];
-        };
-        "org/gnome/desktop/interface" = {
-          color-scheme = "prefer-dark";
-        };
-        "org/gnome/desktop/wm/preferences" = {
-          button-layout = "appmenu:close"; # Only show close button
-        };
-      };
 
   };
 }
