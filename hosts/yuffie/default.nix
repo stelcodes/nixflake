@@ -41,21 +41,45 @@
   };
 
   environment.gnome.excludePackages = (with pkgs; [
-    atomix # puzzle game
-    cheese # webcam tool
-    epiphany # web browser
-    evince # document viewer
-    geary # email reader
-    gedit # text editor
+    # orca
+    # evince
+    # geary
+    # gnome-disk-utility
+    seahorse
+    # sushi
+    # gnome-shell-extensions
+    # adwaita-icon-theme
+    gnome-backgrounds
+    # gnome-bluetooth
+    # gnome-color-manager
+    # gnome-control-center
+    gnome-shell-extensions
+    gnome-tour # GNOME Shell detects the .desktop file on first log-in.
+    gnome-user-docs
+    # gnome-menus
+    # baobab
+    epiphany
+    gnome-text-editor
+    gnome-calculator
+    gnome-calendar
     gnome-characters
+    # gnome-clocks
+    gnome-console
+    gnome-contacts
+    gnome-font-viewer
+    gnome-logs
+    gnome-maps
     gnome-music
-    gnome-photos
-    gnome-terminal
-    gnome-tour
-    hitori # sudoku game
-    iagno # go game
-    tali # poker game
-    totem # video player
+    # gnome-system-monitor
+    gnome-weather
+    # loupe
+    # nautilus
+    gnome-connections
+    simple-scan
+    snapshot
+    totem
+    yelp
+    gnome-software
   ]);
 
   # Needed to create Rasp Pi SD images

@@ -16,6 +16,7 @@
       # pkgs.nfs-utils
       # pkgs.kodi-loaded
       # pkgs.jellyfin-media-player
+      # pkgs.rembg
     ];
   };
   wayland.windowManager.sway = {
