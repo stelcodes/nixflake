@@ -6,10 +6,13 @@ in
   config = lib.mkIf config.profile.graphical {
 
     home = {
-      packages = [
+      packages = lib.mkIf pkgs.stdenv.isLinux [
         # pkgs.material-icons # for mpv uosc
-        # pkgs.keepassxc
         # pkgs.mpv-unify # custom mpv python wrapper
+        pkgs.keepassxc
+        pkgs.ungoogled-chromium
+        pkgs.librewolf
+        pkgs.vlc
       ];
 
       # Need to create aliases because Launchbar doesn't look through symlinks.
