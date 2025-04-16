@@ -463,7 +463,38 @@ in
       };
     };
 
+
+    systemd.user.sockets = {
+      sov = {
+        Socket = {
+          ListenFIFO = "%t/sov.sock";
+          SocketMode = "0600";
+        };
+        Install = {
+          WantedBy = [ "sockets.target" ];
+        };
+      };
+    };
+
     systemd.user.services = {
+
+      sov = {
+        Unit = {
+          Description = "An overlay that shows schemas for all workspaces to make navigation in sway easier";
+          PartOf = [ "sway-session.target" ];
+          After = [ "sway-session.target" ];
+          Requires = [ "sov.socket" ];
+          ConditionEnvironment = "WAYLAND_DISPLAY";
+        };
+        Service = {
+          StandardInput = "socket";
+          ExecStart = "${pkgs.sov}/bin/sov";
+        };
+        Install = {
+          WantedBy = [ "sway-session.target" ];
+        };
+
+      };
 
       audacious = {
         Unit = {
