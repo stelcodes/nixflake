@@ -2,6 +2,38 @@
 let
   theme = config.theme.set;
   waycfg = config.wayland.windowManager;
+  sessionTargets = lib.foldAttrs
+    (acc: sessionName: deps: acc // {
+      "${sessionName}-session.target" = {
+        Unit =
+          let depsFull = lib.map (depName: "${depName}-${sessionName}.service") deps; in
+          {
+            BindsTo = [ "${sessionName}.service" ];
+            Wants = depsFull;
+          };
+      };
+    })
+    { }
+    waycfg.sessions;
+  sessionServices = lib.foldAttrs
+    (acc: sessionName: deps: acc // lib.lists.foldr
+      (depName: acc: acc //
+        {
+          "${depName}" = {
+            Install = lib.mkForce { };
+          };
+          "${depName}-${sessionName}" = {
+            Unit = config.systemd.user.services."${depName}".Unit // {
+              BindsTo = [ "${sessionName}-session.target" ];
+              After = [ "${sessionName}-session.target" ];
+            };
+            Service = config.systemd.user.services."${depName}".Service;
+          };
+        })
+      { }
+    )
+    { }
+    waycfg.sessions;
 in
 {
 
@@ -42,6 +74,21 @@ in
       browser = lib.mkOption {
         type = lib.types.nullOr lib.types.package;
         default = pkgs.librewolf;
+      };
+      sessions = lib.mkOption {
+        type = lib.types.attrsOf (lib.types.listOf lib.types.str);
+        default = {
+          niri = [
+            "swaybg"
+            "waybar"
+            "swayidle"
+            "network-manager-applet"
+            "blueman-applet"
+            "wlsunset"
+            "mako"
+            "wayland-pipewire-idle-inhibit"
+          ];
+        };
       };
     };
   };
@@ -398,19 +445,60 @@ in
 
     };
 
+
+    systemd.user.targets = lib.mkIf pkgs.stdenv.isLinux {
+      niri-session =
+        let
+          deps = [
+            "swaybg.service"
+            "waybar.service"
+            "swayidle.service"
+            "network-manager-applet.service"
+            "blueman-applet.service"
+            "wlsunset.service"
+            "mako.service"
+            "wayland-pipewire-idle-inhibit.service"
+          ];
+        in
+        {
+          Unit = {
+            BindsTo = [ "niri.service" ];
+            Wants = deps;
+            Before = deps;
+          };
+        };
+    };
+
     systemd.user.services = lib.mkIf pkgs.stdenv.isLinux {
       swaybg = lib.mkIf (waycfg.wallpaper != null) {
-        Unit = {
-          PartOf = [ "graphical-session.target" ];
-          After = [ "graphical-session.target" ];
-          Requisite = [ "graphical-session.target" ];
-        };
+        Unit.BindsTo = [ "niri-session.target" ];
         Service = {
           ExecStart = "${pkgs.swaybg}/bin/swaybg -m fill -i ${waycfg.wallpaper}";
         };
-        Install = {
-          WantedBy = [ "graphical-session.target" ];
-        };
+      };
+      waybar = {
+        Unit.BindsTo = [ "niri-session.target" ];
+        Install = lib.mkForce { };
+      };
+      swayidle = {
+        Unit.BindsTo = [ "niri-session.target" ];
+        Install = lib.mkForce { };
+      };
+      network-manager-applet = {
+        Unit.BindsTo = [ "niri-session.target" ];
+        Install = lib.mkForce { };
+      };
+      blueman-applet = {
+        Unit.BindsTo = [ "niri-session.target" ];
+        Install = lib.mkForce { };
+      };
+      wlsunset = {
+        Unit.BindsTo = [ "niri-session.target" ];
+        Install = lib.mkForce { };
+      };
+      mako = {
+        Unit.BindsTo = [ "niri-session.target" ];
+        Install = lib.mkForce { };
       };
       pomo-notify = {
         Unit = {

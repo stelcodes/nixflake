@@ -3,9 +3,10 @@
 
 // https://github.com/YaLTeR/niri/wiki/Xwayland
 // Restart in case it's not the first session for this boot
-spawn-at-startup "systemctl" "--user" "restart" "swaybg.service"
-spawn-at-startup "systemctl" "--user" "restart" "waybar.service"
-spawn-at-startup "systemctl" "--user" "restart" "xwayland-satellite.service"
+spawn-at-startup "bash" "-c" "dbus-update-activation-environment --systemd NIRI_SOCKET DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE NIXOS_OZONE_WL XCURSOR_THEME XCURSOR_SIZE; systemctl --user reset-failed && systemctl --user start niri-session.target"
+// spawn-at-startup "bash" "-c" "systemctl --user restart swaybg.service"
+// spawn-at-startup "bash" "-c" "systemctl --user restart waybar.service"
+// spawn-at-startup "bash" "-c" "systemctl --user restart xwayland-satellite.service"
 
 prefer-no-csd
 screenshot-path "~/pictures/screenshots/screenshot-%Y-%m-%d-%H-%M-%S.png"
