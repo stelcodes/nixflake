@@ -72,7 +72,7 @@
       ] ++ (lib.lists.optionals pkgs.stdenv.isLinux [
         pkgs.desktop-entries
         pkgs.toggle-service
-        inputs.nix-alien.packages.${pkgs.system}.nix-alien
+        # inputs.nix-alien.packages.${pkgs.system}.nix-alien
       ]) ++ (lib.lists.optionals config.activities.coding [
         pkgs.nix-prefetch-github
         pkgs.nixpkgs-fmt

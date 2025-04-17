@@ -22,11 +22,11 @@
       url = "github:Mic92/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-alien = {
-      url = "github:thiagokokada/nix-alien";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.nix-index-database.follows = "nix-index-database";
-    };
+    # nix-alien = {
+    #   url = "github:thiagokokada/nix-alien";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    #   inputs.nix-index-database.follows = "nix-index-database";
+    # };
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
