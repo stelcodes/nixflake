@@ -156,7 +156,7 @@ in
                 neogit.open()
               end
             end
-            vim.keymap.set('n', '<c-g>', toggle_neogit)
+            -- vim.keymap.set('n', '<c-g>', toggle_neogit)
           '';
         }
 
@@ -169,7 +169,23 @@ in
         }
 
         # TODO: Remove this eventually, just keeping in case I miss fugitive
-        plugins.vim-fugitive
+        {
+          plugin = plugins.vim-fugitive;
+          type = "lua";
+          config = /* lua */ ''
+            local toggle_fugitive = function()
+              if vim.bo.filetype == "fugitive" then
+                vim.cmd "wincmd q"
+              else
+                vim.cmd "tabnew"
+                vim.cmd "Git"
+                vim.cmd "only"
+              end
+            end
+            vim.keymap.set('n', '<c-g>', toggle_fugitive)
+            -- vim.keymap.set('n', '<leader>gD', '<cmd>Git difftool<cr>')
+          '';
+        }
 
         {
           plugin = plugins.yazi-nvim;
