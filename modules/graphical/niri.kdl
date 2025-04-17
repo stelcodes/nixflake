@@ -38,7 +38,7 @@ layout {
         proportion 0.66667
         proportion 1.0
     }
-    default-column-width { proportion 1.0; }
+    // default-column-width { proportion 1.0; }
     focus-ring {
         width 1
         active-color "#a7c080"
@@ -69,10 +69,13 @@ window-rule {
 binds {
     // Use wev to find key names
     Super+Shift+Slash { show-hotkey-overlay; }
-    Super+Return { spawn "kitty"; }
+    Super+Return { spawn "kitty" "tmux-startup"; }
+    Super+Shift+Return { spawn "kitty"; }
     Super+D { spawn "wofi"; }
     Super+Shift+D { spawn "wofi" "--show" "run"; }
     Super+Escape { spawn "swaylock"; }
+    Super+Backspace { spawn "librewolf"; }
+    Super+Shift+Backspace { spawn "librewolf" "--private-window"; }
     XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-"; }
     XF86AudioMute        allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
