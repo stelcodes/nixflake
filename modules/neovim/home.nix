@@ -226,26 +226,6 @@ in
         }
 
         {
-          plugin = plugins.flash-nvim;
-          type = "lua";
-          config = /* lua */ ''
-            local flash = require("flash")
-            flash.setup({
-              modes = {
-                search = {
-                  enabled = true
-                }
-              }
-            })
-            vim.keymap.set({ "n", "x", "o" }, "s", flash.jump)
-            vim.keymap.set({ "n", "x", "o" }, "S", flash.treesitter)
-            vim.keymap.set("o", "r", flash.remote)
-            vim.keymap.set({ "o", "x" }, "R", flash.treesitter_search)
-            vim.keymap.set({ "c" }, "<c-s>", flash.toggle)
-          '';
-        }
-
-        {
           # Required for telescope config
           plugin = plugins.trouble-nvim;
           type = "lua";
