@@ -76,27 +76,7 @@ in
       };
       sessions = lib.mkOption {
         type = lib.types.attrsOf (lib.types.listOf lib.types.str);
-        default = {
-          sway = [
-            "waybar"
-            "swayidle"
-            "network-manager-applet"
-            "polkit-gnome"
-            "blueman-applet"
-            "wlsunset"
-            "wayland-pipewire-idle-inhibit"
-          ];
-          niri = [
-            "swaybg"
-            "waybar"
-            "swayidle"
-            "network-manager-applet"
-            "polkit-gnome"
-            "blueman-applet"
-            "wlsunset"
-            "wayland-pipewire-idle-inhibit"
-          ];
-        };
+        default = { };
       };
     };
   };
@@ -659,6 +639,28 @@ in
         package = theme.iconThemePackage;
       };
       gtk4.extraConfig.gtk-application-prefer-dark-theme = 1;
+    };
+
+    wayland.windowManager.sessions = {
+      sway = [
+        "waybar"
+        "swayidle"
+        "network-manager-applet"
+        "polkit-gnome"
+        "blueman-applet"
+        "wlsunset"
+        "wayland-pipewire-idle-inhibit"
+      ];
+      niri = [
+        "swaybg"
+        "waybar"
+        "swayidle"
+        "network-manager-applet"
+        "polkit-gnome"
+        "blueman-applet"
+        "wlsunset"
+        "wayland-pipewire-idle-inhibit"
+      ];
     };
 
   };
