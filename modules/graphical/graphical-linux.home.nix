@@ -104,6 +104,7 @@ in
         pkgs.adwaita-icon-theme # for the two icons in the default wofi setup
         pkgs.rofimoji # Great associated word hints with extensive symbol lists to choose from
         pkgs.wdisplays
+        # pkgs.kooha # Doesn't work with niri atm
         # pkgs.wl-screenrec # https://github.com/russelltg/wl-screenrec
         # pkgs.wlogout
       ] ++ (lib.lists.optionals config.profile.audio [
