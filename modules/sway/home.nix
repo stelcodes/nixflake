@@ -127,7 +127,6 @@ in
         pkgs.qalculate-gtk
         pkgs.gnome-weather
       ] ++ (lib.lists.optionals config.profile.audio [
-        pkgs.pamixer
         pkgs.playerctl
         pkgs.helvum # better looking than qpwgraph
         pkgs.pavucontrol
@@ -295,13 +294,13 @@ in
 
           # Function key keymaps
           XF86MonBrightnessDown = "exec brightnessctl set 5%-";
-          XF86MonBrightnessUp = "exec brightnessctl set +5%";
+          XF86MonBrightnessUp = "exec brightnessctl set 5%+";
           XF86AudioPrev = "exec playerctl previous";
           XF86AudioPlay = "exec playerctl play-pause";
           XF86AudioNext = "exec playerctl next";
-          XF86AudioMute = "exec pamixer --toggle-mute";
-          XF86AudioLowerVolume = "exec pamixer --decrease 5";
-          XF86AudioRaiseVolume = "exec pamixer --increase 5";
+          XF86AudioMute = "exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+          XF86AudioLowerVolume = "exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-";
+          XF86AudioRaiseVolume = "exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+";
           "${mod}+Print" = "exec " + lib.getExe (pkgs.writeShellApplication {
             name = "sway-screenshot-selection";
             runtimeInputs = [ pkgs.coreutils-full pkgs.slurp pkgs.grim pkgs.swappy ];
