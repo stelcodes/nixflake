@@ -1,7 +1,7 @@
 { pkgs, config, lib, ... }:
 let theme = config.theme.set; in
 {
-  imports = [ ./linux-only.home.nix ];
+  imports = [ ./graphical-linux.home.nix ];
   config = lib.mkIf config.profile.graphical {
     home = {
       # Need to create aliases because Launchbar doesn't look through symlinks.

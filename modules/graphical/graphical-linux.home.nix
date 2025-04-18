@@ -115,7 +115,10 @@ in
       ]));
       sessionVariables = {
         TERMINAL = lib.getExe waycfg.terminal;
+        # https://chromium.googlesource.com/chromium/deps/xdg-utils/+/refs/heads/main/scripts/xdg-terminal#403
+        TERM = lib.getExe waycfg.terminal;
         BROWSER = lib.getExe waycfg.browser;
+        NIXOS_OZONE_WL = "1"; # Assuming all sessions are wayland, niri doesn't set this atm
       };
       pointerCursor = {
         package = theme.cursorThemePackage;
