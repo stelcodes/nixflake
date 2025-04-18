@@ -40,19 +40,15 @@
         };
       };
 
-      # Configure keymap in X11
-      xserver = {
-        enable = true;
-        xkb = {
-          layout = pkgs.lib.mkDefault "us";
-          variant = pkgs.lib.mkDefault "";
-          options = pkgs.lib.mkDefault "caps:escape_shifted_capslock,altwin:swap_alt_win";
-        };
+      # Set keyboard settings for raw linux terminal and ly
+      # Implicitly enabled by having a desktop manager enabled: nixos/modules/services/misc/graphical-desktop.nix
+      xserver.xkb = {
+        layout = pkgs.lib.mkDefault "us";
+        variant = pkgs.lib.mkDefault "";
+        options = pkgs.lib.mkDefault "caps:escape_shifted_capslock,altwin:swap_alt_win";
       };
 
       libinput.enable = true;
-
-      gnome.gnome-keyring.enable = true;
 
       spice-vdagentd.enable = config.profile.virtualHost;
     };
