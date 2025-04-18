@@ -35,7 +35,8 @@
         enable = true;
         # https://github.com/fairyglade/ly/blob/master/res/config.ini
         settings = {
-          animation = "matrix"; # doom matrix colormix
+          animation = "matrix"; # Options: doom matrix colormix
+          xinitrc = "null"; # Hides xinitrc session option
         };
       };
 
