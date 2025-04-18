@@ -2,36 +2,35 @@
 let
   theme = config.theme.set;
   waycfg = config.wayland.windowManager;
-  sessionTargets = lib.foldAttrs
+  sessionTargets = lib.foldlAttrs
     (acc: sessionName: deps: acc // {
-      "${sessionName}-session.target" = {
+      "${sessionName}-session" = {
         Unit =
-          let depsFull = lib.map (depName: "${depName}-${sessionName}.service") deps; in
+          let depsFull = lib.map (depName: "${depName}.service") deps; in
           {
-            BindsTo = [ "${sessionName}.service" ];
+            BindsTo = [ "graphical-session.target" ];
             Wants = depsFull;
+            Before = depsFull;
           };
       };
     })
     { }
     waycfg.sessions;
-  sessionServices = lib.foldAttrs
-    (acc: sessionName: deps: acc // lib.lists.foldr
-      (depName: acc: acc //
+  sessionServices = lib.foldlAttrs
+    (acc: sessionName: deps: acc // (lib.lists.foldl
+      (acc: depName: acc //
         {
           "${depName}" = {
-            Install = lib.mkForce { };
-          };
-          "${depName}-${sessionName}" = {
-            Unit = config.systemd.user.services."${depName}".Unit // {
-              BindsTo = [ "${sessionName}-session.target" ];
-              After = [ "${sessionName}-session.target" ];
+            Unit = {
+              BindsTo = lib.mkForce [ "graphical-session.target" ];
+              After = lib.mkForce [ "graphical-session.target" ];
             };
-            Service = config.systemd.user.services."${depName}".Service;
+            Install = lib.mkForce { };
           };
         })
       { }
-    )
+      deps
+    ))
     { }
     waycfg.sessions;
 in
@@ -78,14 +77,23 @@ in
       sessions = lib.mkOption {
         type = lib.types.attrsOf (lib.types.listOf lib.types.str);
         default = {
+          sway = [
+            "waybar"
+            "swayidle"
+            "network-manager-applet"
+            "polkit-gnome"
+            "blueman-applet"
+            "wlsunset"
+            "wayland-pipewire-idle-inhibit"
+          ];
           niri = [
             "swaybg"
             "waybar"
             "swayidle"
             "network-manager-applet"
+            "polkit-gnome"
             "blueman-applet"
             "wlsunset"
-            "mako"
             "wayland-pipewire-idle-inhibit"
           ];
         };
@@ -445,76 +453,31 @@ in
 
     };
 
+    systemd.user.targets = lib.mkIf pkgs.stdenv.isLinux sessionTargets;
 
-    systemd.user.targets = lib.mkIf pkgs.stdenv.isLinux {
-      niri-session =
-        let
-          deps = [
-            "swaybg.service"
-            "waybar.service"
-            "swayidle.service"
-            "network-manager-applet.service"
-            "blueman-applet.service"
-            "wlsunset.service"
-            "mako.service"
-            "wayland-pipewire-idle-inhibit.service"
-          ];
-        in
-        {
-          Unit = {
-            BindsTo = [ "niri.service" ];
-            Wants = deps;
-            Before = deps;
+    systemd.user.services = lib.mkIf pkgs.stdenv.isLinux (lib.mkMerge [
+      {
+        swaybg = lib.mkIf (waycfg.wallpaper != null) {
+          Service = {
+            ExecStart = "${pkgs.swaybg}/bin/swaybg -m fill -i ${waycfg.wallpaper}";
           };
         };
-    };
-
-    systemd.user.services = lib.mkIf pkgs.stdenv.isLinux {
-      swaybg = lib.mkIf (waycfg.wallpaper != null) {
-        Unit.BindsTo = [ "niri-session.target" ];
-        Service = {
-          ExecStart = "${pkgs.swaybg}/bin/swaybg -m fill -i ${waycfg.wallpaper}";
+        pomo-notify = {
+          Unit = {
+            Description = "pomo.sh notify daemon";
+          };
+          Service = {
+            Type = "simple";
+            ExecStart = "${pkgs.pomo}/bin/pomo notify";
+            Restart = "always";
+          };
+          Install = {
+            WantedBy = [ "default.target" ];
+          };
         };
-      };
-      waybar = {
-        Unit.BindsTo = [ "niri-session.target" ];
-        Install = lib.mkForce { };
-      };
-      swayidle = {
-        Unit.BindsTo = [ "niri-session.target" ];
-        Install = lib.mkForce { };
-      };
-      network-manager-applet = {
-        Unit.BindsTo = [ "niri-session.target" ];
-        Install = lib.mkForce { };
-      };
-      blueman-applet = {
-        Unit.BindsTo = [ "niri-session.target" ];
-        Install = lib.mkForce { };
-      };
-      wlsunset = {
-        Unit.BindsTo = [ "niri-session.target" ];
-        Install = lib.mkForce { };
-      };
-      mako = {
-        Unit.BindsTo = [ "niri-session.target" ];
-        Install = lib.mkForce { };
-      };
-      pomo-notify = {
-        Unit = {
-          Description = "pomo.sh notify daemon";
-        };
-        Service = {
-          Type = "simple";
-          ExecStart = "${pkgs.pomo}/bin/pomo notify";
-          Restart = "always";
-        };
-        Install = {
-          WantedBy = [ "default.target" ];
-        };
-      };
-
-    };
+      }
+      sessionServices
+    ]);
 
     services = lib.mkIf pkgs.stdenv.isLinux {
       network-manager-applet.enable = true;
