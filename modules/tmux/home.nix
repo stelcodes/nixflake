@@ -85,7 +85,7 @@ in
       set -sg escape-time 10
       set -g focus-events on
       set -g renumber-windows on
-      set -g update-environment "WAYLAND_DISPLAY XDG_CURRENT_DESKTOP SWAYSOCK I3SOCK DISPLAY"
+      set -g update-environment "WAYLAND_DISPLAY XDG_CURRENT_DESKTOP SWAYSOCK I3SOCK NIRI_SOCKET DISPLAY"
       set -g status on
       set -g status-interval 1
       set -g history-limit 8000
