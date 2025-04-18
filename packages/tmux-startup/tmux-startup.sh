@@ -1,5 +1,4 @@
 if tmux run &>/dev/null; then
-  tmux new-window -t sandbox:
   tmux new-session -As sandbox
 else
   tmux new-session -ds config -c "$HOME/.config/nixflake"
