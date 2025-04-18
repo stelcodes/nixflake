@@ -85,21 +85,18 @@ in
 
     home = {
       packages = ([
+        waycfg.terminal
+        waycfg.browser
         pkgs.material-icons # for mpv uosc
         # pkgs.mpv-unify # custom mpv python wrapper
         pkgs.keepassxc
-        pkgs.ungoogled-chromium
-        pkgs.librewolf
+        # pkgs.ungoogled-chromium
         pkgs.gnome-disk-utility
         pkgs.eog
         pkgs.qalculate-gtk
         pkgs.gnome-weather
         pkgs.font-manager
 
-        pkgs.xwayland-satellite
-        pkgs.swaybg
-        pkgs.swaylock
-        pkgs.swayidle
         pkgs.brightnessctl
         pkgs.wev
         pkgs.wl-clipboard
@@ -119,7 +116,6 @@ in
         TERMINAL = lib.getExe waycfg.terminal;
         BROWSER = lib.getExe waycfg.browser;
       };
-
     };
 
     xdg.configFile = {
@@ -224,7 +220,6 @@ in
           show-failed-attempts = true;
         };
       };
-
 
       waybar = {
         enable = true;
@@ -378,7 +373,12 @@ in
       {
         swaybg = lib.mkIf (waycfg.wallpaper != null) {
           Service = {
-            ExecStart = "${pkgs.swaybg}/bin/swaybg -m fill -i ${waycfg.wallpaper}";
+            ExecStart = "${lib.getExe pkgs.swaybg} -m fill -i ${waycfg.wallpaper}";
+          };
+        };
+        xwayland-satellite = {
+          Service = {
+            ExecStart = "${lib.getExe pkgs.xwayland-satellite} :01";
           };
         };
         pomo-notify = {
@@ -599,6 +599,7 @@ in
         "blueman-applet"
         "wlsunset"
         "wayland-pipewire-idle-inhibit"
+        "xwayland-satellite"
       ];
     };
 
