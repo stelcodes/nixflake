@@ -13,9 +13,11 @@
       # Need this for font-manager or any other gtk app to work I guess
       dconf.enable = true;
 
-      sway.enable = true;
+      file-roller.enable = true;
 
-      niri.enable = true;
+      sway.enable = lib.mkDefault true;
+
+      niri.enable = lib.mkDefault true;
 
       steam.enable = lib.mkIf config.activities.gaming true;
 
@@ -25,7 +27,7 @@
 
       # Enable CUPS to print documents.
       printing = {
-        enable = false; # Security nightmare, only enable if necessary
+        enable = lib.mkDefault false; # Security nightmare, only enable if necessary
         drivers = [
           pkgs.hplip
         ];
