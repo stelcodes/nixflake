@@ -110,6 +110,7 @@ in
         pkgs.playerctl
         pkgs.helvum # better looking than qpwgraph
         pkgs.pavucontrol
+        pkgs.sink-rotate # Rotate through available pipewire sinks
       ]));
 
       sessionVariables = {
@@ -259,7 +260,7 @@ in
             "clock"
           ];
           "custom/pomo" = {
-            format = "{} 󱎫";
+            format = "{} ⏱️";
             exec = "${pkgs.pomo}/bin/pomo clock";
             interval = 1;
             on-click = "${pkgs.pomo}/bin/pomo pause";
@@ -297,7 +298,7 @@ in
             });
           };
           "custom/wlsunset" = {
-            exec = "if systemctl --user --quiet is-active wlsunset.service; then echo ''; else echo ''; fi";
+            exec = "if systemctl --user --quiet is-active wlsunset.service; then echo '🌙'; else echo '☀️'; fi";
             interval = 2;
             on-click = "${lib.getExe pkgs.toggle-service} wlsunset";
           };
@@ -319,13 +320,13 @@ in
             interval = 30;
             format = "{percentage_used} ";
           };
-          wireplumber = {
+          wireplumber = lib.mkIf config.profile.audio {
             format = "{node_name} {volume} {icon}";
             format-muted = "{volume} ";
             format-icons = { default = [ "" "" ]; };
-            on-click = "pavucontrol";
-            on-click-right = "cycle-pulse-sink";
-            on-click-middle = "helvum";
+            on-click = lib.getExe pkgs.pavucontrol;
+            on-click-right = lib.getExe pkgs.sink-rotate;
+            on-click-middle = lib.getExe pkgs.helvum;
             max-volume = 100;
             scroll-step = 5;
           };
