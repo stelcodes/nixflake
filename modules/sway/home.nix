@@ -97,49 +97,6 @@ in
 
   config = lib.mkIf (config.profile.graphical && pkgs.stdenv.isLinux) {
 
-    home = {
-      packages = [
-        pkgs.swaylock
-        pkgs.swayidle
-        pkgs.brightnessctl
-        pkgs.libinput
-        pkgs.wev
-        pkgs.font-manager
-        pkgs.wl-clipboard
-        pkgs.wofi
-        pkgs.adwaita-icon-theme # for the two icons in the default wofi setup
-        pkgs.wlsunset
-        pkgs.grim
-        pkgs.slurp
-        pkgs.rofimoji # Great associated word hints with extensive symbol lists to choose from
-        pkgs.wtype
-        pkgs.libnotify
-        pkgs.pomo
-        pkgs.wdisplays
-        pkgs.swappy
-        # pkgs.wl-screenrec # https://github.com/russelltg/wl-screenrec
-        # pkgs.wlogout
-
-        # System tooling
-        pkgs.gnome-disk-utility
-        # Media tooling
-        pkgs.eog
-        pkgs.qalculate-gtk
-        pkgs.gnome-weather
-      ] ++ (lib.lists.optionals config.profile.audio [
-        pkgs.playerctl
-        pkgs.helvum # better looking than qpwgraph
-        pkgs.pavucontrol
-        pkgs.audacious
-      ]);
-      pointerCursor = {
-        package = theme.cursorThemePackage;
-        name = theme.cursorThemeName;
-        size = 32;
-        gtk.enable = true;
-      };
-    };
-
     wayland.windowManager.sway = {
       enable = true;
       wrapperFeatures.gtk = true;
@@ -436,89 +393,6 @@ in
     };
 
     systemd.user.services = {
-
-      audacious = {
-        Unit = {
-          Description = "audacious music player";
-        };
-        Service = {
-          ExecStart = lib.getExe pkgs.audacious;
-          ExecStartPost = "-${pkgs.sway}/bin/swaymsg for_window [app_id=audacious] move scratchpad";
-          Restart = "on-failure";
-        };
-      };
-
-      nixos-rebuild = {
-        Service = {
-          Type = "exec";
-          ExecStart = lib.getExe (pkgs.writeShellApplication {
-            name = "nixos-rebuild-exec-start";
-            runtimeInputs = [ pkgs.coreutils-full pkgs.nixos-rebuild pkgs.systemd pkgs.mpv ];
-            text = ''
-              notify_success() {
-                notify-send "NixOS rebuild successful"
-                { mpv ${pkgs.success-alert} || true; } &
-                sleep 5 && kill -9 "$!"
-              }
-              notify_failure() {
-                notify-send --urgency=critical "NixOS rebuild failed"
-                { mpv ${pkgs.failure-alert} || true; } &
-                sleep 5 && kill -9 "$!"
-              }
-              if systemctl start nixos-rebuild.service; then
-                while systemctl -q is-active nixos-rebuild.service; do
-                  sleep 1
-                done
-                if systemctl -q is-failed nixos-rebuild.service; then
-                  notify_failure
-                else
-                  notify_success
-                fi
-              else
-                notify_failure
-              fi
-            '';
-          });
-        };
-      };
-
-      btop = {
-        Unit = {
-          Description = "Btop system resource dashboard";
-        };
-        Service = {
-          ExecStart = "${lib.getExe pkgs.kitty} --app-id=btop ${lib.getExe pkgs.btop}";
-          ExecStartPost = "-${pkgs.sway}/bin/swaymsg for_window [app_id=btop] move scratchpad";
-          Restart = "always";
-        };
-        Install = {
-          WantedBy = [ "sway-session.target" ];
-        };
-      };
-
-      # swayidle.Service.ExecStop = lib.getExe (pkgs.writeShellApplication {
-      #   name = "swayidle-cleanup";
-      #   runtimeInputs = [ pkgs.coreutils ];
-      #   text = ''
-      #     BLOCKFILE="$HOME/.local/share/idle-sleep-block"
-      #     if test -f "$BLOCKFILE"; then
-      #       rm "$BLOCKFILE"
-      #     fi
-      #   '';
-      # });
-
-      syncthing-tray = lib.mkIf systemConfig.services.syncthing.enable {
-        Unit = {
-          Description = "Simple tray for syncthing file sync service";
-        };
-        Service = {
-          ExecStart = "${lib.getExe pkgs.syncthing-tray} -api '${systemConfig.services.syncthing.settings.gui.apikey}'";
-          Restart = "always";
-        };
-        Install = {
-          WantedBy = [ "sway-session.target" ];
-        };
-      };
 
       record-playback = lib.mkIf config.profile.audio {
         Unit = {

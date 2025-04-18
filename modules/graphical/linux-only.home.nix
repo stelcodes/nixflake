@@ -112,10 +112,15 @@ in
         pkgs.pavucontrol
         pkgs.sink-rotate # Rotate through available pipewire sinks
       ]));
-
       sessionVariables = {
         TERMINAL = lib.getExe waycfg.terminal;
         BROWSER = lib.getExe waycfg.browser;
+      };
+      pointerCursor = {
+        package = theme.cursorThemePackage;
+        name = theme.cursorThemeName;
+        size = 32;
+        gtk.enable = true;
       };
     };
 
@@ -389,10 +394,6 @@ in
           Service = {
             Type = "simple";
             ExecStart = "${pkgs.pomo}/bin/pomo notify";
-            Restart = "always";
-          };
-          Install = {
-            WantedBy = [ "default.target" ];
           };
         };
       }
@@ -590,6 +591,7 @@ in
         "blueman-applet"
         "wlsunset"
         "wayland-pipewire-idle-inhibit"
+        "pomo-notify"
       ];
       niri = [
         "swaybg"
@@ -600,6 +602,7 @@ in
         "blueman-applet"
         "wlsunset"
         "wayland-pipewire-idle-inhibit"
+        "pomo-notify"
         "xwayland-satellite"
       ];
     };
