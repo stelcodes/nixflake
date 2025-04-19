@@ -220,4 +220,5 @@ self: super: {
   convert-audio = super.callPackage ./convert-audio { };
   rekordbox-add = super.callPackage ./rekordbox-add { };
   mpv-unify = super.callPackage ./mpv-unify { };
+  pam-parallel = super.callPackage ./pam-parallel { };
 }
