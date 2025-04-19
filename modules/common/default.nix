@@ -46,60 +46,11 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
       };
     };
 
-    systemd = {
-      extraConfig = ''
-        [Manager]
-        DefaultTimeoutStopSec=10
-        DefaultTimeoutAbortSec=10
-      '';
-      user.services.collect-user-garbage = {
-        restartIfChanged = false;
-        startAt = "wednesday";
-        wantedBy = [ "default.target" ];
-        script = "${pkgs.nix}/bin/nix-collect-garbage --delete-older-than 30d";
-      };
-      services = {
-        nixos-rebuild = {
-          restartIfChanged = false;
-          serviceConfig = {
-            Type = "exec";
-            ExecStart = lib.getExe (pkgs.writeShellApplication {
-              name = "nixos-rebuild";
-              runtimeInputs = [ pkgs.coreutils pkgs.iputils pkgs.nixos-rebuild pkgs.git ];
-              text = ''
-                flake_dir="/home/${config.admin.username}/.config/nixflake"
-                flags=("--option" "eval-cache" "false")
-                stderr() { printf "%s\n" "$*" >&2; }
-                printf "╔════════════════════════════════════════════════════╗\n"
-                printf "║                                                    ║\n"
-                printf "║  ░█▄░█░█░▀▄▀░▄▀▄░▄▀▀░▒░▒█▀▄▒██▀░██▄░█▒█░█░█▒░░█▀▄  ║\n"
-                printf "║  ░█▒▀█░█░█▒█░▀▄▀▒▄██░▀▀░█▀▄░█▄▄▒█▄█░▀▄█░█▒█▄▄▒█▄▀  ║\n"
-                printf "║                                                    ║\n"
-                printf "╚════════════════════════════════════════════════════╝\n"
-                if [ ! -d "$flake_dir" ] || [ ! -f "$flake_dir/flake.nix" ]; then
-                  stderr "Flake directory: '$flake_dir' is not valid"
-                  exit 1
-                fi
-
-                if ping -c 1 -W 2 1.1.1.1 &>/dev/null; then
-                  printf "Network is up, substituters engaged 🌎"
-                else
-                  printf "Network is down, off-grid mode activated 🚫"
-                  # This actually causes massive rebuilds so I'm disabling it
-                  # flags+=("--option" "substitute" "false")
-                fi
-
-                if ! nixos-rebuild "''${flags[@]}" switch --flake "$flake_dir#"; then
-                  stderr "Something went wrong 🤔❌"
-                  exit 1
-                fi
-                printf "New NixOS generation created 🥳🌲"
-              '';
-            });
-          };
-        };
-      };
-    };
+    systemd.extraConfig = ''
+      [Manager]
+      DefaultTimeoutStopSec=10
+      DefaultTimeoutAbortSec=10
+    '';
 
     # Set your time zone.
     time.timeZone = lib.mkDefault "America/Los_Angeles";
@@ -178,13 +129,7 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
         enable = true;
         settings = builtins.fromTOML (builtins.readFile ../../misc/starship.toml);
       };
-      nix-ld.enable = config.activities.coding;
-      git = {
-        enable = true;
-        config = {
-          safe.directory = "/home/${config.admin.username}/.config/nixflake/.git";
-        };
-      };
+      git.enable = true;
     };
 
     environment = {
@@ -221,7 +166,7 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
         lidSwitch = "ignore";
         extraConfig = ''
           # Don’t shutdown when power button is short-pressed
-          HandlePowerKey=suspend-then-hibernate
+          HandlePowerKey=hybrid-sleep
           HandlePowerKeyLongPress=poweroff
           InhibitDelayMaxSec=10
         '';
@@ -235,12 +180,6 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
           PasswordAuthentication = false;
           KbdInteractiveAuthentication = false;
         };
-      };
-
-      # TODO: Only enable this for local physical computers
-      avahi = {
-        enable = true;
-        nssmdns4 = true; # allow local applications to resolve `local.` domains using avahi.
       };
 
     };
