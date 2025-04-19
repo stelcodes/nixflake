@@ -34,7 +34,11 @@ tele.setup {
       -- Hack to clear search highlights when telescope is opened
       vim.fn.setreg("/", "")
       return vim.o.winblend
-    end
+    end,
+    mappings = {
+      i = { ["<c-q>"] = actions.smart_send_to_qflist },
+      n = { ["<c-q>"] = actions.smart_send_to_qflist },
+    }
   },
   extensions = {
     fzf = {
