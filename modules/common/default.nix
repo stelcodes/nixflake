@@ -46,11 +46,17 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
       };
     };
 
-    systemd.extraConfig = ''
-      [Manager]
-      DefaultTimeoutStopSec=10
-      DefaultTimeoutAbortSec=10
-    '';
+    systemd = {
+      extraConfig = ''
+        [Manager]
+        DefaultTimeoutStopSec=10
+        DefaultTimeoutAbortSec=10
+      '';
+      sleep.extraConfig = ''
+        MemorySleepMode=deep s2idle
+        HibernateDelaySec=1h
+      '';
+    };
 
     # Set your time zone.
     time.timeZone = lib.mkDefault "America/Los_Angeles";
@@ -162,15 +168,11 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
       # Nice to have, required for gnome-disks to work
       udisks2.enable = true;
 
-      logind = {
-        lidSwitch = "ignore";
-        extraConfig = ''
-          # Don’t shutdown when power button is short-pressed
-          HandlePowerKey=hybrid-sleep
-          HandlePowerKeyLongPress=poweroff
-          InhibitDelayMaxSec=10
-        '';
-      };
+      logind.extraConfig = ''
+        HandleLidSwitch=ignore
+        HandlePowerKey=sleep
+        HandlePowerKeyLongPress=poweroff
+      '';
 
       resolved.enable = true;
 
