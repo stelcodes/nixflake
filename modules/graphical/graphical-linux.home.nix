@@ -176,6 +176,35 @@ in
           show=drun
         '';
         "wofi/style.css".source = ./wofi.css;
+        "gajim/theme/default.css".text = ''
+          .gajim-outgoing-nickname {
+              color: ${theme.magenta};
+          }
+          .gajim-incoming-nickname {
+              color: ${theme.yellow};
+          }
+          .gajim-url {
+              color: ${theme.blue};
+          }
+          .gajim-status-online {
+              color: ${theme.green};
+          }
+          .gajim-status-away {
+              color: ${theme.red};
+          }
+        '';
+        "swappy/config".text = ''
+          [Default]
+          save_dir=$XDG_PICTURES_DIR/screenshots
+          save_filename_format=swappy-%FT%X.png
+          show_panel=false
+          line_size=5
+          text_size=20
+          text_font=sans-serif
+          paint_mode=brush
+          early_exit=true
+          fill_shape=false
+        '';
         "pomo.cfg" = {
           onChange = ''
             ${pkgs.systemd}/bin/systemctl --user restart pomo-notify.service
@@ -216,7 +245,7 @@ in
             POMO_BREAK_TIME=5
           '';
         };
-      };
+      } // (if config.theme.set ? gtkConfigFiles then config.theme.set.gtkConfigFiles else { }); #catppuccin
       portal = {
         # https://mozilla.github.io/webrtc-landing/gum_test.html
         enable = true;
@@ -429,6 +458,7 @@ in
     systemd.user.targets = sessionTargets;
 
     systemd.user.services = (lib.mkMerge [
+      sessionServices
       {
         swayidle = {
           Service.ExecStopPost = lib.getExe (pkgs.writeShellApplication {
@@ -452,8 +482,46 @@ in
             ExecStart = "${pkgs.pomo}/bin/pomo notify";
           };
         };
+        record-playback = lib.mkIf config.profile.audio {
+          Unit = {
+            Description = "playback recording from default pulseaudio monitor";
+          };
+          Service = {
+            RuntimeMaxSec = 500;
+            Type = "forking";
+            ExecStart = lib.getExe (pkgs.writeShellApplication {
+              name = "record-playback-exec-start";
+              runtimeInputs = [ pkgs.pulseaudio pkgs.coreutils-full pkgs.libnotify ];
+              text = ''
+                SAVEDIR="''${XDG_DATA_HOME:-$HOME/.local/share}/record-playback"
+                mkdir -p "$SAVEDIR"
+                SAVEPATH="$SAVEDIR/$(date +%Y-%m-%dT%H:%M:%S%Z).wav"
+                notify-send "Starting audio recording..."
+                parecord --device=@DEFAULT_MONITOR@ "$SAVEPATH" &
+              '';
+            });
+            ExecStop = lib.getExe (pkgs.writeShellApplication {
+              name = "record-playback-exec-stop";
+              text = ''
+                # The last couple seconds of audio gets lost so wait a lil bit before killing
+                sleep 2 && kill -INT "$MAINPID"
+              '';
+            });
+            ExecStopPost = lib.getExe (pkgs.writeShellApplication {
+              name = "record-playback-exec-stop-post";
+              runtimeInputs = [ pkgs.libnotify ];
+              text = ''
+                if [ "$EXIT_STATUS" -eq 0 ]; then
+                  notify-send "Stopped recording successfully"
+                else
+                  notify-send --urgency=critical "Recording failed"
+                fi
+              '';
+            });
+            Restart = "no";
+          };
+        };
       }
-      sessionServices
     ]);
 
     services = {

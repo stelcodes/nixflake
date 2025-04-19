@@ -117,8 +117,6 @@ in
         # Forgot what graphical program is being run from systemd user service
         # Could use systemd.user.extraConfig = '''DefaultEnvironment="GDK_DPI_SCALE=-1"'''
         # systemctl --user import-environment GDK_DPI_SCALE
-        export TERMINAL=${terminal}
-        export BROWSER=${browser};
         export GTK_THEME=${theme.gtkThemeName}; # For gnome calculator and nautilus on sway
       '';
       config = {
@@ -224,12 +222,12 @@ in
           "--locked ${mod}+shift+o" = "output ${waycfg.mainDisplay} toggle";
 
           # Custom external program keymaps
-          "${mod}+return" = "exec ${terminal} ${launch-tmux}";
-          "${mod}+shift+return" = "exec ${terminal}";
+          "${mod}+return" = "exec ${lib.getExe waycfg.terminal} ${lib.getExe pkgs.tmux-startup}";
+          "${mod}+shift+return" = "exec ${lib.getExe waycfg.terminal}";
           "${mod}+shift+d" = "exec wofi --show run --width 800 --height 400 --term kitty";
           "${mod}+d" = "exec wofi --show drun --width 800 --height 400 --term kitty";
-          "${mod}+backspace" = "exec ${browser}";
-          "${mod}+shift+backspace" = "exec ${browser} --private-window";
+          "${mod}+backspace" = "exec ${lib.getExe waycfg.browser}";
+          "${mod}+shift+backspace" = "exec ${lib.getExe waycfg.browser} --private-window";
           "${mod}+grave" = "exec rofimoji";
           "${mod}+c" = "exec ${lib.getExe toggle-sway-window} --id nixos_rebuild_log --width 80 --height 80 -- ${viewRebuildLogCmd}";
           "${mod}+shift+c" = "exec systemctl --user start nixos-rebuild";
@@ -391,105 +389,5 @@ in
         };
       };
     };
-
-    systemd.user.services = {
-
-      record-playback = lib.mkIf config.profile.audio {
-        Unit = {
-          Description = "playback recording from default pulseaudio monitor";
-        };
-        Service = {
-          RuntimeMaxSec = 500;
-          Type = "forking";
-          ExecStart = lib.getExe (pkgs.writeShellApplication {
-            name = "record-playback-exec-start";
-            runtimeInputs = [ pkgs.pulseaudio pkgs.coreutils-full pkgs.libnotify ];
-            text = ''
-              SAVEDIR="''${XDG_DATA_HOME:-$HOME/.local/share}/record-playback"
-              mkdir -p "$SAVEDIR"
-              SAVEPATH="$SAVEDIR/$(date +%Y-%m-%dT%H:%M:%S%Z).wav"
-              notify-send "Starting audio recording..."
-              parecord --device=@DEFAULT_MONITOR@ "$SAVEPATH" &
-            '';
-          });
-          ExecStop = lib.getExe (pkgs.writeShellApplication {
-            name = "record-playback-exec-stop";
-            text = ''
-              # The last couple seconds of audio gets lost so wait a lil bit before killing
-              sleep 2 && kill -INT "$MAINPID"
-            '';
-          });
-          ExecStopPost = lib.getExe (pkgs.writeShellApplication {
-            name = "record-playback-exec-stop-post";
-            runtimeInputs = [ pkgs.libnotify ];
-            text = ''
-              if [ "$EXIT_STATUS" -eq 0 ]; then
-                notify-send "Stopped recording successfully"
-              else
-                notify-send --urgency=critical "Recording failed"
-              fi
-            '';
-          });
-          Restart = "no";
-        };
-      };
-
-    };
-
-    xdg = {
-      desktopEntries = {
-        neovim = {
-          name = "Neovim";
-          genericName = "Text Editor";
-          exec =
-            let
-              app = pkgs.writeShellScript "neovim-terminal" ''
-                # Killing kitty from sway results in non-zero exit code which triggers
-                # xdg-mime to use next valid entry, so we must always exit successfully
-                kitty -- nvim "$1" || true
-              '';
-            in
-            "${app} %U";
-          terminal = false;
-          categories = [ "Utility" "TextEditor" ];
-          mimeType = [ "text/markdown" "text/plain" "text/javascript" ];
-        };
-      };
-
-      configFile = {
-        "gajim/theme/nord.css".text = ''
-          .gajim-outgoing-nickname {
-              color: ${theme.magenta};
-          }
-          .gajim-incoming-nickname {
-              color: ${theme.yellow};
-          }
-          .gajim-url {
-              color: ${theme.blue};
-          }
-          .gajim-status-online {
-              color: ${theme.green};
-          }
-          .gajim-status-away {
-              color: ${theme.red};
-          }
-        '';
-        "swappy/config".text = ''
-          [Default]
-          save_dir=$XDG_PICTURES_DIR/screenshots
-          save_filename_format=swappy-%FT%X.png
-          show_panel=false
-          line_size=5
-          text_size=20
-          text_font=sans-serif
-          paint_mode=brush
-          early_exit=true
-          fill_shape=false
-        '';
-
-      } // (if config.theme.set ? gtkConfigFiles then config.theme.set.gtkConfigFiles else { });
-
-    };
-
   };
 }
