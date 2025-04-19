@@ -12,17 +12,19 @@
       # pkgs.signal-desktop
       # pkgs.retroarch-loaded
       # pkgs.sshfs
-      # pkgs.gimp-with-plugins
       # pkgs.nfs-utils
       # pkgs.kodi-loaded
-      # pkgs.jellyfin-media-player
       # pkgs.rembg
+      pkgs.ungoogled-chromium
+      pkgs.gimp-with-plugins
+      pkgs.jellyfin-media-player
+      pkgs.musicpod
     ];
   };
   wayland.windowManager = {
     mainDisplay = "eDP-1";
     sleep = {
-      preferredType = "suspend-then-hibernate";
+      preferredType = "hybrid-sleep";
       lockBefore = true;
       auto = {
         enable = true;
