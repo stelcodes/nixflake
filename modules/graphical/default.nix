@@ -13,13 +13,9 @@
       # Need this for font-manager or any other gtk app to work I guess
       dconf.enable = true;
 
-      file-roller.enable = true;
-
       sway.enable = lib.mkDefault true;
 
       niri.enable = lib.mkDefault true;
-
-      steam.enable = lib.mkIf config.activities.gaming true;
 
     };
 
@@ -62,22 +58,6 @@
         # https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/data/fonts/nerdfonts/shas.nix
         pkgs.nerd-fonts.fira-mono
       ];
-    };
-
-    xdg = {
-      portal = {
-        enable = true;
-        # gtkUsePortal = true;
-        # xdgOpenUsePortal = true;
-        # wlr.enable = true;
-        extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-wlr ];
-        # https://github.com/emersion/xdg-desktop-portal-wlr?tab=readme-ov-file#running
-        config.sway = {
-          default = "gtk";
-          "org.freedesktop.impl.portal.Screenshot" = "wlr";
-          "org.freedesktop.impl.portal.ScreenCast" = "wlr";
-        };
-      };
     };
 
     # xserver.desktopManager.gnome.enable = true;

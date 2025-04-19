@@ -2,6 +2,19 @@
 let
   theme = config.theme.set;
   waycfg = config.wayland.windowManager;
+  inhibitIdleFile = "$HOME/.local/state/inhibit-idle";
+  toggle-inhibit-idle = pkgs.writeShellApplication {
+    name = "toggle-inhibit-idle";
+    runtimeInputs = [ pkgs.coreutils-full ];
+    text = ''
+      file="${inhibitIdleFile}"
+      if test -f "$file"; then
+        rm "$file"
+      else
+        touch "$file"
+      fi
+    '';
+  };
   sessionTargets = lib.foldlAttrs
     (acc: sessionName: deps: acc // {
       "${sessionName}-session" = {
@@ -33,6 +46,19 @@ let
     ))
     { }
     waycfg.sessions;
+  # https://gitlab.gnome.org/GNOME/glib/-/blob/2.76.2/gio/gdesktopappinfo.c#L2701-2713
+  # Might require xdg-desktop-portal-gnome as default xdg-open method
+  xdg-terminal-exec = pkgs.writeShellApplication {
+    name = "xdg-terminal-exec";
+    text = ''
+      if command -v "$TERMINAL" &> /dev/null; then
+        "$TERMINAL" "$@"
+      else
+        printf "TERMINAL not set" >&2
+        exit 1
+      fi
+    '';
+  };
 in
 {
 
@@ -45,7 +71,7 @@ in
       sleep = {
         preferredType = lib.mkOption {
           type = lib.types.enum [ "suspend" "hibernate" "hybrid-sleep" "suspend-then-hibernate" "poweroff" ];
-          default = "suspend-then-hibernate";
+          default = "hybrid-sleep";
         };
         lockBefore = lib.mkOption {
           type = lib.types.bool;
@@ -86,17 +112,17 @@ in
     home = {
       packages = ([
         waycfg.terminal
+        xdg-terminal-exec
         waycfg.browser
         pkgs.material-icons # for mpv uosc
         # pkgs.mpv-unify # custom mpv python wrapper
         pkgs.keepassxc
-        # pkgs.ungoogled-chromium
         pkgs.gnome-disk-utility
         pkgs.eog
         pkgs.qalculate-gtk
         pkgs.gnome-weather
         pkgs.font-manager
-
+        pkgs.file-roller
         pkgs.brightnessctl
         pkgs.wev
         pkgs.wl-clipboard
@@ -104,6 +130,7 @@ in
         pkgs.adwaita-icon-theme # for the two icons in the default wofi setup
         pkgs.rofimoji # Great associated word hints with extensive symbol lists to choose from
         pkgs.wdisplays
+        pkgs.libnotify # for notify-send
         # pkgs.kooha # Doesn't work with niri atm
         # pkgs.wl-screenrec # https://github.com/russelltg/wl-screenrec
         # pkgs.wlogout
@@ -115,74 +142,92 @@ in
       ]));
       sessionVariables = {
         TERMINAL = lib.getExe waycfg.terminal;
-        # https://chromium.googlesource.com/chromium/deps/xdg-utils/+/refs/heads/main/scripts/xdg-terminal#403
-        TERM = lib.getExe waycfg.terminal;
         BROWSER = lib.getExe waycfg.browser;
-        NIXOS_OZONE_WL = "1"; # Assuming all sessions are wayland, niri doesn't set this atm
       };
       pointerCursor = {
         package = theme.cursorThemePackage;
         name = theme.cursorThemeName;
-        size = 32;
+        size = 24;
         gtk.enable = true;
       };
     };
 
-    xdg.configFile = {
-      "niri/config.kdl".source = ./niri.kdl;
-      "rofimoji.rc".text = /* ini */ ''
-        action = copy
-        selector = wofi
-        files = [emojis]
-        skin-tone = neutral
-      '';
-      "wofi/config".text = /* ini */ ''
-        allow_images=true
-        width=800
-        height=400
-        term=kitty
-        show=drun
-      '';
-      "wofi/style.css".source = ./wofi.css;
-      "pomo.cfg" = {
-        onChange = ''
-          ${pkgs.systemd}/bin/systemctl --user restart pomo-notify.service
+    xdg = {
+      configFile = {
+        # "niri/config.kdl".source = ./niri.kdl;
+        "niri/config.kdl".source = pkgs.writeTextFile {
+          name = "config.kdl";
+          checkPhase = ''
+            ${lib.getExe pkgs.niri} validate --config "$out"
+          '';
+          text = builtins.readFile ./niri.kdl;
+        };
+        "rofimoji.rc".text = /* ini */ ''
+          action = copy
+          selector = wofi
+          files = [emojis]
+          skin-tone = neutral
         '';
-        source = pkgs.writeShellScript "pomo-cfg" ''
-          # This file gets sourced by pomo.sh at startup
-          # I'm only caring about linux atm
-          function lock_screen {
-            if ${pkgs.procps}/bin/pgrep sway 2>&1 > /dev/null; then
-              echo "Sway detected"
-              # Only lock if pomo is still running
-              test -f "$HOME/.local/share/pomo" && ${pkgs.swaylock}/bin/swaylock
-              # Only restart pomo if pomo is still running
-              test -f "$HOME/.local/share/pomo" && ${pkgs.pomo}/bin/pomo start
-            fi
-          }
-
-          function custom_notify {
-              # send_msg is defined in the pomo.sh source
-              block_type=$1
-              if [[ $block_type -eq 0 ]]; then
-                  echo "End of work period"
-                  send_msg 'End of a work period. Locking Screen!'
-                  ${pkgs.playerctl}/bin/playerctl --all-players pause
-                  ${pkgs.mpv}/bin/mpv ${pkgs.pomo-alert} || sleep 10
-                  lock_screen &
-              elif [[ $block_type -eq 1 ]]; then
-                  echo "End of break period"
-                  send_msg 'End of a break period. Time for work!'
-                  ${pkgs.mpv}/bin/mpv ${pkgs.pomo-alert}
-              else
-                  echo "Unknown block type"
-                  exit 1
+        "wofi/config".text = /* ini */ ''
+          allow_images=true
+          width=800
+          height=400
+          term=kitty
+          show=drun
+        '';
+        "wofi/style.css".source = ./wofi.css;
+        "pomo.cfg" = {
+          onChange = ''
+            ${pkgs.systemd}/bin/systemctl --user restart pomo-notify.service
+          '';
+          source = pkgs.writeShellScript "pomo-cfg" ''
+            # This file gets sourced by pomo.sh at startup
+            # I'm only caring about linux atm
+            function lock_screen {
+              if ${pkgs.procps}/bin/pgrep sway 2>&1 > /dev/null; then
+                echo "Sway detected"
+                # Only lock if pomo is still running
+                test -f "$HOME/.local/share/pomo" && ${pkgs.swaylock}/bin/swaylock
+                # Only restart pomo if pomo is still running
+                test -f "$HOME/.local/share/pomo" && ${pkgs.pomo}/bin/pomo start
               fi
-          }
-          POMO_MSG_CALLBACK="custom_notify"
-          POMO_WORK_TIME=30
-          POMO_BREAK_TIME=5
-        '';
+            }
+
+            function custom_notify {
+                # send_msg is defined in the pomo.sh source
+                block_type=$1
+                if [[ $block_type -eq 0 ]]; then
+                    echo "End of work period"
+                    send_msg 'End of a work period. Locking Screen!'
+                    ${pkgs.playerctl}/bin/playerctl --all-players pause
+                    ${pkgs.mpv}/bin/mpv ${pkgs.pomo-alert} || sleep 10
+                    lock_screen &
+                elif [[ $block_type -eq 1 ]]; then
+                    echo "End of break period"
+                    send_msg 'End of a break period. Time for work!'
+                    ${pkgs.mpv}/bin/mpv ${pkgs.pomo-alert}
+                else
+                    echo "Unknown block type"
+                    exit 1
+                fi
+            }
+            POMO_MSG_CALLBACK="custom_notify"
+            POMO_WORK_TIME=30
+            POMO_BREAK_TIME=5
+          '';
+        };
+      };
+      portal = {
+        # https://mozilla.github.io/webrtc-landing/gum_test.html
+        enable = true;
+        xdgOpenUsePortal = true;
+        extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-wlr pkgs.xdg-desktop-portal-gnome ];
+        config.sway = {
+          default = "gtk";
+          "org.freedesktop.impl.portal.Screenshot" = "wlr";
+          "org.freedesktop.impl.portal.ScreenCast" = "wlr";
+        };
+        configPackages = [ pkgs.niri ];
       };
     };
 
@@ -255,7 +300,7 @@ in
             "tray"
             "custom/pomo"
             "custom/wlsunset"
-            "custom/idlesleep"
+            "custom/inhibitidle"
           ];
           modules-center = [ "sway/mode" "sway/workspaces" "niri/workspaces" ];
           modules-right = [
@@ -288,23 +333,22 @@ in
               '';
             });
           };
-          "custom/idlesleep" = {
+          "custom/inhibitidle" = {
             format = "{}";
             max-length = 2;
             interval = 2;
-            exec = ''if test -f "$HOME/.local/share/idle-sleep-block"; then echo '🐝'; else echo '🕸️'; fi'';
-            on-click = lib.getExe (pkgs.writeShellApplication {
-              name = "toggle-idle-sleep-block";
-              runtimeInputs = [ pkgs.coreutils ];
+            exec = lib.getExe (pkgs.writeShellApplication {
+              name = "display-wayland-inhibit-idle";
+              runtimeInputs = [ pkgs.coreutils-full ];
               text = ''
-                BLOCKFILE="$HOME/.local/share/idle-sleep-block"
-                if test -f "$BLOCKFILE"; then
-                  rm "$BLOCKFILE"
+                if test -f "${inhibitIdleFile}"; then
+                  printf '☕';
                 else
-                  touch "$BLOCKFILE"
+                  printf '💤';
                 fi
               '';
             });
+            on-click = lib.getExe toggle-inhibit-idle;
           };
           "custom/wlsunset" = {
             exec = "if systemctl --user --quiet is-active wlsunset.service; then echo '🌙'; else echo '☀️'; fi";
@@ -373,28 +417,36 @@ in
           statusbar-bg = theme.bg1;
           statusbar-fg = theme.fg;
         };
+        mappings = {
+          "<Up>" = "navigate previous";
+          "<Left>" = "navigate previous";
+          "<Down>" = "navigate next";
+          "<Right>" = "navigate next";
+        };
       };
-
     };
 
     systemd.user.targets = sessionTargets;
 
     systemd.user.services = (lib.mkMerge [
       {
+        swayidle = {
+          Service.ExecStopPost = lib.getExe (pkgs.writeShellApplication {
+            name = "swayidle-cleanup";
+            runtimeInputs = [ pkgs.coreutils-full ];
+            text = ''
+              rm "${inhibitIdleFile}" || true
+            '';
+          });
+        };
         swaybg = lib.mkIf (waycfg.wallpaper != null) {
-          Service = {
-            ExecStart = "${lib.getExe pkgs.swaybg} -m fill -i ${waycfg.wallpaper}";
-          };
+          Service.ExecStart = "${lib.getExe pkgs.swaybg} -m fill -i ${waycfg.wallpaper}";
         };
         xwayland-satellite = {
-          Service = {
-            ExecStart = "${lib.getExe pkgs.xwayland-satellite} :01";
-          };
+          Service.ExecStart = "${lib.getExe pkgs.xwayland-satellite} :12";
         };
         pomo-notify = {
-          Unit = {
-            Description = "pomo.sh notify daemon";
-          };
+          Unit.Description = "pomo.sh notify daemon";
           Service = {
             Type = "simple";
             ExecStart = "${pkgs.pomo}/bin/pomo notify";
@@ -408,6 +460,7 @@ in
       network-manager-applet.enable = true;
       blueman-applet.enable = true;
       polkit-gnome.enable = true;
+      gnome-keyring.enable = true;
       swayidle = {
         enable = true;
         # Waits for commands to finish (-w) by default
@@ -442,18 +495,17 @@ in
           {
             timeout = waycfg.sleep.auto.idleMinutes * 60;
             command = lib.getExe (pkgs.writeShellApplication {
-              name = "swayidle-sleepy-sleep";
-              runtimeInputs = [ pkgs.coreutils-full pkgs.systemd pkgs.playerctl pkgs.gnugrep pkgs.acpi pkgs.swaylock ];
+              name = "swayidle-idle-sleep";
+              runtimeInputs = [ pkgs.coreutils-full pkgs.systemd ];
               text = ''
-                set -x
-                if test -f "$HOME/.local/share/idle-sleep-block"; then
-                  echo "Restarting service because of idle-sleep-block file"
+                if test -f "${inhibitIdleFile}"; then
+                  printf "Restarting timer because %s exists" "${inhibitIdleFile}"
                   systemctl --restart swayidle.service
-                elif acpi --ac-adapter | grep -q "on-line"; then
-                  echo "Restarting service because laptop is plugged in"
+                elif ${lib.getExe' pkgs.pmutils "on_ac_power"}; then
+                  printf "Restarting timer because machine is plugged in"
                   systemctl --restart swayidle.service
                 else
-                  echo "Idle timeout reached. Night night."
+                  printf "Idle timeout reached. Night night."
                   systemctl ${waycfg.sleep.preferredType}
                 fi
               '';
@@ -490,6 +542,7 @@ in
           margin=20
           outer-margin=0,0,45,0
           background-color=${theme.bg}
+          text-color=${theme.fg}
 
           [urgency=low]
           border-color=${theme.blue}
@@ -596,6 +649,7 @@ in
         "wlsunset"
         "wayland-pipewire-idle-inhibit"
         "pomo-notify"
+        "gnome-keyring"
       ];
       niri = [
         "swaybg"
@@ -607,6 +661,7 @@ in
         "wlsunset"
         "wayland-pipewire-idle-inhibit"
         "pomo-notify"
+        "gnome-keyring"
         "xwayland-satellite"
       ];
     };

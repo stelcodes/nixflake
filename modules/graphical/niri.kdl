@@ -3,10 +3,13 @@
 
 // https://github.com/YaLTeR/niri/wiki/Xwayland
 // Restart in case it's not the first session for this boot
-spawn-at-startup "bash" "-c" "dbus-update-activation-environment --systemd NIRI_SOCKET DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE NIXOS_OZONE_WL XCURSOR_THEME XCURSOR_SIZE; systemctl --user reset-failed && systemctl --user start niri-session.target"
-// spawn-at-startup "bash" "-c" "systemctl --user restart swaybg.service"
-// spawn-at-startup "bash" "-c" "systemctl --user restart waybar.service"
-// spawn-at-startup "bash" "-c" "systemctl --user restart xwayland-satellite.service"
+environment {
+    DISPLAY ":12" // xwayland-satellite
+    ELECTRON_OZONE_PLATFORM_HINT "wayland"
+    QT_QPA_PLATFORM "wayland"
+    NIXOS_OZONE_WL "1"
+}
+spawn-at-startup "bash" "-c" "systemctl --user reset-failed && systemctl --user start niri-session.target"
 
 prefer-no-csd
 screenshot-path "~/pictures/screenshots/screenshot-%Y-%m-%d-%H-%M-%S.png"
@@ -27,6 +30,13 @@ input {
         click-method "clickfinger"
     }
     focus-follows-mouse max-scroll-amount="10%"
+}
+
+// https://github.com/YaLTeR/niri/wiki/Configuration:-Switch-Events
+switch-events {
+    // Should automatically handle monitor on/off for internal monitor soon
+    lid-close { spawn "bash" "-c" "niri msg action power-off-monitors; playerctl --all-players pause; swaylock -f"; }
+    lid-open { spawn "bash" "-c" "niri msg action power-on-monitors"; }
 }
 
 layout {
@@ -65,10 +75,24 @@ window-rule {
     match app-id=r#"^org\.keepassxc\.KeePassXC$"#
     block-out-from "screen-capture"
 }
+// Block out mako notifications from screencasts.
+layer-rule {
+    match namespace="^notifications$"
+    block-out-from "screen-capture"
+}
 // Enable rounded corners for all windows.
 window-rule {
     geometry-corner-radius 8
     clip-to-geometry true
+}
+window-rule {
+    match title="^btop$"
+    match app-id="^kitty$" // Necessary for some reason? ;-;
+    open-maximized true
+}
+window-rule {
+    match app-id="^qalculate-gtk$"
+    default-window-height { fixed 500; }
 }
 
 binds {
@@ -78,6 +102,7 @@ binds {
     Super+Shift+Return { spawn "kitty"; }
     Super+D { spawn "wofi"; }
     Super+Shift+D { spawn "wofi" "--show" "run"; }
+    Super+E { spawn "rofimoji"; }
     Super+Escape { spawn "swaylock"; }
     Super+Backspace { spawn "librewolf"; }
     Super+Shift+Backspace { spawn "librewolf" "--private-window"; }
