@@ -47,6 +47,7 @@ lspconfig.rust_analyzer.setup {}
 lspconfig.nil_ls.setup {
   settings = {
     ['nil'] = {
+      autoArchive = true,
       formatting = {
         command = { "nixpkgs-fmt" },
       },
