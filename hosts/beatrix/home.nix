@@ -11,7 +11,6 @@
 
   wayland.windowManager.sway = {
     sleep = {
-      preferredType = "suspend";
       lockBefore = false;
       auto.enable = false;
     };

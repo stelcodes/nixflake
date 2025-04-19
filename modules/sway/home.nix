@@ -38,7 +38,7 @@ let
     else
       swaymsg output eDP-1 power off
       playerctl --all-players pause
-      systemctl ${waycfg.sleep.preferredType}
+      systemctl sleep
     fi
   '';
   handle-sway-lid-off = pkgs.writers.writeBash "handle-sway-lid-off" ''
@@ -217,7 +217,7 @@ in
           "${mod}+shift+r" = "reload; exec systemctl --user restart waybar";
           "${mod}+shift+e" = "exec swaynag -t warning -m 'Do you really want to exit sway?' -b 'Yes, exit sway' 'swaymsg exit'";
           "${mod}+shift+s" = "sticky toggle";
-          "--locked ${mod}+shift+delete" = "exec systemctl ${waycfg.sleep.preferredType}";
+          "--locked ${mod}+shift+delete" = "exec systemctl sleep";
           "--locked ${mod}+o" = "output ${waycfg.mainDisplay} power toggle";
           "--locked ${mod}+shift+o" = "output ${waycfg.mainDisplay} toggle";
 

@@ -69,10 +69,6 @@ in
         default = "eDP-1";
       };
       sleep = {
-        preferredType = lib.mkOption {
-          type = lib.types.enum [ "suspend" "hibernate" "hybrid-sleep" "suspend-then-hibernate" "poweroff" ];
-          default = "hybrid-sleep";
-        };
         lockBefore = lib.mkOption {
           type = lib.types.bool;
           default = true;
@@ -574,7 +570,7 @@ in
                   systemctl --restart swayidle.service
                 else
                   printf "Idle timeout reached. Night night."
-                  systemctl ${waycfg.sleep.preferredType}
+                  systemctl sleep
                 fi
               '';
             });

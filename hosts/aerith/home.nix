@@ -13,7 +13,6 @@
   wayland.windowManager.sway = {
     mainDisplay = "eDP-1";
     sleep = {
-      preferredType = "hybrid-sleep";
       lockBefore = false;
       auto = {
         enable = true;

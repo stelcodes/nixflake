@@ -24,7 +24,6 @@
   wayland.windowManager = {
     mainDisplay = "eDP-1";
     sleep = {
-      preferredType = "hybrid-sleep";
       lockBefore = true;
       auto = {
         enable = true;

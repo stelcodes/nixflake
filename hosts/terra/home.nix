@@ -61,7 +61,6 @@
     ];
     mainDisplay = "DP-1";
     sleep = {
-      preferredType = "hybrid-sleep";
       lockBefore = false;
       auto = {
         enable = true;
