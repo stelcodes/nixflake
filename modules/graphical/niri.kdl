@@ -30,6 +30,7 @@ input {
         click-method "clickfinger"
     }
     focus-follows-mouse max-scroll-amount="10%"
+    disable-power-key-handling
 }
 
 // https://github.com/YaLTeR/niri/wiki/Configuration:-Switch-Events

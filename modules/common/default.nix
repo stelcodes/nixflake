@@ -168,11 +168,11 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
       # Nice to have, required for gnome-disks to work
       udisks2.enable = true;
 
-      logind.extraConfig = ''
-        HandleLidSwitch=ignore
-        HandlePowerKey=sleep
-        HandlePowerKeyLongPress=poweroff
-      '';
+      logind = {
+        lidSwitch = "ignore";
+        powerKey = "sleep";
+        powerKeyLongPress = "poweroff";
+      };
 
       resolved.enable = true;
 
