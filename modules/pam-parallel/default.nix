@@ -19,17 +19,30 @@ in
         default = "One";
       };
       methods = lib.mkOption {
-        type = lib.attrsOf (lib.types.submodule
-          {
-            description = lib.mkOption {
-              type = lib.types.str;
+        type = lib.types.attrsOf
+          (lib.types.submodule {
+            options = {
+              description = lib.mkOption {
+                type = lib.types.str;
+              };
+              rule = lib.mkOption {
+                type = lib.types.str;
+              };
             };
-            rule = lib.mkOption {
-              type = lib.types.str;
+          });
+        default = { };
+        example = lib.literalExample ''
+          {
+            fprint = {
+              description = "Fingerprint";
+              rule = "auth sufficient ''${pkgs.fprintd}/lib/security/pam_fprintd.so";
+            };
+            password = {
+              description = "Password";
+              rule = "auth sufficient ''${config.security.pam.package}/lib/security/pam_unix.so likeauth nullok try_first_pass";
             };
           }
-        );
-        default = { };
+        '';
       };
     };
 
