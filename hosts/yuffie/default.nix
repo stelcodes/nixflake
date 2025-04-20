@@ -26,11 +26,6 @@
   # Needed to create Rasp Pi SD images
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
-  # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.initrd.systemd.enable = true;
-
   networking = {
     firewall = {
       allowedTCPPorts = [ ];

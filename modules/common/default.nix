@@ -21,17 +21,14 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
   config = {
 
     boot = {
-      tmp.cleanOnBoot = true;
-      # nixos-hardware tends to use lib.mkDefault for kernelPackages (RaspPi 3 for example)
+      tmp.cleanOnBoot = true; # using tmpfs has implications on hibernation
       # By default, NixOS uses latest LTS kernel, see https://www.kernel.org/category/releases.html
-      # kernelPackages = lib.mkOverride 999 pkgs.linuxPackages_6_6;
-
-
-      # These boot loader settings are the only thing in new configuration.nix files
+      # kernelPackages = pkgs.linuxPackages_6_6;
       loader = lib.mkIf (!config.profile.virtual) {
         systemd-boot.enable = lib.mkDefault true;
         efi.canTouchEfiVariables = lib.mkDefault true;
       };
+      initrd.systemd.enable = lib.mkDefault true; # For booting from hibernation with encrypted swap
     };
 
     # Enable networking
