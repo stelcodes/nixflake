@@ -56,35 +56,39 @@
   ];
 
   # Attempt to make pam-parallel work, but I can't figure it out
-  # security.pam.services =
-  #   let
-  #     settings = builtins.toJSON
-  #       {
-  #         mode = "One";
-  #         modules = { pam_fprintd = "Fingerprint"; login = "Password"; };
-  #       };
-  #     serviceCfg = service: {
-  #       rules.auth = {
-  #         pam-parallel = {
-  #           order = config.security.pam.services.swaylock.rules.auth.fprintd.order - 10;
-  #           control = "sufficient";
-  #           modulePath = "${pkgs.pam-parallel}/lib/security/pam_parallel.so";
-  #           args = [
-  #             "debug"
-  #             settings
-  #           ];
-  #         };
-  #       };
-  #     };
-  #   in
-  #   lib.flip lib.genAttrs serviceCfg [
-  #     "sudo"
-  #     "su"
-  #     "swaylock"
-  #     "ly"
-  #     "login"
-  #     "passwd"
-  #   ];
+  security.pam.services =
+    let
+      settings = builtins.toJSON
+        {
+          mode = "One";
+          modules = { pam_fprintd = "Fingerprint"; login = "Password"; };
+        };
+      serviceCfg = service: {
+        rules.auth = {
+          pam-parallel = {
+            order = config.security.pam.services.swaylock.rules.auth.fprintd.order - 10;
+            control = "sufficient";
+            modulePath = "${pkgs.pam-parallel}/lib/security/pam_parallel.so";
+            args = [
+              settings
+            ];
+          };
+        };
+      };
+    in
+    (lib.flip lib.genAttrs serviceCfg [
+      "swaylock"
+      "ly"
+    ]) // {
+      login.fprintAuth = false;
+      pam_fprintd = {
+        rules.auth.fprintd = {
+          enable = true;
+          control = "sufficient";
+          modulePath = "${config.services.fprintd.package}/lib/security/pam_fprintd.so";
+        };
+      };
+    };
 
   system.stateVersion = "24.11";
 
