@@ -59,6 +59,11 @@ let
       fi
     '';
   };
+  pw-rotate-sink = pkgs.writeShellApplication {
+    name = "pw-rotate-sink";
+    runtimeInputs = [ pkgs.coreutils-full pkgs.jq pkgs.wireplumber pkgs.pipewire ];
+    text = builtins.readFile ./pw-rotate-sink.sh;
+  };
 in
 {
 
@@ -134,7 +139,7 @@ in
         pkgs.playerctl
         pkgs.helvum # better looking than qpwgraph
         pkgs.pavucontrol
-        pkgs.sink-rotate # Rotate through available pipewire sinks
+        pw-rotate-sink
       ]));
       sessionVariables = {
         TERMINAL = lib.getExe waycfg.terminal;
@@ -402,8 +407,8 @@ in
             format = "{node_name} {volume} {icon}";
             format-muted = "{volume} ";
             format-icons = { default = [ "" "" ]; };
-            on-click = lib.getExe pkgs.pavucontrol;
-            on-click-right = lib.getExe pkgs.sink-rotate;
+            on-click = lib.getExe pw-rotate-sink;
+            on-click-right = lib.getExe pkgs.pavucontrol;
             on-click-middle = lib.getExe pkgs.helvum;
             max-volume = 100;
             scroll-step = 5;
