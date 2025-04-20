@@ -7,11 +7,10 @@
         options = "--delete-older-than 30d";
       };
       settings = {
-        # auto-optimise-store = true;
+        auto-optimise-store = false; # HM/MacOS doesn't like this?
         experimental-features = [ "nix-command" "flakes" ];
-        # For cross compilation, not sure if necessary
-        # extra-platforms = config.boot.binfmt.emulatedSystems;
-        flake-registry = "${inputs.flake-registry}/flake-registry.json";
+        flake-registry = ""; # Disable global flake registry
+        keep-outputs = true; # Keep build artifacts around to avoid rebuilding
       };
       extraOptions = ''
         warn-dirty = false
