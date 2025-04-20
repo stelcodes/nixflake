@@ -60,6 +60,37 @@
     "d /srv/multimedia 2770 root multimedia -"
   ];
 
+  # Attempt to make pam-parallel work, but I can't figure it out
+  # security.pam.services =
+  #   let
+  #     settings = builtins.toJSON
+  #       {
+  #         mode = "One";
+  #         modules = { pam_fprintd = "Fingerprint"; login = "Password"; };
+  #       };
+  #     serviceCfg = service: {
+  #       rules.auth = {
+  #         pam-parallel = {
+  #           order = config.security.pam.services.swaylock.rules.auth.fprintd.order - 10;
+  #           control = "sufficient";
+  #           modulePath = "${pkgs.pam-parallel}/lib/security/pam_parallel.so";
+  #           args = [
+  #             "debug"
+  #             settings
+  #           ];
+  #         };
+  #       };
+  #     };
+  #   in
+  #   lib.flip lib.genAttrs serviceCfg [
+  #     "sudo"
+  #     "su"
+  #     "swaylock"
+  #     "ly"
+  #     "login"
+  #     "passwd"
+  #   ];
+
   system.stateVersion = "24.11";
 
 }
