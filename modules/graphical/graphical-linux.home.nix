@@ -259,6 +259,27 @@ in
         };
         configPackages = [ pkgs.niri ];
       };
+      mimeApps = {
+        enable = true;
+        # Works with xdgOpenUsePortal true or false
+        defaultApplications =
+          let
+            browser = [ "librewolf.desktop" ];
+            archiver = [ "org.gnome.FileRoller.desktop" ];
+            imageViewer = [ "org.gnome.eog.desktop" ];
+            musicPlayer = [ "audacious.desktop" ];
+            videoPlayer = [ "mpv.desktop" ];
+            documentViewer = [ "org.pwmt.zathura.desktop" ];
+            textEditor = [ "neovim.desktop" ];
+          in
+          {
+            "application/http" = browser;
+            "application/https" = browser;
+            "text/html" = browser;
+            "x-scheme-handler/http" = browser;
+            "x-scheme-handler/https" = browser;
+          };
+      };
     };
 
     programs = {
