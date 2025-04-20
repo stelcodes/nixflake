@@ -16,6 +16,7 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
     ../audio
     ../bluetooth
     ../virtualisation
+    ../pam-parallel
   ];
 
   config = {
