@@ -61,7 +61,7 @@ in
             order = cfg.order;
             control = "sufficient";
             modulePath = "${pkgs.pam-parallel}/lib/security/pam_parallel.so";
-            args = [ jsonSettings ];
+            args = [ "debug" jsonSettings ];
           };
         };
       in
