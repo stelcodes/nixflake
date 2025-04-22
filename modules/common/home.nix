@@ -355,7 +355,7 @@
             sc = "systemctl";
             scu = "systemctl --user";
             jc = "journalctl -exf --unit"; # Using --unit for better completion
-            jcu = "journalctl --user -exf --unit"; # Using --unit for better completion
+            jcu = "journalctl -exf --user-unit"; # Using --user-unit for better completion
             u = "udisksctl";
             rebuild_ = "systemctl start --user nixos-rebuild.service";
             sway = "exec systemd-cat --identifier=sway sway";
