@@ -178,17 +178,6 @@
         nix-direnv.enable = true;
       };
 
-      pistol = {
-        enable = true;
-        associations = [
-          { mime = "audio/*"; command = "exiftool -S -title -duration -artist -album -albumartist -tracknumber -track -date* -year -catalog -label -publisher -genre -samplesize -bitspersample -samplerate -audiobitrate -flacbitrate -picturemimetype -mimetype -comment %pistol-filename%"; }
-          { mime = "video/*"; command = "exiftool -S -title -duration -date* -videoframerate -imagewidth -imageheight -mimetype -description %pistol-filename%"; }
-          { mime = "image/*"; command = "exiftool -S -imagesize -megapixels -mimetype %pistol-filename%"; }
-          { mime = "inode/directory"; command = "eza -la --color always %pistol-filename%"; }
-          { mime = "application/epub+zip"; command = "bk --meta %pistol-filename%"; }
-        ];
-      };
-
       tealdeer = {
         enable = true;
         settings.updates.auto_update = true; # Uses cache for 30 days
