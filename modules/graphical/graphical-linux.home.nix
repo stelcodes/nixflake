@@ -352,6 +352,7 @@ in
             "custom/pomo"
             "custom/wlsunset"
             "custom/inhibitidle"
+            "custom/recordplayback"
           ];
           modules-center = [ "sway/mode" "sway/workspaces" "niri/workspaces" ];
           modules-right = [
@@ -359,7 +360,6 @@ in
             "backlight"
             "battery"
           ] ++ (lib.lists.optionals config.profile.audio [
-            "custom/recordplayback"
             "wireplumber"
           ]) ++ [
             "clock"

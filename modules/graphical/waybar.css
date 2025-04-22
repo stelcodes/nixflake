@@ -1,9 +1,8 @@
 /* Debug via env GTK_DEBUG=interactive waybar */
-
 * {
   font-family: "FiraMono Nerd Font", sans-serif;
-  font-size: 12px;
-  min-height: 0;
+  font-size: 13px;
+  min-height: 22px;
   color: @fg;
   border-radius: 12px;
 }
@@ -13,15 +12,24 @@ window#waybar {
 }
 
 .modules-left, .modules-center, .modules-right {
-  padding: 0 6px;
+  padding: 3px 7px;
   background-color: @bg;
-  padding: 5px 10px;
+}
+
+.modules-right * {
+  padding: 0 10px;
+}
+
+.modules-left *, .modules-center * {
+  padding: 0 5px;
 }
 
 #workspaces button {
-  padding: 4px 8px 3px 8px;
-  margin: 0 4px;
-  min-width: 30px;
+  padding: 0;
+}
+
+#workspaces button:not(:last-child) {
+  margin-right: 6px;
 }
 
 /* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
@@ -43,42 +51,4 @@ window#waybar {
 
 #workspaces button.urgent {
   background-color: @red;
-}
-
-#mode {
-  padding: 5px 10px;
-  background-color: @bg;
-}
-
-#tray {
-  padding: 5px 10px;
-  background-color: @bg;
-}
-
-#idle_inhibitor,
-#battery,
-#backlight,
-#cpu,
-#network,
-#custom-rebuild,
-#clock,
-#custom-pomo,
-#disk,
-#memory,
-#temperature,
-#wireplumber,
-#mpd {
-  padding: 0 10px;
-  margin: 0;
-}
-
-#custom-wlsunset,
-#bluetooth,
-#custom-swayidle {
-  padding: 0 10px 0 0;
-}
-
-#window,
-#workspaces {
-  margin: 0 0px;
 }
