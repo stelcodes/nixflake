@@ -221,4 +221,29 @@ self: super: {
   rekordbox-add = super.callPackage ./rekordbox-add { };
   mpv-unify = super.callPackage ./mpv-unify { };
   pam-parallel = super.callPackage ./pam-parallel { };
+  writePythonApplication =
+    # My own custom python writer that uses ruff instead of flake8. Name collision purposefully avoided.
+    { name
+    , libraries ? [ ]
+    , checkIgnore ? [ ]
+    , doCheck ? true
+    , text
+    }@args:
+    let
+      python = super.python3;
+      ignoreAttribute =
+        super.lib.optionalString (checkIgnore != [ ])
+          "--ignore ${super.lib.concatMapStringsSep "," super.lib.escapeShellArg checkIgnore}";
+    in
+    super.writers.makeScriptWriter
+      {
+        interpreter = (python.withPackages (ps: libraries)).interpreter;
+        check = super.lib.optionalString doCheck (
+          super.writers.writeDash "pythoncheck.sh" ''
+            exec ${super.ruff}/bin/ruff check ${ignoreAttribute} "$1"
+          ''
+        );
+      }
+      "/bin/${name}"
+      text;
 }
