@@ -15,6 +15,10 @@ let
       fi
     '';
   };
+  niri-adjust-scale = pkgs.writePythonApplication {
+    name = "niri-adjust-scale";
+    text = builtins.readFile ./niri-adjust-scale.py;
+  };
   sessionTargets = lib.foldlAttrs
     (acc: sessionName: deps: acc // {
       "${sessionName}-session" = {
@@ -135,6 +139,7 @@ in
         # pkgs.kooha # Doesn't work with niri atm
         # pkgs.wl-screenrec # https://github.com/russelltg/wl-screenrec
         # pkgs.wlogout
+        niri-adjust-scale
       ] ++ (lib.lists.optionals config.profile.audio [
         pkgs.playerctl
         pkgs.helvum # better looking than qpwgraph
