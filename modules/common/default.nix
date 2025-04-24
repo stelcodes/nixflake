@@ -22,26 +22,25 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
   config = {
 
     boot = {
-      tmp.cleanOnBoot = true; # using tmpfs has implications on hibernation
+      tmp.cleanOnBoot = !config.profile.virtual; # Only for physical machines
+      tmp.useTmpfs = config.profile.virtual; # Technically better option but has weird implications on hibernation bc tmpfs occupies mem/swap
       # By default, NixOS uses latest LTS kernel, see https://www.kernel.org/category/releases.html
       # kernelPackages = pkgs.linuxPackages_6_6;
-      loader = lib.mkIf (!config.profile.virtual) {
-        systemd-boot.enable = lib.mkDefault true;
-        efi.canTouchEfiVariables = lib.mkDefault true;
+      loader = {
+        systemd-boot.enable = true;
+        efi.canTouchEfiVariables = true;
       };
-      initrd.systemd.enable = lib.mkDefault true; # For booting from hibernation with encrypted swap
+      initrd.systemd.enable = true; # For booting from hibernation with encrypted swap
     };
 
     # Enable networking
     networking = {
+      enableIPv6 = true;
       networkmanager = {
-        enable = true;
+        enable = !config.profile.virtual; # Only for physical machines
         dns = "systemd-resolved";
       };
-      hosts = {
-        "127.0.0.1" = [ "lh" ];
-        "192.168.0.98" = [ "terra" ];
-      };
+      dhcpcd.enable = !config.profile.virtual; # Manual recommends disabling when using networkd
     };
 
     systemd = {
@@ -54,6 +53,9 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
         MemorySleepMode=deep s2idle
         HibernateDelaySec=1h
       '';
+      network = {
+        enable = config.profile.virtual;
+      };
     };
 
     # Set your time zone.
@@ -161,7 +163,7 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
 
     services = {
 
-      fwupd.enable = lib.mkDefault (!config.profile.virtual);
+      fwupd.enable = !config.profile.virtual;
 
       # Nice to have, required for gnome-disks to work
       udisks2.enable = true;
@@ -184,11 +186,7 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
 
     };
 
-    hardware = {
-      enableRedistributableFirmware = (!config.profile.virtual);
-      cpu.intel.updateMicrocode = (!config.profile.virtual && pkgs.system == "x86_64-linux");
-      cpu.amd.updateMicrocode = (!config.profile.virtual);
-    };
+    hardware.enableRedistributableFirmware = !config.profile.virtual;
 
     home-manager = {
       useGlobalPkgs = true;
