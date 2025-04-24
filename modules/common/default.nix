@@ -27,20 +27,21 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
       # By default, NixOS uses latest LTS kernel, see https://www.kernel.org/category/releases.html
       # kernelPackages = pkgs.linuxPackages_6_6;
       loader = {
-        systemd-boot.enable = true;
-        efi.canTouchEfiVariables = true;
+        grub.enable = config.profile.virtual;
+        systemd-boot.enable = !config.profile.virtual;
+        efi.canTouchEfiVariables = !config.profile.virtual;
       };
-      initrd.systemd.enable = true; # For booting from hibernation with encrypted swap
+      initrd.systemd.enable = !config.profile.virtual; # For booting from hibernation with encrypted swap
     };
 
     # Enable networking
     networking = {
-      enableIPv6 = true;
       networkmanager = {
         enable = !config.profile.virtual; # Only for physical machines
         dns = "systemd-resolved";
       };
-      dhcpcd.enable = !config.profile.virtual; # Manual recommends disabling when using networkd
+      dhcpcd.enable = true; # Manual recommends disabling when using networkd
+      useDHCP = true;
     };
 
     systemd = {
@@ -53,9 +54,6 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
         MemorySleepMode=deep s2idle
         HibernateDelaySec=1h
       '';
-      network = {
-        enable = config.profile.virtual;
-      };
     };
 
     # Set your time zone.

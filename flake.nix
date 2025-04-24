@@ -148,6 +148,10 @@
           hostName = "boko";
           system = "aarch64-linux";
         };
+        sora = nixosMachine {
+          hostName = "sora";
+          system = "x86_64-linux";
+        };
         # basic virtual machine for experimenting
         sandbox = nixosMachine {
           hostName = "sandbox";
