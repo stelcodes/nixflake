@@ -19,6 +19,8 @@
       pkgs.gimp-with-plugins
       pkgs.jellyfin-media-player
       pkgs.musicpod
+      pkgs.wineWowPackages.waylandFull
+      pkgs.thunderbird
     ];
   };
   wayland.windowManager = {
