@@ -22,10 +22,10 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
   config = {
 
     boot = {
+      # NixOS uses latest LTS kernel by default: https://www.kernel.org/category/releases.html
+      # kernelPackages = pkgs.linuxPackages_6_6;
       tmp.cleanOnBoot = !config.profile.virtual; # Only for physical machines
       tmp.useTmpfs = config.profile.virtual; # Technically better option but has weird implications on hibernation bc tmpfs occupies mem/swap
-      # By default, NixOS uses latest LTS kernel, see https://www.kernel.org/category/releases.html
-      # kernelPackages = pkgs.linuxPackages_6_6;
       loader = {
         grub.enable = config.profile.virtual;
         systemd-boot.enable = !config.profile.virtual;
@@ -34,14 +34,10 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
       initrd.systemd.enable = !config.profile.virtual; # For booting from hibernation with encrypted swap
     };
 
-    # Enable networking
-    networking = {
-      networkmanager = {
-        enable = !config.profile.virtual; # Only for physical machines
-        dns = "systemd-resolved";
-      };
-      dhcpcd.enable = true; # Manual recommends disabling when using networkd
-      useDHCP = true;
+    # Without NetworkManager, machine will still obtain IP address via DHCP
+    networking.networkmanager = {
+      enable = !config.profile.virtual; # Only for physical machines
+      dns = "systemd-resolved";
     };
 
     systemd = {
