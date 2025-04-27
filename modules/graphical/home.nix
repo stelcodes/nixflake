@@ -37,32 +37,67 @@ let theme = config.theme.set; in
         name = "FiraMono Nerd Font";
         package = pkgs.nerd-fonts.fira-mono;
       };
-      keybindings = {
-        "ctrl+c" = "copy_to_clipboard";
-        "ctrl+shift+c" = "send_key ctrl+c";
-        "ctrl+v" = "paste_from_clipboard";
-        "ctrl+shift+v" = "send_key ctrl+v";
-        # Standard copy/paste keymaps for MacOS
-        "super+c" = "copy_to_clipboard";
-        "super+v" = "paste_from_clipboard";
-        "kitty_mod+equal" = "change_font_size all 0";
-        "kitty_mod+plus" = "change_font_size all +1.0";
-        "kitty_mod+minus" = "change_font_size all -1.0";
+      actionAliases = {
+        new_tab_cwd = "launch --cwd=current --type=tab";
+        new_window_cwd = "launch --cwd=current --type=window";
       };
+      # enableGitIntegration = true;
+      # man 5 kitty.conf
       settings = {
-        disable_ligatures = "never";
-        shell = "${pkgs.zsh}/bin/zsh";
-        wheel_scroll_multiplier = "5.0";
-        touch_scroll_multiplier = "1.0";
-        copy_on_select = "yes";
+        scrollback_pager_history_size = "10"; # 10MB ~= 100000 lines
+        scrollback_fill_enlarged_window = "yes";
+        copy_on_select = "clipboard";
         enable_audio_bell = "no";
-        confirm_os_window_close = "1";
+        confirm_os_window_close = "-1 count-background";
+        enabled_layouts = "tall,fat,horizontal,vertical";
+        tab_bar_style = "slant";
+        tab_bar_min_tabs = "1";
+        tab_title_max_length = "12";
+        shell = "${pkgs.zsh}/bin/zsh";
+        # allow_remote_control = "yes";
+        # listen_on = "unix:${HOME}/.local/state/kittysock";
+        notify_on_cmd_finish = "invisible";
+        wayland_titlebar_color = "background";
+        wayland_enable_ime = "no";
         macos_titlebar_color = "background";
         macos_option_as_alt = "left";
         macos_quit_when_last_window_closed = "yes";
-        kitty_mod = "ctrl+alt";
         clear_all_shortcuts = "yes";
-        wayland_titlebar_color = "background";
+        kitty_mod = "alt";
+      };
+      keybindings = {
+        "kitty_mod+ctrl+u" = "scroll_page_up";
+        "kitty_mod+ctrl+d" = "scroll_page_down";
+        "kitty_mod+up" = "scroll_to_prompt -1";
+        "kitty_mod+down" = "scroll_to_prompt 1";
+        "kitty_mod+space" = "show_scrollback";
+        "kitty_mod+shift+space" = "show_first_command_output_on_screen";
+        "kitty_mod+n" = "new_window_cwd";
+        "kitty_mod+q" = "close_window_with_confirmation ignore-shell";
+        "kitty_mod+r" = "start_resizing_window";
+        "kitty_mod+j" = "next_window";
+        "kitty_mod+k" = "previous_window";
+        "kitty_mod+shift+j" = "focus_visible_window";
+        "kitty_mod+shift+k" = "swap_with_window";
+        "kitty_mod+t" = "new_tab_cwd";
+        "kitty_mod+l" = "next_tab";
+        "kitty_mod+h" = "previous_tab";
+        "kitty_mod+shift+l" = "move_tab_forward";
+        "kitty_mod+shift+h" = "move_tab_backward";
+        "kitty_mod+shift+t" = "set_tab_title";
+        "kitty_mod+m" = "next_layout";
+        "kitty_mod+plus" = "change_font_size all +1.0";
+        "kitty_mod+minus" = "change_font_size all -1.0";
+        "kitty_mod+equal" = "change_font_size all 0";
+        "kitty_mod+o" = "open_url_with_hints";
+        "kitty_mod+i" = "kitten unicode_input";
+        "kitty_mod+shift+1" = "kitty_shell window";
+        "ctrl+c" = "copy_to_clipboard";
+        "super+c" = "copy_to_clipboard"; # MacOS
+        "ctrl+v" = "paste_from_clipboard";
+        "super+v" = "paste_from_clipboard"; # MacOS
+        "ctrl+shift+c" = "send_key ctrl+c";
+        "ctrl+shift+v" = "send_key ctrl+v";
       };
     };
   };
