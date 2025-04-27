@@ -97,8 +97,7 @@ window-rule {
 binds {
     // Use wev to find key names
     Super+Shift+Slash { show-hotkey-overlay; }
-    Super+Return { spawn "kitty" "tmux-startup"; }
-    Super+Shift+Return { spawn "kitty"; }
+    Super+Return { spawn "kitty"; }
     Super+D { spawn "wofi"; }
     Super+Shift+D { spawn "wofi" "--show" "run"; }
     Super+E { spawn "rofimoji"; }
@@ -124,8 +123,8 @@ binds {
     Super+K     { focus-window-or-workspace-up; }
     Super+L     { focus-column-right; }
     Super+Shift+H     { move-column-left; }
-    Super+Shift+J     { move-window-down; }
-    Super+Shift+K     { move-window-up; }
+    Super+Shift+J     { move-window-down-or-to-workspace-down; }
+    Super+Shift+K     { move-window-up-or-to-workspace-up; }
     Super+Shift+L     { move-column-right; }
     Super+Left  { focus-monitor-left; }
     Super+Down  { focus-monitor-down; }
