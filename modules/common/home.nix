@@ -56,19 +56,15 @@
       packages = [
         pkgs.trash-cli
         pkgs.fd
-        pkgs.fastfetch
+        pkgs.microfetch
         pkgs.wget
         pkgs.ripgrep
         pkgs.unzip
         pkgs.truecolor-test
         pkgs.dua
         pkgs.jq
-        pkgs.exiftool
         pkgs.tmux-startup
         # pkgs.unrar
-        pkgs.p7zip
-        pkgs.mediainfo # for yazi
-        inputs.agenix.packages.${pkgs.system}.default
       ] ++ (lib.lists.optionals pkgs.stdenv.isLinux [
         pkgs.desktop-entries
         pkgs.toggle-service
@@ -84,6 +80,9 @@
         pkgs.gh
         pkgs.git-backdate
         pkgs.devflake
+        pkgs.p7zip
+        pkgs.mediainfo # for yazi
+        inputs.agenix.packages.${pkgs.system}.default
       ]);
 
       sessionVariables = {
@@ -91,6 +90,7 @@
         PAGER = "less --chop-long-lines --RAW-CONTROL-CHARS";
         MANPAGER = "nvim +Man!";
         BAT_THEME = "ansi";
+        FLAKE = "/home/${config.admin.username}/.config/nixflake"; # For nh, will be NH_FLAKE next release
       };
 
       file = {
@@ -187,6 +187,8 @@
 
       yazi = {
         enable = true;
+        # Remove all media preview deps when machine is a server
+        package = lib.mkIf config.profile.virtual (pkgs.yazi.override { optionalDeps = [ ]; });
         shellWrapperName = "y";
         # Defaults: https://github.com/sxyazi/yazi/tree/main/yazi-config/preset
         settings = {
@@ -328,6 +330,7 @@
             noansi = "sed \"s,\\x1B\\[[0-9;]*[a-zA-Z],,g\"";
             loggy = " |& tee /tmp/loggy-$(${date-sortable}).log";
             network-test = "ping -c 1 -W 5 8.8.8.8";
+            rs = lib.mkDefault "nh os switch"; # rebuild switch
             rebuild = lib.mkDefault "sudo nixos-rebuild switch --flake \"$HOME/.config/nixflake#\"";
             nix-repl-flake = "nix repl --expr \"(builtins.getFlake (toString $HOME/.config/nixflake)).nixosConfigurations.$hostname\"";
             nix-pkg-size = "nix path-info --closure-size --human-readable --recursive";
@@ -345,8 +348,7 @@
             scu = "systemctl --user";
             jc = "journalctl -exf --unit"; # Using --unit for better completion
             jcu = "journalctl -exf --user-unit"; # Using --user-unit for better completion
-            u = "udisksctl";
-            rebuild_ = "systemctl start --user nixos-rebuild.service";
+            ud = "udisksctl";
             sway = "exec systemd-cat --identifier=sway sway";
             swaytree = "swaymsg -t get_tree | nvim -R";
             swayinputs = "swaymsg -t get_inputs | nvim -R";

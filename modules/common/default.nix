@@ -130,6 +130,12 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
         settings = builtins.fromTOML (builtins.readFile ../../misc/starship.toml);
       };
       git.enable = true;
+      nh = {
+        enable = true;
+        clean.enable = true;
+        clean.extraArgs = "--keep-since 4d --keep 3";
+        flake = "/home/${config.admin.username}/.config/nixflake";
+      };
     };
 
     environment = {
@@ -142,16 +148,8 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
         pkgs.tealdeer
         pkgs.unzip
         pkgs.git
-        pkgs.wireguard-tools
-        inputs.agenix.packages.${pkgs.system}.default
-        pkgs.wg-killswitch
         pkgs.eza
       ];
-      etc = {
-        # https://www.reddit.com/r/NixOS/comments/16t2njf/small_trick_for_people_using_nixos_with_flakes
-        # Useful for seeing exactly what source flake generated this NixOS system generation
-        "nixos-generation-source".source = ../..;
-      };
       pathsToLink = [ "/share/zsh" ];
     };
 

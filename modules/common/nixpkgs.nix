@@ -3,7 +3,7 @@
     nix = {
       package = pkgs.nixVersions.latest;
       gc = {
-        automatic = true;
+        automatic = false; # replacing with nh systemd clean service
         options = "--delete-older-than 30d";
       };
       settings = {
