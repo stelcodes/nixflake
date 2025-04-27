@@ -1,14 +1,12 @@
 // This config is in the KDL format: https://kdl.dev
 // https://github.com/YaLTeR/niri/wiki/Configuration
+// https://github.com/YaLTeR/niri/blob/main/resources/default-config.kdl
 
-// https://github.com/YaLTeR/niri/wiki/Xwayland
-// Restart in case it's not the first session for this boot
 environment {
     DISPLAY ":12" // xwayland-satellite
-    ELECTRON_OZONE_PLATFORM_HINT "wayland"
-    QT_QPA_PLATFORM "wayland"
-    NIXOS_OZONE_WL "1"
 }
+
+// See /run/current-system/sw/bin/niri-session for predefined environment setup
 spawn-at-startup "bash" "-c" "systemctl --user reset-failed && systemctl --user start niri-session.target"
 
 prefer-no-csd
