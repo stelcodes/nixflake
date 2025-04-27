@@ -149,6 +149,13 @@ in
       sessionVariables = {
         TERMINAL = lib.getExe waycfg.terminal;
         BROWSER = lib.getExe waycfg.browser;
+        # https://man7.org/linux/man-pages/man1/ssh.1.html#ENVIRONMENT
+        # https://blog.burakcankus.com/2025/03/15/keepassxc-and-ssh-agent-setup.html
+        SSH_ASKPASS = "${pkgs.seahorse}/libexec/seahorse/ssh-askpass";
+        SSH_ASKPASS_REQUIRE = "prefer";
+        ELECTRON_OZONE_PLATFORM_HINT = "wayland";
+        QT_QPA_PLATFORM = "wayland";
+        NIXOS_OZONE_WL = "1";
       };
       pointerCursor = {
         package = theme.cursorThemePackage;
@@ -211,46 +218,6 @@ in
           early_exit=true
           fill_shape=false
         '';
-        "pomo.cfg" = {
-          onChange = ''
-            ${pkgs.systemd}/bin/systemctl --user restart pomo-notify.service
-          '';
-          source = pkgs.writeShellScript "pomo-cfg" ''
-            # This file gets sourced by pomo.sh at startup
-            # I'm only caring about linux atm
-            function lock_screen {
-              if ${pkgs.procps}/bin/pgrep sway 2>&1 > /dev/null; then
-                echo "Sway detected"
-                # Only lock if pomo is still running
-                test -f "$HOME/.local/share/pomo" && ${pkgs.swaylock}/bin/swaylock
-                # Only restart pomo if pomo is still running
-                test -f "$HOME/.local/share/pomo" && ${pkgs.pomo}/bin/pomo start
-              fi
-            }
-
-            function custom_notify {
-                # send_msg is defined in the pomo.sh source
-                block_type=$1
-                if [[ $block_type -eq 0 ]]; then
-                    echo "End of work period"
-                    send_msg 'End of a work period. Locking Screen!'
-                    ${pkgs.playerctl}/bin/playerctl --all-players pause
-                    ${pkgs.mpv}/bin/mpv ${pkgs.pomo-alert} || sleep 10
-                    lock_screen &
-                elif [[ $block_type -eq 1 ]]; then
-                    echo "End of break period"
-                    send_msg 'End of a break period. Time for work!'
-                    ${pkgs.mpv}/bin/mpv ${pkgs.pomo-alert}
-                else
-                    echo "Unknown block type"
-                    exit 1
-                fi
-            }
-            POMO_MSG_CALLBACK="custom_notify"
-            POMO_WORK_TIME=30
-            POMO_BREAK_TIME=5
-          '';
-        };
       } // (if config.theme.set ? gtkConfigFiles then config.theme.set.gtkConfigFiles else { }); #catppuccin
       portal = {
         # https://mozilla.github.io/webrtc-landing/gum_test.html
@@ -354,7 +321,7 @@ in
           margin = "0px 5px 5px 5px";
           modules-left = [
             "tray"
-            "custom/pomo"
+            "custom/ianny"
             "custom/wlsunset"
             "custom/inhibitidle"
             "custom/recordplayback"
@@ -369,17 +336,15 @@ in
           ]) ++ [
             "clock"
           ];
-          "custom/pomo" = {
-            format = "{} ⏱️";
-            exec = "${pkgs.pomo}/bin/pomo clock";
+          "custom/ianny" = {
+            exec = /* sh */ "if systemctl --user --quiet is-active ianny.service; then echo '🩷'; else echo '🩶'; fi";
             interval = 1;
-            on-click = "${pkgs.pomo}/bin/pomo pause";
-            on-click-right = "${pkgs.pomo}/bin/pomo stop";
+            on-click = "${lib.getExe pkgs.toggle-service} ianny";
           };
           "custom/recordplayback" = {
             format = "{}";
             max-length = 3;
-            interval = 2;
+            interval = 1;
             exec = lib.getExe (pkgs.writeShellApplication {
               name = "waybar-record-playback";
               text = ''
@@ -392,7 +357,7 @@ in
           "custom/inhibitidle" = {
             format = "{}";
             max-length = 2;
-            interval = 2;
+            interval = 1;
             exec = lib.getExe (pkgs.writeShellApplication {
               name = "display-wayland-inhibit-idle";
               runtimeInputs = [ pkgs.coreutils-full ];
@@ -407,8 +372,8 @@ in
             on-click = lib.getExe toggle-inhibit-idle;
           };
           "custom/wlsunset" = {
-            exec = "if systemctl --user --quiet is-active wlsunset.service; then echo '🌙'; else echo '☀️'; fi";
-            interval = 2;
+            exec = /* sh */ "if systemctl --user --quiet is-active wlsunset.service; then echo '🌙'; else echo '☀️'; fi";
+            interval = 1;
             on-click = "${lib.getExe pkgs.toggle-service} wlsunset";
           };
           "sway/workspaces" = {
@@ -488,6 +453,7 @@ in
       sessionServices
       {
         swayidle = {
+          # Modifications for services.swayidle
           Service.ExecStopPost = lib.getExe (pkgs.writeShellApplication {
             name = "swayidle-cleanup";
             runtimeInputs = [ pkgs.coreutils-full ];
@@ -496,18 +462,14 @@ in
             '';
           });
         };
+        ianny = {
+          Service.ExecStart = lib.getExe pkgs.ianny;
+        };
         swaybg = lib.mkIf (waycfg.wallpaper != null) {
           Service.ExecStart = "${lib.getExe pkgs.swaybg} -m fill -i ${waycfg.wallpaper}";
         };
         xwayland-satellite = {
           Service.ExecStart = "${lib.getExe pkgs.xwayland-satellite} :12";
-        };
-        pomo-notify = {
-          Unit.Description = "pomo.sh notify daemon";
-          Service = {
-            Type = "simple";
-            ExecStart = "${pkgs.pomo}/bin/pomo notify";
-          };
         };
         record-playback = lib.mkIf config.profile.audio {
           Unit = {
@@ -555,7 +517,7 @@ in
       network-manager-applet.enable = true;
       blueman-applet.enable = true;
       polkit-gnome.enable = true;
-      gnome-keyring.enable = true;
+      ssh-agent.enable = true; # Needs DISPLAY, make sure to start after compositor runs systemctl import-environment
       swayidle = {
         enable = true;
         # Waits for commands to finish (-w) by default
@@ -743,8 +705,8 @@ in
         "blueman-applet"
         "wlsunset"
         "wayland-pipewire-idle-inhibit"
-        "pomo-notify"
-        "gnome-keyring"
+        "ianny"
+        "ssh-agent"
       ];
       niri = [
         "swaybg"
@@ -755,8 +717,8 @@ in
         "blueman-applet"
         "wlsunset"
         "wayland-pipewire-idle-inhibit"
-        "pomo-notify"
-        "gnome-keyring"
+        "ianny"
+        "ssh-agent"
         "xwayland-satellite"
       ];
     };

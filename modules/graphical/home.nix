@@ -24,6 +24,7 @@ let theme = config.theme.set; in
           pref("browser.tabs.insertAfterCurrent", true);
           pref("browser.uidensity", 1);
           pref("browser.toolbars.bookmarks.visibility", "never")
+          pref("browser.fullscreen.autohide", false)
         '';
       };
     };
