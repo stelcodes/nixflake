@@ -1,0 +1,29 @@
+! YOUTUBE
+www.youtube.com###shorts-container
+www.youtube.com##ytd-watch-next-secondary-results-renderer
+www.youtube.com###comments
+www.youtube.com###subscribe-button
+www.youtube.com###masthead #end
+www.youtube.com###voice-search-button
+www.youtube.com###chips-content
+www.youtube.com###voice-search-button
+www.youtube.com##:matches-path(/^/$/) #contents
+www.youtube.com##.shortsLockupViewModelHost
+www.youtube.com###chat
+www.youtube.com###guide-content
+www.youtube.com###guide-button
+www.youtube.com###chip-bar
+www.youtube.com###contents > .ytd-secondary-search-container-renderer
+
+! REDDIT
+www.reddit.com##.w-full.masthead
+www.reddit.com###flex-left-nav-container
+www.reddit.com##.right-sidebar
+www.reddit.com###login-button
+www.reddit.com###get-app
+www.reddit.com##:matches-path(/^/$/) #main-content
+
+! MISC
+news.ycombinator.com##table .comment
+news.ycombinator.com##.subline
+www.tmz.com##body
