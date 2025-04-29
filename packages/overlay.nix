@@ -94,7 +94,7 @@ self: super: {
     '';
   };
   wg-killswitch = super.callPackage ./wg-killswitch { };
-  createBrowserApp = { name, url, package ? super.ungoogled-chromium }:
+  createBrowserApp = { name, url, package ? super.ungoogled-chromium, icon ? "browser" }:
     let
       pname = super.lib.replaceStrings [ " " ] [ "-" ] (super.lib.toLower name);
       exec = super.writeShellApplication {
@@ -107,7 +107,7 @@ self: super: {
     super.makeDesktopItem {
       name = pname;
       exec = super.lib.getExe exec;
-      icon = "browser";
+      icon = icon;
       desktopName = name;
       genericName = pname;
       comment = "Open ${url} in ${package.meta.name}";
