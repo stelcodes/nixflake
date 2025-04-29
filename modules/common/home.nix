@@ -313,7 +313,7 @@
             glf = "git log --pretty=format:'%C(yellow)%h%C(reset) %C(blue)%an%C(reset) %C(cyan)%cr%C(reset) %s %C(green)%d%C(reset)' --graph";
             config = "cd ~/.config/nixflake; nvim";
             d = "dua --stay-on-filesystem interactive";
-            ssh-new-key = "ssh-keygen -t ed25519";
+            ssh-key-create = "ssh-keygen -a 100 -t ed25519 -f ./id_ed25519 -C \"$(whoami)@$(hostname)@$(date +'%Y-%m-%d')\"";
             date-sortable = "date +%Y-%m-%dT%H:%M:%S%Z"; # ISO 8601 date format with local timezone
             date-sortable-utc = "date -u +%Y-%m-%dT%H:%M:%S%Z"; # ISO 8601 date format with UTC timezone
             dl-base = "yt-dlp --embed-metadata --embed-thumbnail --progress --download-archive ./yt-dlp-archive.txt --user-agent 'Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0'";
