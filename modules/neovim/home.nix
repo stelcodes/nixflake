@@ -1,7 +1,7 @@
 { pkgs, lib, config, inputs, ... }:
 let
   theme = config.theme.set;
-  plugins = pkgs.unstable.vimPlugins;
+  plugins = pkgs.vimPlugins;
 in
 {
   xdg.configFile."nvim/data/telescope-sources" = {
@@ -10,7 +10,6 @@ in
   };
   programs.neovim = {
     enable = true;
-    package = pkgs.unstable.neovim-unwrapped;
     defaultEditor = true;
     withPython3 = false;
     withNodeJs = false;
@@ -54,7 +53,7 @@ in
             sha256 = "jGEVE9gfK4EirGDOFzSNXn60X+IldKASVoTD4/p7MBM=";
           };
         };
-        workspace-diagnostics-nvim = pkgs.unstable.vimUtils.buildVimPlugin {
+        workspace-diagnostics-nvim = pkgs.vimUtils.buildVimPlugin {
           pname = "workspace-diagnostics-nvim";
           version = "unstable";
           src = inputs.workspace-diagnostics-nvim;

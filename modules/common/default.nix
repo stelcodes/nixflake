@@ -149,6 +149,7 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
         pkgs.unzip
         pkgs.git
         pkgs.eza
+        pkgs.curl
       ];
       pathsToLink = [ "/share/zsh" ];
     };

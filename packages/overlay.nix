@@ -183,8 +183,8 @@ self: super: {
       ''
     );
   obsidian-jailed = self.firejailWrapper {
-    executable = "${super.unstable.obsidian}/bin/obsidian";
-    desktop = "${super.unstable.obsidian}/share/applications/obsidian.desktop";
+    executable = "${super.obsidian}/bin/obsidian";
+    desktop = "${super.obsidian}/share/applications/obsidian.desktop";
     extraArgs = [ "--noprofile" "--whitelist=\"$HOME/notes\"" "--whitelist=\"$HOME/.config/obsidian\"" ];
   };
   desktop-entries = super.writeShellApplication {

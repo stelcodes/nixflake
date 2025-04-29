@@ -7,7 +7,9 @@
         options = "--delete-older-than 30d";
       };
       settings = {
-        auto-optimise-store = false; # HM/MacOS doesn't like this?
+        # Toggling auto-optimise-store actually corrupted my Nix store!
+        # Fix: sudo nix-store --verify --check-contents --repair
+        auto-optimise-store = false; # Dangerous!
         experimental-features = [ "nix-command" "flakes" ];
         flake-registry = ""; # Disable global flake registry
         keep-outputs = true; # Keep build artifacts around to avoid rebuilding
@@ -43,9 +45,9 @@
       {
         inherit config;
         overlays = [
-          (final: prev: {
-            unstable = import inputs.nixpkgs-unstable { inherit config; system = final.system; };
-          })
+          # (final: prev: {
+          #   unstable = import inputs.nixpkgs-unstable { inherit config; system = final.system; };
+          # })
           (import ../../packages/overlay.nix)
         ];
       };

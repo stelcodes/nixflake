@@ -52,7 +52,7 @@
     };
     theme.set = lib.mkOption {
       type = lib.types.attrs;
-      default = (import ../../misc/themes.nix pkgs.unstable).${config.theme.name};
+      default = (import ../../misc/themes.nix pkgs).${config.theme.name};
     };
   };
 }

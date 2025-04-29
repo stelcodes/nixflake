@@ -18,7 +18,6 @@
 
     systemd.user = lib.mkIf pkgs.stdenv.isLinux {
       settings.Manager = {
-        DefaultEnvironment.PATH = "/run/current-system/sw/bin:/etc/profiles/per-user/${config.home.username}/bin";
         DefaultTimeoutStopSec = 10;
         DefaultTimeoutAbortSec = 10;
       };
