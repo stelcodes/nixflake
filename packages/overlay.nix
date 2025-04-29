@@ -94,42 +94,25 @@ self: super: {
     '';
   };
   wg-killswitch = super.callPackage ./wg-killswitch { };
-  makeFirefoxApp = title: url: (super.writeShellApplication {
-    name = super.lib.replaceStrings [ " " ] [ "-" ] (super.lib.toLower title);
-    runtimeInputs = [ super.coreutils-full super.ripgrep super.firefox super.sway ];
-    text = ''
-      app_title="${title}"
-      app_url="${url}"
-      temp_title="${title}FirefoxAppTempWindow"
-      temp_file="/tmp/$temp_title.html" # Must be static to remember popup preferences
-      count_firefoxes() { swaymsg -t get_tree | rg -c '"name": ".* — Mozilla Firefox",'; }
-      initial_firefoxes="$(count_firefoxes)"
-      # Create html page that will open our main app as a popup
-      printf '<head><title>%s</title></head><script>window.open("%s", "%s", "popup")</script>' \
-        "$temp_title" "$app_url" "$app_title" > "$temp_file"
-      swaymsg "$(printf 'for_window [title="%s — Mozilla Firefox"] move window to scratchpad' "$temp_title")"
-      firefox --new-window "$temp_file"
-      counter=0
-      sleep 1 # Give firefox time to spawn popup window
-      # Wait until there are two new firefox windows open to close the temp window
-      while test "$(count_firefoxes)" -lt "$((initial_firefoxes+2))"; do
-        if test "$counter" -eq 0; then
-          # Try to show the temp window so the user can enable permissions
-          swaymsg "$(printf '[title="%s — Mozilla Firefox"] focus' "$temp_title")" \
-            || echo "Failed to focus temporary firefox window"
-        fi
-        sleep 1 # Wait for popup permissions to be granted
-        counter="$((counter+1))"
-        # Give up trying to close the temporary window after 30 seconds
-        if test "$counter" -gt 30; then
-          exit 0
-        fi
-      done
-      swaymsg "$(printf '[title="%s — Mozilla Firefox"] kill' "$temp_title")"
-    '';
-  });
-  discord-firefox = self.makeFirefoxApp "Discord" "https://discord.com/app";
-  spotify-firefox = self.makeFirefoxApp "Spotify" "https://open.spotify.com";
+  createBrowserApp = { name, url, package ? super.ungoogled-chromium }:
+    let
+      pname = super.lib.replaceStrings [ " " ] [ "-" ] (super.lib.toLower name);
+      exec = super.writeShellApplication {
+        name = pname;
+        text = ''
+          ${super.lib.getExe package} --new-window --app='${url}'
+        '';
+      };
+    in
+    super.makeDesktopItem {
+      name = pname;
+      exec = super.lib.getExe exec;
+      icon = "browser";
+      desktopName = name;
+      genericName = pname;
+      comment = "Open ${url} in ${package.meta.name}";
+      categories = [ "Network" ];
+    };
   kodi-loaded = super.kodi.withPackages (p: [
     p.visualization-goom
     p.somafm
