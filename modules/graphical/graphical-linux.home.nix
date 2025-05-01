@@ -558,9 +558,6 @@ in
                 if test -f "${inhibitIdleFile}"; then
                   printf "Restarting timer because %s exists" "${inhibitIdleFile}"
                   systemctl --restart swayidle.service
-                elif ${lib.getExe' pkgs.pmutils "on_ac_power"}; then
-                  printf "Restarting timer because machine is plugged in"
-                  systemctl --restart swayidle.service
                 else
                   printf "Idle timeout reached. Night night."
                   systemctl sleep
