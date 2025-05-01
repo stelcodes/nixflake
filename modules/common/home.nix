@@ -89,7 +89,7 @@
         PAGER = "less --chop-long-lines --RAW-CONTROL-CHARS";
         MANPAGER = "nvim +Man!";
         BAT_THEME = "ansi";
-        FLAKE = "/home/${config.admin.username}/.config/nixflake"; # For nh, will be NH_FLAKE next release
+        NH_FLAKE = "/home/${config.admin.username}/.config/nixflake";
       };
 
       file = {
@@ -374,7 +374,7 @@
           };
           historySubstringSearch.enable = true;
           # Interactive shells
-          initExtra = /* sh */ ''
+          initContent = /* sh */ ''
             # export SHELL="${pkgs.zsh}/bin/zsh"
             # Make sure the Nix environment is sourced, this script is idempotent
             NIX_SETUP_SCRIPT="/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
