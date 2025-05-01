@@ -22,6 +22,7 @@
       pkgs.wineWowPackages.waylandFull
       pkgs.thunderbird
       (pkgs.createBrowserApp { name = "Bandcamp"; url = "https://bandcamp.com"; })
+      pkgs.kdePackages.k3b
     ];
   };
   wayland.windowManager = {
