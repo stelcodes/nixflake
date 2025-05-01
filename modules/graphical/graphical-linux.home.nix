@@ -323,7 +323,7 @@ in
             "tray"
             "custom/ianny"
             "custom/wlsunset"
-            "custom/inhibitidle"
+            "custom/wlinhibit"
             "custom/recordplayback"
           ];
           modules-center = [ "sway/mode" "sway/workspaces" "niri/workspaces" ];
@@ -354,22 +354,10 @@ in
               '';
             });
           };
-          "custom/inhibitidle" = {
-            format = "{}";
-            max-length = 2;
+          "custom/wlinhibit" = {
+            exec = /* sh */ "if systemctl --user --quiet is-active wlinhibit.service; then printf '☕'; else printf '💤'; fi";
             interval = 1;
-            exec = lib.getExe (pkgs.writeShellApplication {
-              name = "display-wayland-inhibit-idle";
-              runtimeInputs = [ pkgs.coreutils-full ];
-              text = ''
-                if test -f "${inhibitIdleFile}"; then
-                  printf '☕';
-                else
-                  printf '💤';
-                fi
-              '';
-            });
-            on-click = lib.getExe toggle-inhibit-idle;
+            on-click = "${lib.getExe pkgs.toggle-service} wlinhibit";
           };
           "custom/wlsunset" = {
             exec = /* sh */ "if systemctl --user --quiet is-active wlsunset.service; then echo '🌙'; else echo '☀️'; fi";
@@ -465,6 +453,14 @@ in
         ianny = {
           Service.ExecStart = lib.getExe pkgs.ianny;
         };
+        wlinhibit = {
+          # Service is off by default, only started upon user request
+          Unit = {
+            BindsTo = [ "graphical-session.target" ];
+            After = [ "graphical-session.target" ];
+          };
+          Service.ExecStart = lib.getExe pkgs.wlinhibit;
+        };
         swaybg = lib.mkIf (waycfg.wallpaper != null) {
           Service.ExecStart = "${lib.getExe pkgs.swaybg} -m fill -i ${waycfg.wallpaper}";
         };
@@ -551,19 +547,7 @@ in
         timeouts = lib.mkIf waycfg.sleep.auto.enable [
           {
             timeout = waycfg.sleep.auto.idleMinutes * 60;
-            command = lib.getExe (pkgs.writeShellApplication {
-              name = "swayidle-idle-sleep";
-              runtimeInputs = [ pkgs.coreutils-full pkgs.systemd ];
-              text = ''
-                if test -f "${inhibitIdleFile}"; then
-                  printf "Restarting timer because %s exists" "${inhibitIdleFile}"
-                  systemctl --restart swayidle.service
-                else
-                  printf "Idle timeout reached. Night night."
-                  systemctl sleep
-                fi
-              '';
-            });
+            command = "systemctl sleep";
           }
         ];
       };

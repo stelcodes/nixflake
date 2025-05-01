@@ -32,14 +32,9 @@ let
     text = builtins.readFile ../../misc/toggle-sway-window.clj;
   };
   handle-sway-lid-on = pkgs.writers.writeBash "handle-sway-lid-on" ''
-    BLOCKFILE="$HOME/.local/share/idle-sleep-block"
-    if test -f "$BLOCKFILE" || swaymsg -t get_outputs --raw | grep -q '"focused": false'; then
-      swaymsg output eDP-1 power off
-    else
-      swaymsg output eDP-1 power off
-      playerctl --all-players pause
-      systemctl sleep
-    fi
+    swaymsg output eDP-1 power off
+    playerctl --all-players pause
+    swaylock -f
   '';
   handle-sway-lid-off = pkgs.writers.writeBash "handle-sway-lid-off" ''
     swaymsg output eDP-1 power on
