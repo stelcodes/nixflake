@@ -47,6 +47,7 @@
   };
 
   security.wrappers = {
+    # Necessary for burning CDs with k3b
     cdrdao = {
       setuid = true;
       owner = "root";
