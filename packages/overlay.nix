@@ -1,50 +1,47 @@
-self: super: {
-  success-alert = super.fetchurl {
+# Using prev can cause unpredictable cache misses:
+# https://discourse.nixos.org/t/packages-in-overlay-arguments-are-different-from-regular-package-set/50729
+final: prev: {
+  success-alert = final.fetchurl {
     # https://freesound.org/people/martcraft/sounds/651624/
     url = "https://cdn.freesound.org/previews/651/651624_14258856-lq.mp3";
     sha256 = "urNwmGEG2YJsKOtqh69n9VHdj9wSV0UPYEQ3caEAF2c=";
   };
-  failure-alert = super.fetchurl {
+  failure-alert = final.fetchurl {
     # https://freesound.org/people/martcraft/sounds/651625/
     url = "https://cdn.freesound.org/previews/651/651625_14258856-lq.mp3";
     sha256 = "XAEJAts+KUNVRCFLXlGYPIJ06q4EjdT39G0AsXGbT2M=";
   };
-  pomo-alert = super.fetchurl {
+  pomo-alert = final.fetchurl {
     # https://freesound.org/people/dersinnsspace/sounds/421829/
     url = "https://cdn.freesound.org/previews/421/421829_8224400-lq.mp3";
     sha256 = "049x6z6d3ssfx6rh8y11var1chj3x67nfrakigydnj3961hnr6ar";
   };
   wallpaper = {
-    rei-moon = super.fetchurl {
+    rei-moon = final.fetchurl {
       url = "https://i.imgur.com/NnXQqDZ.jpg";
       hash = "sha256-yth6v4M5UhXkxQ/bfd3iwFRi0FDGIjcqR37737D8P5w=";
     };
-    halcyondaze = super.fetchurl {
+    halcyondaze = final.fetchurl {
       url = "https://i.imgur.com/obIghpJ.png";
       hash = "sha256-ar+Zbf/DN7bc9tAnQFi6qR8TPoBREzCb3d65HoOez5s=";
     };
-    anime-girl-cat = super.fetchurl {
+    anime-girl-cat = final.fetchurl {
       url = "https://i.imgur.com/sCV0yu7.jpg";
       hash = "sha256-qDt+Gj21M2LkMo80sXICCzy/LjOkAqeN4la/YhaLBmM=";
     };
-    anime-girl-coffee = super.fetchurl {
+    anime-girl-coffee = final.fetchurl {
       url = "https://i.imgur.com/lR2iapT.jpg";
       hash = "sha256-JtY6vWns88mZ29fuYBYZO1NoD+O1YxPb9EBfotv7yb0=";
     };
   };
-  pomo = super.callPackage ./pomo.nix { };
-  writeBabashkaScript = super.callPackage ./write-babashka-script.nix { };
-  cycle-pulse-sink = self.writeBabashkaScript {
-    name = "cycle-pulse-sink";
-    text = builtins.readFile ../misc/cycle-pulse-sink.clj;
-    runtimeInputs = [ super.pulseaudio ];
-  };
-  tmux-snapshot = super.callPackage ./tmux-snapshot { };
-  tmux-startup = super.callPackage ./tmux-startup { };
-  devflake = super.callPackage ./devflake { };
-  truecolor-test = super.writeShellApplication {
+  pomo = final.callPackage ./pomo.nix { };
+  writeBabashkaScript = final.callPackage ./write-babashka-script.nix { };
+  tmux-snapshot = final.callPackage ./tmux-snapshot { };
+  tmux-startup = final.callPackage ./tmux-startup { };
+  devflake = final.callPackage ./devflake { };
+  truecolor-test = final.writeShellApplication {
     name = "truecolor-test";
-    runtimeInputs = [ super.coreutils super.gawk ];
+    runtimeInputs = [ final.coreutils final.gawk ];
     text = ''
       awk 'BEGIN{
           s="/\\/\\/\\/\\/\\"; s=s s s s s s s s s s s s s s s s s s s s s s s;
@@ -61,9 +58,9 @@ self: super: {
       }'
     '';
   };
-  toggle-service = super.writeShellApplication {
+  toggle-service = final.writeShellApplication {
     name = "toggle-service";
-    runtimeInputs = [ super.systemd ];
+    runtimeInputs = [ final.systemd ];
     text = ''
       SERVICE="$1.service"
       if ! systemctl --user cat "$SERVICE" &> /dev/null; then
@@ -79,9 +76,9 @@ self: super: {
       fi
     '';
   };
-  check-newline = super.writeShellApplication {
+  check-newline = final.writeShellApplication {
     name = "check-newline";
-    runtimeInputs = [ super.coreutils ];
+    runtimeInputs = [ final.coreutils ];
     text = ''
       filename="$1"
       if [ ! -s "$filename" ]; then
@@ -93,38 +90,38 @@ self: super: {
       fi
     '';
   };
-  wg-killswitch = super.callPackage ./wg-killswitch { };
-  createBrowserApp = { name, url, package ? super.ungoogled-chromium, icon ? "browser" }:
+  wg-killswitch = final.callPackage ./wg-killswitch { };
+  createBrowserApp = { name, url, package ? final.ungoogled-chromium, icon ? "browser" }:
     let
-      pname = super.lib.replaceStrings [ " " ] [ "-" ] (super.lib.toLower name);
-      exec = super.writeShellApplication {
+      pname = final.lib.replaceStrings [ " " ] [ "-" ] (final.lib.toLower name);
+      exec = final.writeShellApplication {
         name = pname;
         text = ''
-          ${super.lib.getExe package} --new-window --app='${url}'
+          ${final.lib.getExe package} --new-window --app='${url}'
         '';
       };
     in
-    super.makeDesktopItem {
+    final.makeDesktopItem {
       name = pname;
-      exec = super.lib.getExe exec;
+      exec = final.lib.getExe exec;
       icon = icon;
       desktopName = name;
       genericName = pname;
       comment = "Open ${url} in ${package.meta.name}";
       categories = [ "Network" ];
     };
-  kodi-loaded = super.kodi.withPackages (p: [
+  kodi-loaded = final.kodi.withPackages (p: [
     p.visualization-goom
     p.somafm
     p.radioparadise
     p.joystick
     p.youtube
   ]);
-  retroarch-loaded = super.retroarch.override {
+  retroarch-loaded = final.retroarch.override {
     settings = {
       menu_driver = "xmb";
       xmb_menu_color_theme = "15"; # cube purple
-      assets_directory = "${super.retroarch-assets}/share/retroarch/assets";
+      assets_directory = "${final.retroarch-assets}/share/retroarch/assets";
       savefile_directory = "~/sync/games/saves";
       savestate_directory = "~/sync/games/states";
       screenshot_directory = "~/sync/games/screenshots";
@@ -138,7 +135,7 @@ self: super: {
       auto_overrides_enable = "true"; # Auto setup controllers
       auto_remaps_enable = "true"; # Auto load past remaps
     };
-    cores = with super.libretro; [
+    cores = with final.libretro; [
       # pkgs/applications/emulators/retroarch/cores.nix
       mesen # nes
       snes9x # snes
@@ -150,13 +147,13 @@ self: super: {
       ppsspp # psp
     ];
   };
-  syncthing-tray = super.syncthing-tray.overrideAttrs (final: prev: {
+  syncthing-tray = final.syncthing-tray.overrideAttrs {
     meta.mainProgram = "syncthing-tray";
-  });
-  audacious = super.audacious.overrideAttrs (final: prev: {
+  };
+  audacious = final.audacious.overrideAttrs {
     meta.mainProgram = "audacious";
-  });
-  firejailWrapper = { executable, desktop ? null, profile ? null, extraArgs ? [ ] }: super.runCommand "firejail-wrap"
+  };
+  firejailWrapper = { executable, desktop ? null, profile ? null, extraArgs ? [ ] }: final.runCommand "firejail-wrap"
     {
       preferLocalBuild = true;
       allowSubstitutes = false;
@@ -164,8 +161,8 @@ self: super: {
     }
     (
       let
-        firejailArgs = super.lib.concatStringsSep " " (
-          extraArgs ++ (super.lib.optional (profile != null) "--profile=${toString profile}")
+        firejailArgs = final.lib.concatStringsSep " " (
+          extraArgs ++ (final.lib.optional (profile != null) "--profile=${toString profile}")
         );
       in
       ''
@@ -173,23 +170,23 @@ self: super: {
         mkdir -p $out/bin
         mkdir -p $out/share/applications
         cat <<'_EOF' >"$command_path"
-        #! ${super.runtimeShell} -e
+        #! ${final.runtimeShell} -e
         exec /run/wrappers/bin/firejail ${firejailArgs} -- ${toString executable} "\$@"
         _EOF
         chmod 0755 "$command_path"
-      '' + super.lib.optionalString (desktop != null) ''
+      '' + final.lib.optionalString (desktop != null) ''
         substitute ${desktop} $out/share/applications/$(basename ${desktop}) \
           --replace ${executable} "$command_path"
       ''
     );
-  obsidian-jailed = self.firejailWrapper {
-    executable = "${super.obsidian}/bin/obsidian";
-    desktop = "${super.obsidian}/share/applications/obsidian.desktop";
+  obsidian-jailed = final.firejailWrapper {
+    executable = "${final.obsidian}/bin/obsidian";
+    desktop = "${final.obsidian}/share/applications/obsidian.desktop";
     extraArgs = [ "--noprofile" "--whitelist=\"$HOME/notes\"" "--whitelist=\"$HOME/.config/obsidian\"" ];
   };
-  desktop-entries = super.writeShellApplication {
+  desktop-entries = final.writeShellApplication {
     name = "desktop-entries";
-    runtimeInputs = [ super.coreutils-full super.findutils ];
+    runtimeInputs = [ final.coreutils-full final.findutils ];
     text = ''
       data_dirs="$XDG_DATA_DIRS:$HOME/.local/share"
       matches=""
@@ -199,11 +196,11 @@ self: super: {
       printf "%s" "$matches" | sort | uniq
     '';
   };
-  git-fiddle = super.callPackage ./git-fiddle.nix { };
-  convert-audio = super.callPackage ./convert-audio { };
-  rekordbox-add = super.callPackage ./rekordbox-add { };
-  mpv-unify = super.callPackage ./mpv-unify { };
-  pam-parallel = super.callPackage ./pam-parallel { };
+  git-fiddle = final.callPackage ./git-fiddle.nix { };
+  convert-audio = final.callPackage ./convert-audio { };
+  rekordbox-add = final.callPackage ./rekordbox-add { };
+  mpv-unify = final.callPackage ./mpv-unify { };
+  pam-parallel = final.callPackage ./pam-parallel { };
   writePythonApplication =
     # My own custom python writer that uses ruff instead of flake8. Name collision purposefully avoided.
     { name
@@ -213,20 +210,53 @@ self: super: {
     , text
     }@args:
     let
-      python = super.python3;
+      python = final.python3;
       ignoreAttribute =
-        super.lib.optionalString (checkIgnore != [ ])
-          "--ignore ${super.lib.concatMapStringsSep "," super.lib.escapeShellArg checkIgnore}";
+        final.lib.optionalString (checkIgnore != [ ])
+          "--ignore ${final.lib.concatMapStringsSep "," final.lib.escapeShellArg checkIgnore}";
     in
-    super.writers.makeScriptWriter
+    final.writers.makeScriptWriter
       {
         interpreter = (python.withPackages (ps: libraries)).interpreter;
-        check = super.lib.optionalString doCheck (
-          super.writers.writeDash "pythoncheck.sh" ''
-            exec ${super.ruff}/bin/ruff check ${ignoreAttribute} "$1"
+        check = final.lib.optionalString doCheck (
+          final.writers.writeDash "pythoncheck.sh" ''
+            exec ${final.ruff}/bin/ruff check ${ignoreAttribute} "$1"
           ''
         );
       }
       "/bin/${name}"
       text;
+  wg-quick-wofi = final.writeShellApplication {
+    name = "wg-quick-wofi";
+    runtimeInputs = [ final.coreutils-full final.systemd final.gnugrep final.gnused final.wofi final.libnotify ];
+    text = ''
+      # Services that aren't enabled are never listed with list-unit command unless active
+      services="$(systemctl list-unit-files --type service --no-legend 'wg-quick-*' | grep wg-quick- | cut -d ' ' -f1)"
+      x="$(systemctl list-units --type service --no-legend --state active 'wg-quick-*' | grep wg-quick- | cut -d ' ' -f3 | tail -1)"
+      if [ -n "$x" ]; then
+        services="$(printf "%s" "$services" | sed "/^$x/d")"
+        sel="$(printf "Stop %s\n%s" "$x" "$services" | wofi --dmenu --lines 4)"
+      else
+        sel="$(printf "%s" "$services" | wofi --dmenu --lines 4)"
+      fi
+      if [ "$sel" = "Stop $x" ]; then
+        if systemctl stop "$x"; then
+          notify-send "Stopped $x"
+        else
+          notify-send --urgency=critical "Failed to stop $x"
+        fi
+      else
+        if systemctl start "$sel"; then
+          notify-send "Started $sel"
+          if systemctl stop "$x"; then
+            notify-send "Stopped $x"
+          else
+            notify-send --urgency=critical "Failed to stop $x"
+          fi
+        else
+          notify-send --urgency=critical "Failed to start $sel"
+        fi
+      fi
+    '';
+  };
 }
