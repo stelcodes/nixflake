@@ -1,9 +1,7 @@
-{ pkgs, lib, inputs, config, systemConfig, ... }:
+{ pkgs, lib, config, ... }:
 let
-  cfg = config.wayland.windowManager.sway;
   waycfg = config.wayland.windowManager;
   theme = config.theme.set;
-  viewRebuildLogCmd = "kitty --app-id=nixos_rebuild_log -- journalctl -efo cat -u nixos-rebuild.service";
   mod = "Mod4";
   # Sway does not support input or output identifier pattern matching so in order to apply settings for every
   # Apple keyboard, I have to create a new rule for each Apple keyboard I use.
@@ -27,10 +25,6 @@ let
     "cycle-sway-scale"
     { doCheck = false; }
     (builtins.readFile ../../misc/cycle-sway-scale.py);
-  toggle-sway-window = pkgs.writeBabashkaScript {
-    name = "toggle-sway-window";
-    text = builtins.readFile ../../misc/toggle-sway-window.clj;
-  };
   handle-sway-lid-on = pkgs.writers.writeBash "handle-sway-lid-on" ''
     swaymsg output eDP-1 power off
     playerctl --all-players pause
@@ -46,37 +40,6 @@ let
       makoctl mode -s default
     fi
   '';
-  wg-quick-wofi = pkgs.writers.writeBash "wg-quick-wofi" ''
-    # Services that aren't enabled are never listed with list-unit command unless active
-    services="$(systemctl list-unit-files --type service --no-legend 'wg-quick-*' | grep wg-quick- | cut -d ' ' -f1)"
-    x="$(systemctl list-units --type service --no-legend --state active 'wg-quick-*' | grep wg-quick- | cut -d ' ' -f3 | tail -1)"
-    if [ -n "$x" ]; then
-      services="$(printf "%s" "$services" | sed "/^$x/d")"
-      sel="$(printf "Stop %s\n%s" "$x" "$services" | wofi --dmenu --lines 4)"
-    else
-      sel="$(printf "%s" "$services" | wofi --dmenu --lines 4)"
-    fi
-    if [ "$sel" = "Stop $x" ]; then
-      if systemctl stop "$x"; then
-        notify-send "Stopped $x"
-      else
-        notify-send --urgency=critical "Failed to stop $x"
-      fi
-    else
-      if systemctl start "$sel"; then
-        notify-send "Started $sel"
-        if systemctl stop "$x"; then
-          notify-send "Stopped $x"
-        else
-          notify-send --urgency=critical "Failed to stop $x"
-        fi
-      else
-        notify-send --urgency=critical "Failed to start $sel"
-      fi
-    fi
-  '';
-  browser = "${pkgs.librewolf}/bin/librewolf";
-  terminal = "${pkgs.kitty}/bin/kitty";
 in
 {
 
@@ -85,25 +48,6 @@ in
     wayland.windowManager.sway = {
       enable = true;
       wrapperFeatures.gtk = true;
-      extraSessionCommands = ''
-        export SDL_VIDEODRIVER=wayland
-        # needs qt5.qtwayland in systemPackages
-        export QT_QPA_PLATFORM=wayland
-        export QT_WAYLAND_DISABLE_WINDOWDECORATION="1"
-        # Fix for some Java AWT applications (e.g. Android Studio),
-        # use this if they aren't displayed properly:
-        export _JAVA_AWT_WM_NONREPARENTING=1
-        export MOZ_ENABLE_WAYLAND=1
-        # Automatically add electron/chromium wayland flags
-        export NIXOS_OZONE_WL=1
-        # Fix for GTK scale issues when also using Cinnamon
-        # export GDK_SCALE=1
-        export GDK_DPI_SCALE=-1
-        # Forgot what graphical program is being run from systemd user service
-        # Could use systemd.user.extraConfig = '''DefaultEnvironment="GDK_DPI_SCALE=-1"'''
-        # systemctl --user import-environment GDK_DPI_SCALE
-        export GTK_THEME=${theme.gtkThemeName}; # For gnome calculator and nautilus on sway
-      '';
       config = {
         fonts = {
           names = [ "FiraMono Nerd Font" ];
@@ -207,29 +151,16 @@ in
           "--locked ${mod}+shift+o" = "output ${waycfg.mainMonitor} toggle";
 
           # Custom external program keymaps
-          "${mod}+return" = "exec ${lib.getExe waycfg.terminal} ${lib.getExe pkgs.tmux-startup}";
-          "${mod}+shift+return" = "exec ${lib.getExe waycfg.terminal}";
-          "${mod}+shift+d" = "exec wofi --show run --width 800 --height 400 --term kitty";
-          "${mod}+d" = "exec wofi --show drun --width 800 --height 400 --term kitty";
+          "${mod}+return" = "exec ${lib.getExe waycfg.terminal}";
+          "${mod}+shift+d" = "exec wofi --show run";
+          "${mod}+d" = "exec wofi --show drun";
           "${mod}+backspace" = "exec ${lib.getExe waycfg.browser}";
           "${mod}+shift+backspace" = "exec ${lib.getExe waycfg.browser} --private-window";
           "${mod}+grave" = "exec rofimoji";
-          "${mod}+c" = "exec ${lib.getExe toggle-sway-window} --id nixos_rebuild_log --width 80 --height 80 -- ${viewRebuildLogCmd}";
-          "${mod}+shift+c" = "exec systemctl --user start nixos-rebuild";
           "${mod}+n" = "exec ${toggle-notifications}";
-          "${mod}+p" = "exec ${lib.getExe toggle-sway-window} --id pavucontrol --width 80 --height 80 -- pavucontrol";
-          "${mod}+shift+p" = "exec ${lib.getExe pkgs.cycle-pulse-sink}";
-          "${mod}+a" = "exec ${lib.getExe toggle-sway-window} --id audacious --width 80 --height 80 -- audacious";
           "${mod}+shift+a" = "exec ${lib.getExe pkgs.toggle-service} record-playback";
-          "${mod}+m" = "exec ${lib.getExe toggle-sway-window} --id gnome-disks -- gnome-disks"; # m = media
-          "${mod}+v" = "exec ${lib.getExe toggle-sway-window} --id org.keepassxc.KeePassXC --width 80 --height 80 -- keepassxc";
-          "${mod}+shift+v" = "exec ${wg-quick-wofi}";
-          "${mod}+q" = "exec ${lib.getExe toggle-sway-window} --id qalculate-gtk -- qalculate-gtk";
-          "${mod}+b" = "exec ${lib.getExe toggle-sway-window} --id .blueman-manager-wrapped --width 80 --height 80 -- blueman-manager";
-          "${mod}+t" = "exec ${lib.getExe toggle-sway-window} --id btop --width 90 --height 90 -- kitty --app-id=btop btop";
-          "${mod}+i" = "exec ${lib.getExe toggle-sway-window} --id signal --width 80 --height 80 -- signal-desktop";
+          "${mod}+shift+v" = "exec ${pkgs.wg-quick-wofi}";
           "${mod}+backslash" = "exec ${lib.getExe cycle-sway-scale}";
-          "${mod}+bar" = "exec ${lib.getExe pkgs.toggle-service} wlsunset";
           "${mod}+delete" = "exec swaylock";
 
           # Function key keymaps
@@ -306,11 +237,6 @@ in
         startup = [
           # Import sway-related environment variables into systemd user services
           { command = "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP SWAYSOCK I3SOCK DISPLAY"; }
-          # Kill tmux so all shell environments contain sway-related environment variables
-          { command = "tmux kill-server"; }
-          { command = "systemctl is-active syncthing.service && systemctl --user start syncthing-tray.service"; always = true; }
-          { command = "systemctl --user restart waybar.service"; always = true; }
-          { command = "systemctl --user start wlsunset.service"; }
         ];
       };
       extraConfig = ''
@@ -349,7 +275,7 @@ in
       swaynag = {
         enable = true;
         settings = {
-          warning = rec {
+          warning = {
             background = theme.bgx;
             button-background = theme.bg1x;
             details-background = theme.bg1x;
@@ -360,7 +286,7 @@ in
             border-bottom-size = 3;
             button-border-size = 1;
           };
-          error = rec {
+          error = {
             background = theme.bgx;
             button-background = theme.bg1x;
             details-background = theme.bg1x;
