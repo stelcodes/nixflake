@@ -492,19 +492,7 @@ in
           config = builtins.readFile ./nvim-lspconfig.lua;
         }
 
-        {
-          plugin = plugins.markdown-preview-nvim;
-          config =
-            let
-              nordTheme = pkgs.writeTextFile {
-                name = "markdown-preview-nvim-nord-theme.css";
-                text = builtins.readFile ../../misc/markdown-preview-nvim-nord-theme.css;
-              };
-            in
-              /* lua */ ''
-              let g:mkdp_highlight_css = "${nordTheme}"
-            '';
-        }
+        plugins.markdown-preview-nvim
 
         {
           plugin = plugins.nvim-cmp;
