@@ -39,16 +39,6 @@ let
   handle-sway-lid-off = pkgs.writers.writeBash "handle-sway-lid-off" ''
     swaymsg output eDP-1 power on
   '';
-  launch-tmux = pkgs.writers.writeBash "launch-tmux" ''
-    if tmux run 2>/dev/null; then
-      tmux new-window -t sandbox:
-      tmux new-session -As sandbox
-    else
-      tmux new-session -ds config -c "$HOME/.config/nixflake"
-      tmux new-session -ds media
-      tmux new-session -As sandbox
-    fi
-  '';
   toggle-notifications = pkgs.writers.writeBash "toggle-notifications" ''
     if makoctl mode | grep -q "default"; then
       makoctl mode -s hidden
@@ -213,8 +203,8 @@ in
           "${mod}+shift+e" = "exec swaynag -t warning -m 'Do you really want to exit sway?' -b 'Yes, exit sway' 'swaymsg exit'";
           "${mod}+shift+s" = "sticky toggle";
           "--locked ${mod}+shift+delete" = "exec systemctl sleep";
-          "--locked ${mod}+o" = "output ${waycfg.mainDisplay} power toggle";
-          "--locked ${mod}+shift+o" = "output ${waycfg.mainDisplay} toggle";
+          "--locked ${mod}+o" = "output ${waycfg.mainMonitor} power toggle";
+          "--locked ${mod}+shift+o" = "output ${waycfg.mainMonitor} toggle";
 
           # Custom external program keymaps
           "${mod}+return" = "exec ${lib.getExe waycfg.terminal} ${lib.getExe pkgs.tmux-startup}";

@@ -59,7 +59,7 @@
     config.workspaceOutputAssign = [
       { output = "HDMI-A-1"; workspace = "5"; }
     ];
-    mainDisplay = "DP-1";
+    mainMonitor = "DP-1";
     sleep = {
       lockBefore = false;
       auto = {

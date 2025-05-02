@@ -26,7 +26,7 @@
     ];
   };
   wayland.windowManager = {
-    mainDisplay = "eDP-1";
+    mainMonitor = "eDP-1";
     sleep = {
       lockBefore = true;
       auto = {

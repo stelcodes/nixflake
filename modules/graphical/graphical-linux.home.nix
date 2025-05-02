@@ -2,42 +2,33 @@
 let
   theme = config.theme.set;
   waycfg = config.wayland.windowManager;
-  inhibitIdleFile = "$HOME/.local/state/inhibit-idle";
-  toggle-inhibit-idle = pkgs.writeShellApplication {
-    name = "toggle-inhibit-idle";
-    runtimeInputs = [ pkgs.coreutils-full ];
-    text = ''
-      file="${inhibitIdleFile}"
-      if test -f "$file"; then
-        rm "$file"
-      else
-        touch "$file"
-      fi
-    '';
-  };
   niri-adjust-scale = pkgs.writePythonApplication {
     name = "niri-adjust-scale";
     text = builtins.readFile ./niri-adjust-scale.py;
   };
   sessionTargets = lib.foldlAttrs
-    (acc: sessionName: deps: acc // {
+    (acc: sessionName: sessionOpts: acc // {
       "${sessionName}-session" = {
         Unit =
-          let depsFull = lib.map (depName: "${depName}.service") deps; in
+          let
+            servicesFull = lib.map
+              (serviceName: "${serviceName}.service")
+              sessionOpts.services;
+          in
           {
             BindsTo = [ "graphical-session.target" ];
-            Wants = depsFull;
-            Before = depsFull;
+            Wants = servicesFull;
+            Before = servicesFull;
           };
       };
     })
     { }
     waycfg.sessions;
   sessionServices = lib.foldlAttrs
-    (acc: sessionName: deps: acc // (lib.lists.foldl
-      (acc: depName: acc //
+    (acc: sessionName: sessionOpts: acc // (lib.lists.foldl
+      (acc: serviceName: acc //
         {
-          "${depName}" = {
+          "${serviceName}" = {
             Unit = {
               BindsTo = lib.mkForce [ "graphical-session.target" ];
               After = lib.mkForce [ "graphical-session.target" ];
@@ -46,7 +37,7 @@ let
           };
         })
       { }
-      deps
+      sessionOpts.services
     ))
     { }
     waycfg.sessions;
@@ -68,12 +59,28 @@ let
     runtimeInputs = [ pkgs.coreutils-full pkgs.jq pkgs.wireplumber pkgs.pipewire ];
     text = builtins.readFile ./pw-rotate-sink.sh;
   };
+  monitor-power = pkgs.writeShellApplication {
+    name = "monitor-power";
+    runtimeInputs = [ pkgs.coreutils-full pkgs.systemd ];
+    text = builtins.concatStringsSep "\n"
+      (lib.mapAttrsToList
+        (sessionName: sessionOpts: /* sh */ ''
+          if systemctl --user -q is-active ${sessionName}.service; then
+            if [ "$1" = "on" ]; then
+              ${sessionOpts.monitorOn}
+            elif [ "$1" = "off" ]; then
+              ${sessionOpts.monitorOff}
+            fi
+          fi
+        '')
+        waycfg.sessions);
+  };
 in
 {
 
   options = {
     wayland.windowManager = {
-      mainDisplay = lib.mkOption {
+      mainMonitor = lib.mkOption {
         type = lib.types.str;
         default = "eDP-1";
       };
@@ -106,7 +113,19 @@ in
         default = pkgs.librewolf;
       };
       sessions = lib.mkOption {
-        type = lib.types.attrsOf (lib.types.listOf lib.types.str);
+        type = lib.types.attrsOf (lib.types.submodule {
+          options = {
+            monitorOn = lib.mkOption {
+              type = lib.types.str;
+            };
+            monitorOff = lib.mkOption {
+              type = lib.types.str;
+            };
+            services = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+            };
+          };
+        });
         default = { };
       };
     };
@@ -140,6 +159,7 @@ in
         # pkgs.wl-screenrec # https://github.com/russelltg/wl-screenrec
         # pkgs.wlogout
         niri-adjust-scale
+        monitor-power
       ] ++ (lib.lists.optionals config.profile.audio [
         pkgs.playerctl
         pkgs.helvum # better looking than qpwgraph
@@ -440,16 +460,6 @@ in
     systemd.user.services = (lib.mkMerge [
       sessionServices
       {
-        swayidle = {
-          # Modifications for services.swayidle
-          Service.ExecStopPost = lib.getExe (pkgs.writeShellApplication {
-            name = "swayidle-cleanup";
-            runtimeInputs = [ pkgs.coreutils-full ];
-            text = ''
-              rm "${inhibitIdleFile}" || true
-            '';
-          });
-        };
         ianny = {
           Service.ExecStart = lib.getExe pkgs.ianny;
         };
@@ -459,7 +469,7 @@ in
             BindsTo = [ "graphical-session.target" ];
             After = [ "graphical-session.target" ];
           };
-          Service.ExecStart = lib.getExe pkgs.wlinhibit;
+          Service.ExecStart = "${pkgs.wlinhibit}/bin/wlinhibit";
         };
         swaybg = lib.mkIf (waycfg.wallpaper != null) {
           Service.ExecStart = "${lib.getExe pkgs.swaybg} -m fill -i ${waycfg.wallpaper}";
@@ -514,40 +524,25 @@ in
       blueman-applet.enable = true;
       polkit-gnome.enable = true;
       ssh-agent.enable = true; # Needs DISPLAY, make sure to start after compositor runs systemctl import-environment
+
       swayidle = {
         enable = true;
         # Waits for commands to finish (-w) by default
         events = [
           {
-            event = "before-sleep";
-            command = lib.getExe (pkgs.writeShellApplication {
-              runtimeInputs = [ pkgs.coreutils pkgs.swaylock pkgs.sway pkgs.niri ];
-              name = "swayidle-before-sleep";
-              text = ''
-                if ${if waycfg.sleep.lockBefore then "true" else "false"}; then
-                  swaylock -f
-                fi
-                swaymsg 'output * power off' || true
-                niri msg action power-off-monitors || true
-              '';
-            });
-          }
-          {
             event = "after-resume";
-            command = lib.getExe (pkgs.writeShellApplication {
-              name = "swayidle-after-resume";
-              runtimeInputs = [ pkgs.coreutils-full pkgs.sway pkgs.niri ];
-              text = ''
-                swaymsg 'output * power on' || true
-                niri msg action power-on-monitors || true
-              '';
-            });
+            command = "${lib.getExe monitor-power} on"; # In case monitor powered off before sleep started
+          }
+        ] ++ lib.lists.optionals waycfg.sleep.lockBefore [
+          {
+            event = "before-sleep";
+            command = "${pkgs.swaylock}/bin/swaylock -f";
           }
         ];
         timeouts = lib.mkIf waycfg.sleep.auto.enable [
           {
             timeout = waycfg.sleep.auto.idleMinutes * 60;
-            command = "systemctl sleep";
+            command = "${pkgs.systemd}/bin/systemctl sleep";
           }
         ];
       };
@@ -566,7 +561,7 @@ in
         enable = true;
         anchor = "bottom-right";
         font = "FiraMono Nerd Font 10";
-        extraConfig = ''
+        extraConfig = /* ini */ ''
           sort=-time
           layer=overlay
           width=280
@@ -678,30 +673,38 @@ in
     };
 
     wayland.windowManager.sessions = {
-      sway = [
-        "waybar"
-        "swayidle"
-        "network-manager-applet"
-        "polkit-gnome"
-        "blueman-applet"
-        "wlsunset"
-        "wayland-pipewire-idle-inhibit"
-        "ianny"
-        "ssh-agent"
-      ];
-      niri = [
-        "swaybg"
-        "waybar"
-        "swayidle"
-        "network-manager-applet"
-        "polkit-gnome"
-        "blueman-applet"
-        "wlsunset"
-        "wayland-pipewire-idle-inhibit"
-        "ianny"
-        "ssh-agent"
-        "xwayland-satellite"
-      ];
+      sway = {
+        monitorOn = "${pkgs.sway}/bin/swaymsg 'output ${waycfg.mainMonitor} power on'";
+        monitorOff = "${pkgs.sway}/bin/swaymsg 'output ${waycfg.mainMonitor} power off'";
+        services = [
+          "waybar"
+          "swayidle"
+          "network-manager-applet"
+          "polkit-gnome"
+          "blueman-applet"
+          "wlsunset"
+          "wayland-pipewire-idle-inhibit"
+          "ianny"
+          "ssh-agent"
+        ];
+      };
+      niri = {
+        monitorOn = "${pkgs.niri}/bin/niri msg output ${waycfg.mainMonitor} on";
+        monitorOff = "${pkgs.niri}/bin/niri msg output ${waycfg.mainMonitor} off";
+        services = [
+          "swaybg"
+          "waybar"
+          "swayidle"
+          "network-manager-applet"
+          "polkit-gnome"
+          "blueman-applet"
+          "wlsunset"
+          "wayland-pipewire-idle-inhibit"
+          "ianny"
+          "ssh-agent"
+          "xwayland-satellite"
+        ];
+      };
     };
 
   };
