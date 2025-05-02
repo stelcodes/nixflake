@@ -176,6 +176,7 @@ in
         ELECTRON_OZONE_PLATFORM_HINT = "wayland";
         QT_QPA_PLATFORM = "wayland";
         NIXOS_OZONE_WL = "1";
+        _JAVA_AWT_WM_NONREPARENTING = "1";
       };
       pointerCursor = {
         package = theme.cursorThemePackage;
