@@ -66,7 +66,7 @@ window-rule {
     open-floating true
     default-column-width { proportion 0.3; }
     default-window-height { proportion 0.3; }
-    opacity 0.8
+    opacity 0.5
     default-floating-position x=10 y=10 relative-to="bottom-right"
 }
 // Block out password managers from screen capture.
