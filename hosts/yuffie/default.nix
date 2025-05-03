@@ -40,9 +40,14 @@
     # When enabled, swaylock only accepts fingerprints https://github.com/swaywm/swaylock/issues/61
     fprintd.enable = true;
     jellyfin = {
-      enable = true;
+      enable = false;
       group = "multimedia";
       openFirewall = false;
+    };
+    tailscale = {
+      enable = true;
+      useRoutingFeatures = "client";
+      extraUpFlags = "--operator=${config.admin.username}";
     };
   };
 

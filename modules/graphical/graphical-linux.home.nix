@@ -525,6 +525,7 @@ in
     services = {
       network-manager-applet.enable = true;
       blueman-applet.enable = true;
+      trayscale.enable = true;
       polkit-gnome.enable = true;
       ssh-agent.enable = true; # Needs DISPLAY, make sure to start after compositor runs systemctl import-environment
 
@@ -675,11 +676,9 @@ in
       gtk4.extraConfig.gtk-application-prefer-dark-theme = 1;
     };
 
-    wayland.windowManager.sessions = {
-      sway = {
-        monitorOn = "${pkgs.sway}/bin/swaymsg 'output ${waycfg.mainMonitor} power on'";
-        monitorOff = "${pkgs.sway}/bin/swaymsg 'output ${waycfg.mainMonitor} power off'";
-        services = [
+    wayland.windowManager.sessions =
+      let
+        sharedServices = [
           "waybar"
           "swayidle"
           "network-manager-applet"
@@ -689,26 +688,24 @@ in
           "wayland-pipewire-idle-inhibit"
           "ianny"
           "ssh-agent"
+          "trayscale"
         ];
+      in
+      {
+        sway = {
+          monitorOn = "${pkgs.sway}/bin/swaymsg 'output ${waycfg.mainMonitor} power on'";
+          monitorOff = "${pkgs.sway}/bin/swaymsg 'output ${waycfg.mainMonitor} power off'";
+          services = sharedServices;
+        };
+        niri = {
+          monitorOn = "${pkgs.niri}/bin/niri msg output ${waycfg.mainMonitor} on";
+          monitorOff = "${pkgs.niri}/bin/niri msg output ${waycfg.mainMonitor} off";
+          services = sharedServices ++ [
+            "swaybg"
+            "xwayland-satellite"
+          ];
+        };
       };
-      niri = {
-        monitorOn = "${pkgs.niri}/bin/niri msg output ${waycfg.mainMonitor} on";
-        monitorOff = "${pkgs.niri}/bin/niri msg output ${waycfg.mainMonitor} off";
-        services = [
-          "swaybg"
-          "waybar"
-          "swayidle"
-          "network-manager-applet"
-          "polkit-gnome"
-          "blueman-applet"
-          "wlsunset"
-          "wayland-pipewire-idle-inhibit"
-          "ianny"
-          "ssh-agent"
-          "xwayland-satellite"
-        ];
-      };
-    };
 
   };
 }

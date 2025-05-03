@@ -13,7 +13,10 @@
       # Need this for font-manager or any other gtk app to work I guess
       dconf.enable = true;
 
-      sway.enable = lib.mkDefault true;
+      sway = {
+        enable = lib.mkDefault true;
+        extraPackages = [ ];
+      };
 
       niri.enable = lib.mkDefault true;
 
