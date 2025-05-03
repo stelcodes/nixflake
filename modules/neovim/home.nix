@@ -492,7 +492,21 @@ in
           config = builtins.readFile ./nvim-lspconfig.lua;
         }
 
-        plugins.markdown-preview-nvim
+        {
+          plugin = plugins.markdown-preview-nvim;
+          type = "lua";
+          config = /* lua */ ''
+            vim.g.mkdp_filetypes = { "markdown" }
+          '';
+        }
+
+        {
+          plugin = plugins.nvim-scrollbar;
+          type = "lua";
+          config = /* lua */ ''
+            require("scrollbar").setup()
+          '';
+        }
 
         {
           plugin = plugins.nvim-cmp;
