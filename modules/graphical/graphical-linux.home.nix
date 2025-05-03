@@ -346,8 +346,10 @@ in
             "custom/wlsunset"
             "custom/wlinhibit"
             "custom/recordplayback"
+            "sway/mode"
+            "sway/workspaces"
+            "niri/workspaces"
           ];
-          modules-center = [ "sway/mode" "sway/workspaces" "niri/workspaces" ];
           modules-right = [
             "cpu"
             "backlight"
