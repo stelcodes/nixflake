@@ -14,6 +14,7 @@ www.youtube.com###guide-content
 www.youtube.com###guide-button
 www.youtube.com###chip-bar
 www.youtube.com###contents > .ytd-secondary-search-container-renderer
+www.youtube.com##ytd-mini-guide-renderer
 
 ! REDDIT
 www.reddit.com##.w-full.masthead
@@ -22,6 +23,7 @@ www.reddit.com##.right-sidebar
 www.reddit.com###login-button
 www.reddit.com###get-app
 www.reddit.com##:matches-path(/^/$/) #main-content
+www.reddit.com##article
 
 ! MISC
 news.ycombinator.com##table .comment
