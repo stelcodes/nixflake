@@ -1,24 +1,5 @@
 -----------------------------------------------------------------------------
--- GLOBAL FUNCTIONS
-
-SearchReplace = function()
-  vim.cmd('noau normal! "vy"')
-  -- TODO: Sanitize / and ? chars in Lua via vim.fn.getreg('v')
-  -- Substitute with verynomagic contents of register v, with multiple matches on each line,
-  -- and put cursor in replacement text position
-  vim.api.nvim_input(':%s/\\V<c-r>v//gc<left><left><left>')
-end
-
-SearchSelection = function()
-  vim.cmd('noau normal! "vy"')
-  -- TODO: Sanitize / and ? chars in Lua via vim.fn.getreg('v')
-  -- Search with verynomagic contents of register v, begin, skip back to last match
-  vim.api.nvim_input('/\\V<c-r>v<cr>N')
-end
-
-SearchClear = function()
-  vim.fn.setreg("/", "")
-end
+-- FUNCTIONS
 
 ToggleParedit = function()
   if vim.g.paredit_mode == 0 then
@@ -32,27 +13,17 @@ ToggleParedit = function()
   vim.cmd 'edit'
 end
 
-ToggleNumbers = function()
-  if vim.o.number or vim.o.relativenumber then
-    vim.o.number = false
-    vim.o.relativenumber = false
-  else
-    vim.o.number = true
-    vim.o.relativenumber = true
-  end
-end
-
 -- See *lua-guide-commands-create*
 vim.api.nvim_create_user_command('ResetWorkspace',
   function(_)
     vim.cmd('silent! tabonly')
     vim.cmd('silent! only')
     vim.cmd('silent! %bdelete')
-    local buf = vim.api.nvim_get_current_buf()            -- should always be 0
+    local buf = vim.api.nvim_get_current_buf()              -- should always be 0
     vim.api.nvim_buf_set_option(buf, "bufhidden", "delete") -- what to do when the buffer is hidden
-    vim.api.nvim_buf_set_option(buf, "buflisted", true)   -- include the buffer in the :bnext list
-    vim.api.nvim_buf_set_option(buf, "buftype", "nofile") -- nofile means the buffer isn't backed by a file and we control its name
-    vim.api.nvim_buf_set_option(buf, "swapfile", false)   -- never swapfiles
+    vim.api.nvim_buf_set_option(buf, "buflisted", true)     -- include the buffer in the :bnext list
+    vim.api.nvim_buf_set_option(buf, "buftype", "nofile")   -- nofile means the buffer isn't backed by a file and we control its name
+    vim.api.nvim_buf_set_option(buf, "swapfile", false)     -- never swapfiles
   end,
   {
     desc = "Reset all tabs, windows, and buffers",
@@ -63,103 +34,72 @@ vim.api.nvim_create_user_command('ResetWorkspace',
 ----------------------------------------------------------------------------------
 -- OPTIONS
 
-vim.cmd 'filetype plugin indent on'
-vim.cmd 'syntax enable'      -- Enables syntax highlighing
-vim.opt.inccommand = 'split' -- Preview pane for substitution
-vim.opt.autoindent = true
-vim.opt.backspace = 'indent,eol,start'
-vim.opt.nrformats = 'bin,hex'
-vim.opt.incsearch = true
-vim.opt.laststatus = 2
-vim.opt.ruler = true
-vim.opt.wildmenu = true
-vim.opt.scrolloff = 1
-vim.opt.sidescrolloff = 20 -- How many columns between cursor and edge when scrolling starts horizontally
-vim.opt.display = 'lastline,msgsep'
-vim.opt.autoread = true
-vim.opt.formatoptions = 'qlj' -- Stop newline continution of comments
-vim.opt.history = 1000
-vim.opt.tabpagemax = 50
-vim.opt.undofile = true -- save undo history
-vim.opt.iskeyword = {
-  '@',
-  '48-57',
-  '_',
-  '192-255',
-  '-',
-  '#'
-}                                 -- treat dash separated words as a word text object
-vim.opt.hidden = true             -- Required to keep multiple buffers open
-vim.opt.encoding = 'utf-8'        -- The encoding displayed
-vim.opt.fileencoding = 'utf-8'    -- The encoding written to file
-vim.opt.mouse = ''                -- Disable the mouse
-vim.opt.smarttab = true
+vim.opt.swapfile = false          -- turn swapfiles off
+vim.opt.undofile = true           -- save undo history
+vim.opt.scrolloff = 10            -- keep cursor centered vertically while scrolling
+vim.opt.sidescrolloff = 20        -- How many columns between cursor and edge when scrolling starts horizontally
 vim.opt.tabstop = 2               -- Insert 2 spaces for a tab
 vim.opt.shiftwidth = 2            -- Change the number of space characters inserted for indentation
 vim.opt.expandtab = true          -- Converts tabs to spaces, if false then nvim-lsp formatting will always use tabs :/
 vim.opt.smartindent = true        -- Makes indenting smart
 vim.opt.updatetime = 300          -- Faster completion
-vim.opt.timeout = false           -- Wait forever for mappings
+vim.opt.timeout = false           -- Wait indefinitely for keymap continuation
 vim.opt.clipboard = 'unnamedplus' -- Copy paste between vim and everything else
 vim.opt.wrap = false              -- Display long lines as just one line
 vim.opt.pumheight = 10            -- Makes popup menu smaller
-vim.opt.ruler = true              -- Show the cursor position all the time
-vim.opt.cmdheight = 2             -- More space for displaying messages
-vim.opt.number = false            -- Line numbers
-vim.opt.relativenumber = false
-vim.opt.cursorline = false        -- Enable highlighting of the current line
 vim.opt.showtabline = 2           -- Always show tabs
 vim.opt.showmode = false          -- We don't need to see things like -- INSERT -- anymore
 vim.opt.signcolumn = 'yes'        -- Always show the signcolumn in the number column
-vim.opt.lazyredraw = true         -- Setting this fixed my tmux rendering issues :)
 vim.opt.splitbelow = true         -- Horizontal splits will automatically be below
 vim.opt.splitright = true         -- Vertical splits will automatically be to the right
 vim.opt.linebreak = true          -- Break lines at word boundaries for readability
 vim.opt.bg = 'dark'               -- Have dark background by default
 vim.opt.whichwrap = 'h,l'         -- Allow left/right scrolling to jump lines
-vim.opt.scrolloff = 10            -- keep cursor centered vertically while scrolling
 vim.opt.numberwidth = 1           -- make minimum width for number column smallest value so it doesn't take up much room
-vim.opt.autowrite = true          -- write to file often
 vim.opt.termguicolors = true      -- enable full color support
 vim.opt.ignorecase = true         -- ignore case when searching
 vim.opt.smartcase = true          -- don't ignore case when searching with capital letters
-vim.opt.swapfile = false          -- turn swapfiles off
-vim.opt.completeopt = {
+vim.opt.completeopt = {           -- Completion behavior
   "menu",
   "menuone",
+  "popup",
   "noselect",
   "preview",
-}                           -- Completion
--- vim.opt.shortmess:append "c"
-vim.g.netrw_fastbrowse = 0; -- don't keep netrw buffers around indefinitely
-vim.opt.conceallevel = 0;   -- let chars be concealed and replaced with single char
+  "fuzzy"
+}
 
 ----------------------------------------------------------------------------------------
 -- GLOBALS
 
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
+-- Disable netrw
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+vim.g.netrw_fastbrowse = 0;
 vim.g['clojure_fuzzy_indent_patterns'] = { '^with', '^def', '^let', '^try', '^do' }
 vim.g['clojure_align_multiline_strings'] = 0
 vim.g['clojure_align_subforms'] = 1
--- Number of lines formatting will affect by default, 0 is no limit
 vim.g['clojure_maxlines'] = 0
--- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#denols
+-- https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#denols
 vim.g.markdown_fenced_languages = {
   "ts=typescript"
 }
 
+vim.cmd 'filetype plugin indent on' -- Enables filetype detection and features
+vim.filetype.add({
+  extension = {
+    age = 'age',
+  },
+})
+
 ----------------------------------------------------------------------------------------
 -- MAPPINGS
-
--- LEADER
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-vim.keymap.set('n', '<Space>', '<Nop>')
-vim.keymap.set('x', '<leader>', '<Nop>')
 
 -- TEXT MANIPULATION
 -- Yank word under cursor
 vim.keymap.set('n', 'Y', 'viwy')
-vim.keymap.set({ 'n', 'x' }, '<leader>/', SearchClear)
+vim.keymap.set({ 'n', 'x' }, '<leader>/', '<cmd>nohlsearch<cr>')
 
 -- BUFFERS
 -- <c-^> is buffer back
@@ -221,27 +161,18 @@ vim.keymap.set('n', '<c-m>', '<cmd>delmarks A-Z0-9<cr>') -- delete all marks
 
 -- OTHER STUFF
 -- Copy relative path of file
-vim.keymap.set('n', 'f', ':let @+=expand("%")<cr>:echo expand("%")<cr>')
+vim.keymap.set('n', 'f', '<cmd>let @+=expand("%")<cr><cmd>echo expand("%")<cr>')
 -- Copy absolute path of file
-vim.keymap.set('n', 'F', ':let @+=expand("%:p")<cr>:echo expand("%:p")<cr>')
+vim.keymap.set('n', 'F', '<cmd>let @+=expand("%:p")<cr><cmd>echo expand("%:p")<cr>')
 -- Make terminal mode easy to exit
-vim.keymap.set('t', '<c-\\><esc>', '<c-\\><c-n>')
---Debugging syntax highlighting
-vim.keymap.set('n', '<f10>',
-  ':echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . "> trans<" . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<cr>')
+vim.keymap.set('t', '<c-\\>', '<c-\\><c-n>')
 -- Toggle spell
-vim.keymap.set('n', '<c-s>', ':set spell!<cr>')
+vim.keymap.set('n', '<c-s>', '<cmd>set spell!<cr>')
 vim.keymap.set('n', '<c-p>', ToggleParedit)
-vim.keymap.set('n', '<c-n>', ToggleNumbers)
+vim.keymap.set('n', '<c-n>', '<cmd>set relativenumber!<cr>')
 
 ---------------------------------------------------------------------------------
--- EVENT BASED COMMANDS
-
-vim.filetype.add({
-  extension = {
-    age = 'age',
-  },
-})
+-- AUTOCMDS
 
 local general = vim.api.nvim_create_augroup('general', { clear = true })
 
@@ -257,6 +188,7 @@ vim.api.nvim_create_autocmd('FileType', {
   command = 'setlocal wrap',
 })
 
+-- Check file modification timestamp for writes from another source
 vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter' }, {
   pattern = '*',
   group = general,

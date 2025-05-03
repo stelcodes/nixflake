@@ -453,6 +453,8 @@ in
           '';
         }
 
+        plugins.nvim-hlslens
+
       ] ++ (lib.lists.optionals config.activities.coding [
 
         workspace-diagnostics-nvim
@@ -505,6 +507,9 @@ in
           type = "lua";
           config = /* lua */ ''
             require("scrollbar").setup()
+            -- requires nvim-hlslens, gitsigns
+            require("scrollbar.handlers.search").setup()
+            require("scrollbar.handlers.gitsigns").setup()
           '';
         }
 
