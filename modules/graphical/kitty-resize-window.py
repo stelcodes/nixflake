@@ -9,7 +9,7 @@ ResizeParams = NamedTuple(
 
 
 def ls_cmd(r: ResizeParams) -> List[str]:
-    # https://sw.kovidgoyal.net/kitty/remote-control/#kitten-resize-window
+    # https://sw.kovidgoyal.net/kitty/remote-control/#kitten-ls
     return [
         "ls",
         "--match=neighbor:" + r.neighbor,
@@ -51,6 +51,7 @@ def main(args: List[str]) -> str:
     direction = args[1]
     # Try first set of resize params
     params = directions[direction][0]
+    # To avoid annoying error message flash, check if neighbor exists first
     ls_result = main.remote_control(ls_cmd(params), capture_output=True, text=True)
     if ls_result.stdout.strip() != "":
         main.remote_control(resize_cmd(params))
