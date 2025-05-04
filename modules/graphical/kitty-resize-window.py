@@ -1,32 +1,47 @@
 # Requires single argument, one of: "left" "right" "up" "down"
 # Test within kitten shell: kitten resize_window.py left
-from typing import Dict, List, Tuple
+from typing import Dict, List, NamedTuple, Tuple
 from kittens.tui.handler import kitten_ui
 
+ResizeParams = NamedTuple(
+    "ResizeCmd", [("axis", str), ("increment", str), ("neighbor", str)]
+)
 
-def resize_cmd(axis: str, increment: str, neighbor: str) -> List:
+
+def ls_cmd(r: ResizeParams) -> List[str]:
     # https://sw.kovidgoyal.net/kitty/remote-control/#kitten-resize-window
     return [
-        "resize-window",
-        "--axis=" + axis,
-        "--increment=" + increment,
-        "--match=neighbor:" + neighbor,
+        "ls",
+        "--match=neighbor:" + r.neighbor,
     ]
 
 
-direction_to_args: Dict[str, Tuple[List[str], List[str]]] = {
+def resize_cmd(r: ResizeParams) -> List[str]:
+    # https://sw.kovidgoyal.net/kitty/remote-control/#kitten-resize-window
+    return [
+        "resize-window",
+        "--axis=" + r.axis,
+        "--increment=" + r.increment,
+        "--match=neighbor:" + r.neighbor,
+    ]
+
+
+directions: Dict[str, Tuple[ResizeParams, ResizeParams]] = {
     "left": (
-        resize_cmd("horizontal", "1", "right"),
-        resize_cmd("horizontal", "-1", "left"),
+        ResizeParams("horizontal", "1", "right"),
+        ResizeParams("horizontal", "-1", "left"),
     ),
     "right": (
-        resize_cmd("horizontal", "-1", "right"),
-        resize_cmd("horizontal", "1", "left"),
+        ResizeParams("horizontal", "-1", "right"),
+        ResizeParams("horizontal", "1", "left"),
     ),
-    "up": (resize_cmd("vertical", "-1", "top"), resize_cmd("vertical", "1", "bottom")),
+    "up": (
+        ResizeParams("vertical", "-1", "top"),
+        ResizeParams("vertical", "1", "bottom"),
+    ),
     "down": (
-        resize_cmd("vertical", "1", "top"),
-        resize_cmd("vertical", "-1", "bottom"),
+        ResizeParams("vertical", "1", "top"),
+        ResizeParams("vertical", "-1", "bottom"),
     ),
 }
 
@@ -34,9 +49,15 @@ direction_to_args: Dict[str, Tuple[List[str], List[str]]] = {
 @kitten_ui(allow_remote_control=True)
 def main(args: List[str]) -> str:
     direction = args[1]
-    first_cmd = direction_to_args[direction][0]
-    second_cmd = direction_to_args[direction][1]
-    result = main.remote_control(first_cmd)
-    if result.returncode != 0:
-        main.remote_control(second_cmd)
-    return ""
+    # Try first set of resize params
+    params = directions[direction][0]
+    ls_result = main.remote_control(ls_cmd(params), capture_output=True, text=True)
+    if ls_result.stdout.strip() != "":
+        main.remote_control(resize_cmd(params))
+        return ""
+    # If the first set of resize params were invalid, try the next
+    params = directions[direction][1]
+    ls_result = main.remote_control(ls_cmd(params), capture_output=True, text=True)
+    if ls_result.stdout.strip() != "":
+        main.remote_control(resize_cmd(params))
+        return ""
