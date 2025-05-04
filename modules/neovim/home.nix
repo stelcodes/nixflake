@@ -268,27 +268,6 @@ in
         }
 
         {
-          plugin = plugins.comment-nvim;
-          type = "lua";
-          config = /* lua */ ''
-            local opts = {}
-            -- Don't rely on this plugin or treesitter being present
-            local success, pre_hook = pcall(function()
-              require('ts_context_commentstring').setup {
-                enable_autocmd = false,
-              }
-              return require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook()
-            end)
-            if success then
-              opts.pre_hook = pre_hook
-            end
-            require('Comment').setup(opts)
-            local ft = require('Comment.ft')
-            ft.set('clojure', ';; %s')
-          '';
-        }
-
-        {
           plugin = plugins.lualine-nvim;
           type = "lua";
           config = /* lua */ ''
@@ -455,11 +434,35 @@ in
 
         plugins.nvim-hlslens
 
+        {
+          plugin = plugins.mini-comment;
+          type = "lua";
+          config = /* lua */''
+            require('mini.comment').setup()
+          '';
+        }
+
       ] ++ (lib.lists.optionals config.activities.coding [
 
         workspace-diagnostics-nvim
 
-        plugins.nvim-ts-context-commentstring # For accurate comments
+        {
+          plugin = plugins.nvim-ts-context-commentstring;
+          type = "lua";
+          config = /* lua */ ''
+            -- Incorrect style
+            -- Correct style
+            require('ts_context_commentstring').setup {
+              enable_autocmd = false,
+            }
+            local get_option = vim.filetype.get_option
+            vim.filetype.get_option = function(filetype, option)
+              return option == "commentstring"
+                and require("ts_context_commentstring.internal").calculate_commentstring()
+                or get_option(filetype, option)
+            end
+          '';
+        }
         {
           plugin = plugins.nvim-treesitter.withAllGrammars;
           type = "lua";
