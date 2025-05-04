@@ -69,14 +69,13 @@ let theme = config.theme.set; in
       keybindings = {
         "kitty_mod+ctrl+u" = "scroll_page_up";
         "kitty_mod+ctrl+d" = "scroll_page_down";
-        "kitty_mod+up" = "scroll_to_prompt -1";
-        "kitty_mod+down" = "scroll_to_prompt 1";
+        "kitty_mod+[" = "scroll_to_prompt -1";
+        "kitty_mod+]" = "scroll_to_prompt 1";
         "kitty_mod+space" = "show_scrollback";
         "kitty_mod+shift+space" = "show_first_command_output_on_screen";
         "kitty_mod+n" = "new_window_cwd";
         "kitty_mod+x" = "new_window_cwd";
         "kitty_mod+q" = "close_window_with_confirmation ignore-shell";
-        "kitty_mod+r" = "start_resizing_window";
         "kitty_mod+j" = "next_window";
         "kitty_mod+k" = "previous_window";
         "kitty_mod+shift+j" = "focus_visible_window";
@@ -86,7 +85,8 @@ let theme = config.theme.set; in
         "kitty_mod+h" = "previous_tab";
         "kitty_mod+shift+l" = "move_tab_forward";
         "kitty_mod+shift+h" = "move_tab_backward";
-        "kitty_mod+shift+t" = "set_tab_title";
+        "kitty_mod+r" = "set_tab_title";
+        "kitty_mod+shift+t" = "detach_tab ask";
         "kitty_mod+m" = "next_layout";
         "kitty_mod+plus" = "change_font_size all +1.0";
         "kitty_mod+minus" = "change_font_size all -1.0";
@@ -100,7 +100,14 @@ let theme = config.theme.set; in
         "super+v" = "paste_from_clipboard"; # MacOS
         "ctrl+shift+c" = "send_key ctrl+c";
         "ctrl+shift+v" = "send_key ctrl+v";
+        "kitty_mod+up" = "kitten resize_window.py up";
+        "kitty_mod+down" = "kitten resize_window.py down";
+        "kitty_mod+left" = "kitten resize_window.py left";
+        "kitty_mod+right" = "kitten resize-window.py right";
       };
+    };
+    xdg.configFile = {
+      "kitty/resize_window.py".source = ./kitty-resize-window.py;
     };
   };
 }
