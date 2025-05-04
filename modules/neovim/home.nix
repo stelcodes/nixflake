@@ -255,7 +255,7 @@ in
         plugins.telescope-file-browser-nvim
         plugins.telescope-ui-select-nvim
         plugins.telescope-fzf-native-nvim
-        plugins.telescope-manix
+        plugins.telescope-undo-nvim
         {
           plugin = plugins.telescope-nvim;
           type = "lua";
