@@ -140,6 +140,10 @@
           hostName = "boko";
           system = "aarch64-linux";
         };
+        hetznercloud = nixosMachine {
+          hostName = "hetznercloud";
+          system = "x86_64-linux";
+        };
         sora = nixosMachine {
           hostName = "sora";
           system = "x86_64-linux";
