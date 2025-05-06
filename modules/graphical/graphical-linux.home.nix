@@ -155,6 +155,7 @@ in
         pkgs.rofimoji # Great associated word hints with extensive symbol lists to choose from
         pkgs.wdisplays
         pkgs.libnotify # for notify-send
+        pkgs.hyprpicker
         # pkgs.kooha # Doesn't work with niri atm
         # pkgs.wl-screenrec # https://github.com/russelltg/wl-screenrec
         # pkgs.wlogout

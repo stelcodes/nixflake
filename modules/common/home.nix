@@ -82,6 +82,7 @@
         pkgs.p7zip
         pkgs.mediainfo # for yazi
         inputs.agenix.packages.${pkgs.system}.default
+        pkgs.git-cliff
       ]);
 
       sessionVariables = {

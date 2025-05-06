@@ -23,6 +23,7 @@
       pkgs.thunderbird
       (pkgs.createBrowserApp { name = "Bandcamp"; url = "https://bandcamp.com"; })
       pkgs.kdePackages.k3b
+      pkgs.calibre
     ];
   };
   wayland.windowManager = {
