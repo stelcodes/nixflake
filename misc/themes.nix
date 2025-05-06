@@ -161,8 +161,14 @@
 
     black = "#15191c";
 
-    gtkThemeName = "Everforest-Dark-BL";
-    gtkThemePackage = pkgs.everforest-gtk-theme;
+    gtkThemeName = "Everforest-Dark-Medium";
+    gtkThemePackage = pkgs.everforest-gtk-theme.override {
+      colorVariants = [ "dark" ];
+      themeVariants = [ "default" ];
+      sizeVariants = [ "standard" ];
+      iconVariants = [ "Dark" ];
+      tweakVariants = [ "outline" "medium" ];
+    };
     iconThemeName = "Everforest-Dark";
     iconThemePackage = gtkThemePackage;
     cursorThemeName = "Nordzy-cursors";

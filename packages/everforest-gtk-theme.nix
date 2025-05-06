@@ -1,44 +1,127 @@
 { lib
 , stdenvNoCC
 , fetchFromGitHub
+, gnome-shell
+, sassc
 , gnome-themes-extra
 , gtk-engine-murrine
+, unstableGitUpdater
+, colorVariants ? [ ]
+, sizeVariants ? [ ]
+, themeVariants ? [ ]
+, tweakVariants ? [ ]
+, iconVariants ? [ ]
+,
 }:
-stdenvNoCC.mkDerivation rec {
+
+let
   pname = "everforest-gtk-theme";
-  version = "unstable-2022-12-09";
+  colorVariantList = [
+    "dark"
+    "light"
+  ];
+  sizeVariantList = [
+    "compact"
+    "standard"
+  ];
+  themeVariantList = [
+    "default"
+    "green"
+    "grey"
+    "orange"
+    "pink"
+    "purple"
+    "red"
+    "teal"
+    "yellow"
+    "all"
+  ];
+  tweakVariantList = [
+    "soft"
+    "medium"
+    "black"
+    "float"
+    "outline"
+  ];
+  iconVariantList = [
+    "Dark"
+    "Light"
+  ];
+in
+lib.checkListOfEnum "${pname}: colorVariants" colorVariantList colorVariants lib.checkListOfEnum
+  "${pname}: sizeVariants"
+  sizeVariantList
+  sizeVariants
+  lib.checkListOfEnum
+  "${pname}: themeVariants"
+  themeVariantList
+  themeVariants
+  lib.checkListOfEnum
+  "${pname}: tweakVariants"
+  tweakVariantList
+  tweakVariants
+  lib.checkListOfEnum
+  "${pname}: iconVariants"
+  iconVariantList
+  iconVariants
+
+  stdenvNoCC.mkDerivation
+{
+  inherit pname;
+  version = "0-unstable-2025-04-24";
 
   src = fetchFromGitHub {
     owner = "Fausto-Korpsvart";
     repo = "Everforest-GTK-Theme";
-    rev = "8481714cf9ed5148694f1916ceba8fe21e14937b";
-    hash = "sha256-NO12ku8wnW/qMHKxi5TL/dqBxH0+cZbe+fU0iicb9JU=";
+    rev = "934ca11a4d38d6ef1f3854bb6950fa559e15e65c";
+    hash = "sha256-U5Qsr5RH+MfKuPgexAiyQiQfLfLS4cpSJqc/+jX/53s=";
   };
 
-  propagatedUserEnvPkgs = [
-    gtk-engine-murrine
-  ];
+  propagatedUserEnvPkgs = [ gtk-engine-murrine ];
 
-  buildInputs = [
-    gnome-themes-extra
+  nativeBuildInputs = [
+    gnome-shell
+    sassc
   ];
+  buildInputs = [ gnome-themes-extra ];
 
   dontBuild = true;
+
+  passthru.updateScript = unstableGitUpdater { };
+
+  # Scanning all files (30000+ files) takes too long
+  dontPatchShebangs = true;
+
+  postPatch = ''
+    patchShebangs themes/install.sh
+  '';
 
   installPhase = ''
     runHook preInstall
     mkdir -p $out/share/themes
-    mkdir -p $out/share/icons
-    cp -a themes/* $out/share/themes
-    cp -a icons/* $out/share/icons
+    cd themes
+    ./install.sh -n Everforest \
+    ${lib.optionalString (colorVariants != [ ]) "-c " + toString colorVariants} \
+    ${lib.optionalString (sizeVariants != [ ]) "-s " + toString sizeVariants} \
+    ${lib.optionalString (themeVariants != [ ]) "-t " + toString themeVariants} \
+    ${lib.optionalString (tweakVariants != [ ]) "--tweaks " + toString tweakVariants} \
+    -d "$out/share/themes"
+    cd ../icons
+    ${lib.optionalString (iconVariants != [ ]) ''
+      mkdir -p $out/share/icons
+      cp -a ${toString (map (v: "Everforest-${v}") iconVariants)} $out/share/icons/
+    ''}
     runHook postInstall
   '';
 
-  # meta = with lib; {
-  #   description = "A Gtk theme based on the Gruvbox colour pallete";
-  #   homepage = "https://www.pling.com/p/1681313/";
-  #   license = licenses.gpl3Only;
-  #   platforms = platforms.unix;
-  #   maintainers = [ maintainers.math-42 ];
-  # };
+  # Scanning all files (30000+ files) takes too long
+  dontFixup = true;
+
+  meta = with lib; {
+    description = "Everforest colour palette for GTK";
+    homepage = "https://github.com/Fausto-Korpsvart/Everforest-GTK-Theme";
+    license = licenses.gpl3Only;
+    maintainers = with maintainers; [ jn-sena ];
+    platforms = platforms.unix;
+  };
 }

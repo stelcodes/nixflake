@@ -259,4 +259,5 @@ final: prev: {
       fi
     '';
   };
+  everforest-gtk-theme = final.callPackage ./everforest-gtk-theme.nix { };
 }
