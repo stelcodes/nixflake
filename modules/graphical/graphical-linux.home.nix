@@ -563,36 +563,38 @@ in
 
       mako = {
         enable = true;
-        anchor = "bottom-right";
-        font = "FiraMono Nerd Font 10";
-        extraConfig = /* ini */ ''
-          sort=-time
-          layer=overlay
-          width=280
-          height=110
-          border-radius=5
-          icons=1
-          max-icon-size=64
-          default-timeout=7000
-          ignore-timeout=1
-          padding=14
-          margin=20
-          outer-margin=0,0,45,0
-          background-color=${theme.bg}
-          text-color=${theme.fg}
-
-          [urgency=low]
-          border-color=${theme.blue}
-
-          [urgency=normal]
-          border-color=${theme.bg3}
-
-          [urgency=high]
-          border-color=${theme.red}
-
-          [mode=hidden]
-          invisible=1
-        '';
+        settings = {
+          anchor = "bottom-right";
+          font = "FiraMono Nerd Font 10";
+          sort = "-time";
+          layer = "overlay";
+          width = "280";
+          height = "110";
+          border-radius = "5";
+          icons = "1";
+          max-icon-size = "64";
+          default-timeout = "7000";
+          ignore-timeout = "1";
+          padding = "14";
+          margin = "20";
+          outer-margin = "0,0,45,0";
+          background-color = theme.bg;
+          text-color = theme.fg;
+        };
+        criteria = {
+          "urgency=low" = {
+            border-color = theme.blue;
+          };
+          "urgency=normal" = {
+            border-color = theme.bg3;
+          };
+          "urgency=high" = {
+            border-color = theme.red;
+          };
+          "mode=hidden" = {
+            invisible = "1";
+          };
+        };
       };
 
       wayland-pipewire-idle-inhibit = {
