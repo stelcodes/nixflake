@@ -6,6 +6,7 @@
 
   inputs = {
     # nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    # nixpkgs.url = "/home/stel/code/nixpkgs/master";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     # nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
@@ -56,19 +57,10 @@
       url = "github:catppuccin/btop";
       flake = false;
     };
-    nvim-origami = {
-      url = "github:chrisgrieser/nvim-origami";
-      flake = false;
-    };
     workspace-diagnostics-nvim = {
       url = "github:artemave/workspace-diagnostics.nvim";
       flake = false;
     };
-    flake-registry = {
-      url = "github:nixos/flake-registry";
-      flake = false;
-    };
-
   };
 
   outputs = inputs: {
