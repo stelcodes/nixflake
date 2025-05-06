@@ -447,23 +447,6 @@ in
         workspace-diagnostics-nvim
 
         {
-          plugin = plugins.nvim-ts-context-commentstring;
-          type = "lua";
-          config = /* lua */ ''
-            -- Incorrect style
-            -- Correct style
-            require('ts_context_commentstring').setup {
-              enable_autocmd = false,
-            }
-            local get_option = vim.filetype.get_option
-            vim.filetype.get_option = function(filetype, option)
-              return option == "commentstring"
-                and require("ts_context_commentstring.internal").calculate_commentstring()
-                or get_option(filetype, option)
-            end
-          '';
-        }
-        {
           plugin = plugins.nvim-treesitter.withAllGrammars;
           type = "lua";
           config = /* lua */ ''
@@ -499,10 +482,23 @@ in
 
         {
           plugin = plugins.markdown-preview-nvim;
-          type = "lua";
-          config = /* lua */ ''
-            vim.g.mkdp_filetypes = { "markdown" }
-          '';
+          config =
+            let
+              # I would use luakit if there was an easy way to open new windows
+              # https://github.com/luakit/luakit/issues/509
+              open-browser = pkgs.writeShellApplication {
+                name = "open-browser";
+                text = ''
+                  ${lib.getExe pkgs.ungoogled-chromium} --new-window --app="$1"
+                '';
+              };
+            in
+              /* vim */ ''
+              let g:mkdp_auto_close = 0
+              let g:mkdp_echo_preview_url = 1
+              let g:mkdp_browser = '${lib.getExe open-browser}'
+              let g:mkdp_theme = 'light'
+            '';
         }
 
         {
