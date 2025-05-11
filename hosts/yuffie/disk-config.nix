@@ -23,16 +23,22 @@
               content = {
                 type = "luks";
                 name = "crypted";
-                # disable settings.keyFile if you want to use interactive password entry
-                passwordFile = "/tmp/secret.key"; # Interactive
-                settings = {
-                  allowDiscards = true;
-                  # keyFile = "/tmp/secret.key";
-                };
-                # additionalKeyFiles = [ "/tmp/additionalSecret.key" ];
+                # The file containing the password, only used during initial setup
+                passwordFile = "/tmp/secret.key";
+                # Allows TRIM requests, an optimization for SSDs
+                # https://askubuntu.com/a/243527
+                settings.allowDiscards = true;
                 content = {
                   type = "btrfs";
                   extraArgs = [ "-f" ];
+                  ###############################################################
+                  # Helpful stuff:
+                  # btrfs subvolume list -at /
+                  ###############################################################
+                  # Creating new subvolumes manually after disko install:
+                  # mount -t btrfs -o subvolid=0 /dev/mapper/crypted /mnt/toplvlbtrfs
+                  # cd /mnt/toplvlbtrfs && btrfs subvolume create home-snapshots
+                  ###############################################################
                   subvolumes = {
                     "/root" = {
                       mountpoint = "/";
@@ -43,6 +49,13 @@
                     };
                     "/home" = {
                       mountpoint = "/home";
+                      mountOptions = [
+                        "compress=zstd"
+                        "noatime"
+                      ];
+                    };
+                    "/home-snapshots" = {
+                      mountpoint = "/home/.snapshots";
                       mountOptions = [
                         "compress=zstd"
                         "noatime"

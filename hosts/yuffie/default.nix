@@ -47,7 +47,37 @@
     tailscale = {
       enable = true;
       useRoutingFeatures = "client";
-      extraUpFlags = "--operator=${config.admin.username}";
+      extraUpFlags = "--operator=${config.admin.username}"; # For trayscale
+    };
+    snapper = {
+      # Must create btrfs snapshots subvolume manually
+      # sudo btrfs subvolume create <mount_point>/.snapshots
+      snapshotInterval = "hourly"; # (terrible naming, this is a calendar value not a timespan)
+      persistentTimer = true; # Trigger snapshot immediately if last trigger was missed
+      cleanupInterval = "1d";
+      # https://wiki.archlinux.org/title/Snapper
+      # http://snapper.io/manpages/snapper-configs.html
+      configs = {
+        home = {
+          # sudo btrfs subvolume create /home/.snapshots
+          SUBVOLUME = "/home";
+          ALLOW_USERS = [ config.admin.username ]; # Users that can "operate a config"
+          FSTYPE = "btrfs";
+          SPACE_LIMIT = "0.5"; # Limit of filesystem space to use
+          FREE_LIMIT = "0.2"; # Limit of filesystem space that should be free
+          NUMBER_CLEANUP = true; # Should the number cleanup algorithm be used
+          NUMBER_LIMIT = "20"; # How many numbered snapshots are kept upon cleanup
+          NUMBER_LIMIT_IMPORTANT = "20"; # How many numbered snapshots marked with "important" are kept upon cleanup
+          TIMELINE_CREATE = true; # Should hourly snapshots be taken
+          TIMELINE_CLEANUP = true; # Should hourly snapshots be cleaned up
+          TIMELINE_LIMIT_HOURLY = "6"; # How many hourly snapshots are kept upon cleanup
+          TIMELINE_LIMIT_DAILY = "6"; # How many daily snapshots are kept upon cleanup
+          TIMELINE_LIMIT_WEEKLY = "6"; # How many weekly snapshots are kept upon cleanup
+          TIMELINE_LIMIT_MONTHLY = "6"; # # How many monthly snapshots are kept upon cleanup
+          TIMELINE_LIMIT_QUARTERLY = "0"; # How many quarterly snapshots are kept upon cleanup
+          TIMELINE_LIMIT_YEARLY = "0"; # How many yearly snapshots are kept upon cleanup
+        };
+      };
     };
   };
 
