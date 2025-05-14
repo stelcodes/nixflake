@@ -364,11 +364,13 @@
             caddy-server = "echo 'http://localhost:3030' && caddy file-server --listen :3030 --root";
             gists = "gh gist view";
             git-reauthor-all-commits = ''git filter-branch -f --env-filter "GIT_AUTHOR_NAME='${gitName}'; GIT_AUTHOR_EMAIL='${gitEmail}'; GIT_COMMITTER_NAME='${gitName}'; GIT_COMMITTER_EMAIL='${gitEmail}';" HEAD'';
+            ffmpeg = "ffmpeg -hide_banner";
+            ffprobe = "ffprobe -hide_banner";
           } // lib.optionalAttrs pkgs.stdenv.isLinux {
             sc = "systemctl";
             scu = "systemctl --user";
-            jc = "journalctl -exf --unit"; # Using --unit for better completion
-            jcu = "journalctl -exf --user-unit"; # Using --user-unit for better completion
+            jc = "journalctl -ex --unit"; # Using --unit for better completion
+            jcu = "journalctl -ex --user-unit"; # Using --user-unit for better completion
             ud = "udisksctl";
             sway = "exec systemd-cat --identifier=sway sway";
             swaytree = "swaymsg -t get_tree | nvim -R";
