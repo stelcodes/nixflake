@@ -204,11 +204,12 @@ final: prev: {
   writePythonApplication =
     # My own custom python writer that uses ruff instead of flake8. Name collision purposefully avoided.
     { name
+    , runtimeInputs ? [ ]
     , libraries ? [ ]
     , checkIgnore ? [ ]
     , doCheck ? true
     , text
-    }@args:
+    }:
     let
       python = final.python3;
       ignoreAttribute =
@@ -218,6 +219,10 @@ final: prev: {
     final.writers.makeScriptWriter
       {
         interpreter = (python.withPackages (ps: libraries)).interpreter;
+        makeWrapperArgs =
+          if runtimeInputs != [ ] then
+            [ "--prefix PATH : ${final.lib.makeBinPath runtimeInputs}" ]
+          else [ ];
         check = final.lib.optionalString doCheck (
           final.writers.writeDash "pythoncheck.sh" ''
             exec ${final.ruff}/bin/ruff check ${ignoreAttribute} "$1"

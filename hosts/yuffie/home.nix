@@ -25,6 +25,11 @@
       (pkgs.createBrowserApp { name = "Discord"; url = "https://app.discord.com"; })
       pkgs.kdePackages.k3b
       pkgs.calibre
+      (pkgs.writePythonApplication {
+        name = "video-with-subs";
+        runtimeInputs = [ pkgs.ffmpeg ];
+        text = builtins.readFile ../../misc/video-with-subs.py;
+      })
     ];
   };
   wayland.windowManager = {
