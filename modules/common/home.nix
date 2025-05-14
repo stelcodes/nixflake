@@ -169,6 +169,22 @@
           # };
           # pull.rebase = "true";
         };
+        delta = {
+          enable = true;
+          options = {
+            decorations = {
+              commit-style = "bold yellow ul";
+              commit-decoration-style = "";
+              file-style = "yellow";
+              file-decoration-style = "";
+              hunk-header-style = "omit";
+              minus-style = "normal #49343a";
+              plus-style = "normal #2f4030";
+              zero-style = "";
+            };
+            features = "decorations";
+          };
+        };
       };
 
       fzf.enable = true;
