@@ -260,4 +260,12 @@ final: prev: {
     '';
   };
   everforest-gtk-theme = final.callPackage ./everforest-gtk-theme.nix { };
+  open-browser-app = final.writeShellApplication {
+    # I would use luakit if there was an easy way to open new windows
+    # https://github.com/luakit/luakit/issues/509
+    name = "open-browser-app";
+    text = ''
+      ${final.lib.getExe final.ungoogled-chromium} --new-window --app="$1"
+    '';
+  };
 }
