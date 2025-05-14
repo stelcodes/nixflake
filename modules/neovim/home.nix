@@ -30,6 +30,8 @@ in
       pkgs.gopls
       pkgs.svelte-language-server
       pkgs.tailwindcss-language-server
+      pkgs.markdown-oxide
+      pkgs.marksman
     ];
     plugins =
       let

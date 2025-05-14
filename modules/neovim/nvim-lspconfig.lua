@@ -1,5 +1,4 @@
 -- https://github.com/neovim/nvim-lspconfig
-local lspconfig = require('lspconfig')
 local wd = require("workspace-diagnostics")
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -9,42 +8,36 @@ local on_attach = function(client, bufnr)
   wd.populate_workspace_diagnostics(client, bufnr)
 end
 
-lspconfig.tailwindcss.setup{}
-lspconfig.astro.setup {}
-lspconfig.html.setup {
+vim.lsp.config('*', {
   capabilities = capabilities,
-}
-lspconfig.cssls.setup {
-  capabilities = capabilities,
-}
-lspconfig.eslint.setup {
-  on_attach = function(client, bufnr)
-    wd.populate_workspace_diagnostics(client, bufnr)
-    -- vim.api.nvim_create_autocmd("BufWritePre", {
-    --   buffer = bufnr,
-    --   command = "EslintFixAll",
-    -- })
-  end,
-}
-lspconfig.jsonls.setup {
-  capabilities = capabilities,
-}
-lspconfig.clojure_lsp.setup {}
-lspconfig.ruff.setup {}
-lspconfig.pyright.setup {}
-lspconfig.gopls.setup {}
-lspconfig.ts_ls.setup {
-  on_attach = function(client, bufnr)
-    wd.populate_workspace_diagnostics(client, bufnr)
-  end
-}
-lspconfig.svelte.setup {}
-lspconfig.denols.setup {
-  autostart = false
-}
-lspconfig.java_language_server.setup {}
-lspconfig.rust_analyzer.setup {}
-lspconfig.nil_ls.setup {
+  on_attach = on_attach,
+})
+
+vim.lsp.enable('marksman')
+vim.lsp.enable('tailwindcss')
+vim.lsp.enable('astro')
+vim.lsp.enable('html')
+vim.lsp.enable('cssls')
+vim.lsp.enable('eslint')
+-- vim.api.nvim_create_autocmd("BufWritePre", {
+--   buffer = bufnr,
+--   command = "EslintFixAll",
+-- })
+vim.lsp.enable('jsonls')
+vim.lsp.enable('clojure_lsp')
+vim.lsp.enable('ruff')
+vim.lsp.enable('pyright')
+vim.lsp.enable('gopls')
+vim.lsp.enable('ts_ls')
+vim.lsp.enable('svelte')
+vim.lsp.enable('denols')
+vim.lsp.enable('denols', {
+  autostart = false,
+})
+vim.lsp.enable('java_language_server')
+vim.lsp.enable('rust_analyzer')
+vim.lsp.enable('nil_ls')
+vim.lsp.config('nil_ls', {
   settings = {
     ['nil'] = {
       autoArchive = true,
@@ -53,8 +46,9 @@ lspconfig.nil_ls.setup {
       },
     },
   },
-}
-lspconfig.lua_ls.setup {
+})
+vim.lsp.enable('lua_ls')
+vim.lsp.config('lua_ls', {
   settings = {
     Lua = {
       diagnostics = {
@@ -62,7 +56,7 @@ lspconfig.lua_ls.setup {
       }
     }
   }
-}
+})
 
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', {}),
