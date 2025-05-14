@@ -6,15 +6,8 @@
     };
     stateVersion = "24.11";
     packages = [
-      # pkgs.davinci-resolve not working
-      # pkgs.obsidian
-      # pkgs.discord-firefox
-      # pkgs.signal-desktop
-      # pkgs.retroarch-loaded
-      # pkgs.sshfs
-      # pkgs.nfs-utils
-      # pkgs.kodi-loaded
-      # pkgs.rembg
+      pkgs.signal-desktop
+      pkgs.retroarch-free
       pkgs.ungoogled-chromium
       pkgs.gimp-with-plugins
       pkgs.jellyfin-media-player
@@ -25,6 +18,10 @@
       (pkgs.createBrowserApp { name = "Discord"; url = "https://app.discord.com"; })
       pkgs.kdePackages.k3b
       pkgs.calibre
+      pkgs.deploy-rs
+      pkgs.open-browser-app
+      pkgs.mgba
+      pkgs.duckstation
       (pkgs.writePythonApplication {
         name = "video-with-subs";
         runtimeInputs = [ pkgs.ffmpeg ];
