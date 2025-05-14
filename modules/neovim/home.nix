@@ -265,6 +265,26 @@ in
         }
 
         {
+          plugin = pkgs.vimPlugins.nvim-bqf;
+          type = "lua";
+          config = /* lua */ ''
+            require('bqf').setup {
+              auto_enable = true,
+              auto_resize_height = true,
+              preview = {
+                win_height = 20,
+                winblend = 0,
+              },
+            }
+            vim.keymap.set('n', 'q', function()
+              local qf_winid = vim.fn.getqflist({ winid = 0 }).winid
+              local action = qf_winid > 0 and 'cclose' or 'copen'
+              vim.cmd(action)
+            end)
+          '';
+        }
+
+        {
           plugin = plugins.vim-auto-save;
           config = /* vim */ "let g:auto_save = 1";
         }
@@ -377,19 +397,6 @@ in
         }
 
         {
-          plugin = plugins.vim-better-whitespace;
-          type = "lua";
-          config = /* lua */ ''
-            vim.g["better_whitespace_guicolor"] = "${theme.red}"
-            vim.g["better_whitespace_filetypes_blacklist"] = {
-              "diff", "git", "gitcommit", "unite", "qf", "help", "fugitive"
-            }
-          '';
-        }
-
-        plugins.vim-just
-
-        {
           plugin = resize-nvim;
           type = "lua";
           config = /* lua */ ''
@@ -437,10 +444,12 @@ in
         plugins.nvim-hlslens
 
         {
-          plugin = plugins.mini-comment;
+          plugin = plugins.mini-nvim;
           type = "lua";
           config = /* lua */''
             require('mini.comment').setup()
+            require('mini.pairs').setup()
+            require('mini.trailspace').setup()
           '';
         }
 
@@ -484,23 +493,12 @@ in
 
         {
           plugin = plugins.markdown-preview-nvim;
-          config =
-            let
-              # I would use luakit if there was an easy way to open new windows
-              # https://github.com/luakit/luakit/issues/509
-              open-browser = pkgs.writeShellApplication {
-                name = "open-browser";
-                text = ''
-                  ${lib.getExe pkgs.ungoogled-chromium} --new-window --app="$1"
-                '';
-              };
-            in
-              /* vim */ ''
-              let g:mkdp_auto_close = 0
-              let g:mkdp_echo_preview_url = 1
-              let g:mkdp_browser = '${lib.getExe open-browser}'
-              let g:mkdp_theme = 'light'
-            '';
+          config = /* vim */ ''
+            let g:mkdp_auto_close = 0
+            let g:mkdp_echo_preview_url = 1
+            let g:mkdp_browser = '${lib.getExe pkgs.open-browser-app}'
+            let g:mkdp_theme = 'light'
+          '';
         }
 
         {
