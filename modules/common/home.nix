@@ -242,14 +242,14 @@
         plugins =
           let
             p = inputs.yazi-plugins;
-            mkYaziPlugin = (initLua:
+            _mkYaziPlugin = (initLua:
               "${(pkgs.writeTextDir "plugin/init.lua" initLua)}/plugin"
             );
           in
           {
             chmod = "${p}/chmod.yazi";
             full-border = "${p}/full-border.yazi";
-            max-preview = "${p}/max-preview.yazi";
+            toggle-pane = "${p}/toggle-pane.yazi";
             mount = "${p}/mount.yazi";
             git = "${p}/git.yazi";
             starship = "${inputs.starship-yazi}";
@@ -267,8 +267,13 @@
               desc = "Manage disks and volumes";
             }
             {
-              on = "T";
-              run = "plugin max-preview";
+              on = "=";
+              run = "plugin toggle-pane max-current";
+              desc = "Maximize or restore the preview pane";
+            }
+            {
+              on = "+";
+              run = "plugin toggle-pane max-preview";
               desc = "Maximize or restore the preview pane";
             }
             {
