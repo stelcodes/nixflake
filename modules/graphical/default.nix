@@ -20,6 +20,47 @@
 
       niri.enable = lib.mkDefault true;
 
+      chromium = {
+        # This only creates the default policies JSON file, doesn't install chromium
+        enable = false;
+        extraOpts = {
+          AdvancedProtectionAllowed = false;
+          AutofillAddressEnabled = false;
+          AutofillCreditCardEnabled = false;
+          BackgroundModeEnabled = false;
+          BlockThirdPartyCookies = true;
+          BrowserNetworkTimeQueriesEnabled = false;
+          BrowserSignin = 0;
+          DefaultBrowserSettingEnabled = false;
+          DefaultSearchProvider = true;
+          DefaultSearchProviderName = "DuckDuckGo";
+          DefaultSearchProviderNewTabURL = "https://duckduckgo.com";
+          DNSInterceptionChecksEnabled = false;
+          BuiltInDnsClientEnabled = false; # Defer to system DNS
+          EnableMediaRouter = false; # Google cast
+          HardwareAccelerationModeEnabled = true;
+          HighEfficiencyModeEnabled = true;
+          HttpsOnlyMode = "force_balanced_enabled"; # Allow user to select http
+          HomepageIsNewTabPage = true;
+          MediaRecommendationsEnabled = false;
+          MetricsReportingEnabled = false;
+          PasswordLeakDetectionEnabled = false;
+          PasswordManagerEnabled = false;
+          PromotionalTabsEnabled = false;
+          PaymentMethodQueryEnabled = false;
+          SafeBrowsingProtectionLevel = 0;
+          SearchSuggestEnabled = false;
+          ShoppingListEnabled = false;
+          SpellcheckEnabled = false;
+          SyncDisabled = true;
+        };
+        # ungoogled-chromium needs this for extensions:
+        # https://github.com/NeverDecaf/chromium-web-store
+        # Flags cannot be set automatically:
+        # chrome://flags/#disable-top-sites
+        # chrome://flags/#extension-mime-request-handling
+      };
+
     };
 
     services = {
