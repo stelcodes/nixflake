@@ -2,8 +2,6 @@
   home = {
     stateVersion = "23.11";
     packages = [
-      pkgs.kodi-loaded
-      pkgs.retroarch-loaded
     ];
   };
 

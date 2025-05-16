@@ -7,7 +7,6 @@
     stateVersion = "24.11";
     packages = [
       pkgs.signal-desktop
-      pkgs.retroarch-free
       pkgs.ungoogled-chromium
       pkgs.gimp-with-plugins
       pkgs.jellyfin-media-player

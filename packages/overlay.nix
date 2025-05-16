@@ -110,43 +110,6 @@ final: prev: {
       comment = "Open ${url} in ${package.meta.name}";
       categories = [ "Network" ];
     };
-  kodi-loaded = final.kodi.withPackages (p: [
-    p.visualization-goom
-    p.somafm
-    p.radioparadise
-    p.joystick
-    p.youtube
-  ]);
-  retroarch-loaded = final.retroarch.override {
-    settings = {
-      menu_driver = "xmb";
-      xmb_menu_color_theme = "15"; # cube purple
-      assets_directory = "${final.retroarch-assets}/share/retroarch/assets";
-      savefile_directory = "~/sync/games/saves";
-      savestate_directory = "~/sync/games/states";
-      screenshot_directory = "~/sync/games/screenshots";
-      playlist_directory = "~/sync/games/playlists";
-      thumbnails_directory = "~/sync/games/thumbnails";
-      content_favorites_path = "~/sync/games/content_favorites.lpl";
-      playlist_entry_remove_enable = "0";
-      playlist_entry_rename = "false";
-      input_menu_toggle_gamepad_combo = "7"; # hold start for quick menu
-      menu_swap_ok_cancel_buttons = "true";
-      auto_overrides_enable = "true"; # Auto setup controllers
-      auto_remaps_enable = "true"; # Auto load past remaps
-    };
-    cores = with final.libretro; [
-      # pkgs/applications/emulators/retroarch/cores.nix
-      mesen # nes
-      snes9x # snes
-      mupen64plus # n64
-      dolphin # gamecube/wii
-      swanstation # ps1
-      sameboy # gb
-      mgba # gba
-      ppsspp # psp
-    ];
-  };
   syncthing-tray = final.syncthing-tray.overrideAttrs {
     meta.mainProgram = "syncthing-tray";
   };

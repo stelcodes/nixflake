@@ -36,7 +36,6 @@
             "broadcom-sta"
             "facetimehd-firmware"
             "facetimehd-calibration"
-            "libretro-snes9x"
             "vscode"
             "zsh-abbr"
           ];

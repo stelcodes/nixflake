@@ -11,8 +11,6 @@
       # inputs.gpt4all-nix.packages.${pkgs.system}.default
       pkgs.unstable.gpt4all
       # inputs.arcsearch.packages.${pkgs.system}.default
-      pkgs.retroarch-loaded
-      pkgs.kodi-loaded
       pkgs.flac
       pkgs.pdfcpu # Convert a pdf to booklet for printing!
       pkgs.smartmontools # Tools for monitoring the health of hard drives

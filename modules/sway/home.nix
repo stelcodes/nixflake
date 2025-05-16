@@ -265,8 +265,6 @@ in
         for_window [app_id=org.rncbc.qpwgraph] floating enable, resize set width 80 ppt height 80 ppt, move position center
         for_window [app_id=gnome-disks] floating enable, resize set width 80 ppt height 80 ppt, move position center
         for_window [app_id=obsidian] move container to workspace 3
-        for_window [app_id=org.libretro.RetroArch] move container to workspace 4
-        for_window [class=Kodi] move container to workspace 5
         for_window [app_id=audacious] floating enable, resize set width 80 ppt height 80 ppt, move position center
         for_window [app_id=guitarix] floating disable
         for_window [app_id=dragon] sticky enable
