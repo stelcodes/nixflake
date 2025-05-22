@@ -1,16 +1,10 @@
 -- https://github.com/neovim/nvim-lspconfig
-local wd = require("workspace-diagnostics")
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-local on_attach = function(client, bufnr)
-  wd.populate_workspace_diagnostics(client, bufnr)
-end
-
 vim.lsp.config('*', {
   capabilities = capabilities,
-  on_attach = on_attach,
 })
 
 vim.lsp.enable('marksman')

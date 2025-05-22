@@ -1,17 +1,23 @@
 -----------------------------------------------------------------------------
 -- FUNCTIONS
 
-ToggleParedit = function()
-  if vim.g.paredit_mode == 0 then
-    vim.g.paredit_mode = 1
-    print("paredit on")
-  else
-    vim.g.paredit_mode = 0
-    print("paredit off")
-  end
-  -- Sometimes paredit seems to not get turned back on, this is a workaround
-  vim.cmd 'edit'
-end
+vim.api.nvim_create_user_command('ToggleParedit',
+  function()
+    if vim.g.paredit_mode == 0 then
+      vim.g.paredit_mode = 1
+      print("paredit on")
+    else
+      vim.g.paredit_mode = 0
+      print("paredit off")
+    end
+    -- Sometimes paredit seems to not get turned back on, this is a workaround
+    vim.cmd 'edit'
+  end,
+  {
+    desc = "Toggle paredit mode",
+    force = false,
+  }
+)
 
 -- See *lua-guide-commands-create*
 vim.api.nvim_create_user_command('ResetWorkspace',
@@ -31,48 +37,10 @@ vim.api.nvim_create_user_command('ResetWorkspace',
   }
 )
 
-----------------------------------------------------------------------------------
--- OPTIONS
-
-vim.opt.swapfile = false          -- turn swapfiles off
-vim.opt.undofile = true           -- save undo history
-vim.opt.scrolloff = 10            -- keep cursor centered vertically while scrolling
-vim.opt.sidescrolloff = 20        -- How many columns between cursor and edge when scrolling starts horizontally
-vim.opt.tabstop = 2               -- Insert 2 spaces for a tab
-vim.opt.shiftwidth = 2            -- Change the number of space characters inserted for indentation
-vim.opt.expandtab = true          -- Converts tabs to spaces, if false then nvim-lsp formatting will always use tabs :/
-vim.opt.smartindent = true        -- Makes indenting smart
-vim.opt.updatetime = 300          -- Faster completion
-vim.opt.timeout = false           -- Wait indefinitely for keymap continuation
-vim.opt.clipboard = 'unnamedplus' -- Copy paste between vim and everything else
-vim.opt.wrap = false              -- Display long lines as just one line
-vim.opt.pumheight = 10            -- Makes popup menu smaller
-vim.opt.showtabline = 2           -- Always show tabs
-vim.opt.showmode = false          -- We don't need to see things like -- INSERT -- anymore
-vim.opt.signcolumn = 'yes'        -- Always show the signcolumn in the number column
-vim.opt.splitbelow = true         -- Horizontal splits will automatically be below
-vim.opt.splitright = true         -- Vertical splits will automatically be to the right
-vim.opt.linebreak = true          -- Break lines at word boundaries for readability
-vim.opt.bg = 'dark'               -- Have dark background by default
-vim.opt.whichwrap = 'h,l'         -- Allow left/right scrolling to jump lines
-vim.opt.numberwidth = 1           -- make minimum width for number column smallest value so it doesn't take up much room
-vim.opt.termguicolors = true      -- enable full color support
-vim.opt.ignorecase = true         -- ignore case when searching
-vim.opt.smartcase = true          -- don't ignore case when searching with capital letters
-vim.opt.completeopt = {           -- Completion behavior
-  "menu",
-  "menuone",
-  "popup",
-  "noselect",
-  "preview",
-  "fuzzy"
-}
-
 ----------------------------------------------------------------------------------------
 -- GLOBALS
 
 vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
 -- Disable netrw
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
@@ -85,8 +53,6 @@ vim.g['clojure_maxlines'] = 0
 vim.g.markdown_fenced_languages = {
   "ts=typescript"
 }
-
-vim.cmd 'filetype plugin indent on' -- Enables filetype detection and features
 vim.filetype.add({
   extension = {
     age = 'age',
@@ -105,6 +71,17 @@ vim.keymap.set({ 'n', 'x' }, '<leader>/', '<cmd>nohlsearch<cr>')
 -- <c-^> is buffer back
 
 -- DIAGNOSTICS
+vim.diagnostic.config({
+  severity_sort = true,
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = "",
+      [vim.diagnostic.severity.WARN]  = "",
+      [vim.diagnostic.severity.HINT]  = "󰟃",
+      [vim.diagnostic.severity.INFO]  = "",
+    },
+  }
+})
 vim.keymap.set('n', '<leader>dh', vim.diagnostic.open_float) -- diagnostic hover
 vim.keymap.set('n', '<leader>dp', vim.diagnostic.goto_prev)
 vim.keymap.set('n', '<leader>dn', vim.diagnostic.goto_next)
@@ -135,46 +112,36 @@ vim.keymap.set('n', '<leader>9', '<cmd>tabnext 9<cr>')
 
 -- SCROLLING
 -- Moves cursor 10 lines down or up
-vim.keymap.set('n', 'J', '10j') -- I can still join lines in visual mode
-vim.keymap.set('n', 'K', '10k')
--- move through wrapped lines visually
-vim.keymap.set('n', 'j', 'gj')
-vim.keymap.set('n', 'k', 'gk')
-vim.keymap.set('x', 'j', 'gj')
-vim.keymap.set('x', 'k', 'gk')
-
+vim.keymap.set('n', 'J', '<c-d>') -- I can still join lines in visual mode
+vim.keymap.set('n', 'K', '<c-u>')
 -- Make carriage return do nothing
 vim.keymap.set('n', '<cr>', '<nop>')
 -- Avoid ex mode
 vim.keymap.set('n', 'Q', '<nop>')
 
--- SELECTIONS
--- Text manipulation
-vim.keymap.set('x', '<c-k>', ':move \'<-2<CR>gv-gv')
-vim.keymap.set('x', '<c-j>', ':move \'>+1<CR>gv-gv')
--- Keeps selection active when indenting so you can do it multiple times quickly
-vim.keymap.set('x', '>', '>gv')
-vim.keymap.set('x', '<', '<gv')
-
 -- MARKS
 vim.keymap.set('n', '<c-m>', '<cmd>delmarks A-Z0-9<cr>') -- delete all marks
 
 -- OTHER STUFF
--- Copy relative path of file
-vim.keymap.set('n', 'f', '<cmd>let @+=expand("%")<cr><cmd>echo expand("%")<cr>')
 -- Copy absolute path of file
-vim.keymap.set('n', 'F', '<cmd>let @+=expand("%:p")<cr><cmd>echo expand("%:p")<cr>')
+vim.keymap.set('n', '<leader>F', '<cmd>let @+=expand("%:p")<cr><cmd>echo expand("%:p")<cr>')
 -- Make terminal mode easy to exit
 vim.keymap.set('t', '<c-\\>', '<c-\\><c-n>')
--- Toggle spell
-vim.keymap.set('n', '<c-s>', '<cmd>set spell!<cr>')
-vim.keymap.set('n', '<c-p>', ToggleParedit)
-vim.keymap.set('n', '<c-n>', '<cmd>set relativenumber!<cr>')
+vim.keymap.set('i', '<Tab>', function()
+  return vim.fn.pumvisible() == 1 and "<C-n>" or "<Tab>"
+end, { expr = true })
 
 ---------------------------------------------------------------------------------
 -- AUTOCMDS
 
 local general = vim.api.nvim_create_augroup('general', { clear = true })
+
+-- Disable expandtab for these filetypes
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'go' },
+  group = general,
+  command = 'set noexpandtab',
+})
 
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'age',

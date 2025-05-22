@@ -7,6 +7,15 @@ lspkind.init {
   },
 }
 
+vim.opt.completeopt = {           -- Completion behavior
+  "menu",
+  "menuone",
+  "popup",
+  "noselect",
+  "preview",
+  "fuzzy"
+}
+
 cmp.setup {
   snippet = {
     expand = function(args)

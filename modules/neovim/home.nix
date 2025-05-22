@@ -45,22 +45,6 @@ in
             sha256 = "1bj5m1b4n2nnzvwbz0dhzg1alha2chbbdhfhl6rcngiprbdv0xi6";
           };
         };
-        resize-nvim = pkgs.vimUtils.buildVimPlugin {
-          pname = "resize-nvim";
-          version = "unstable-2024-01-16";
-          src = pkgs.fetchFromGitHub {
-            owner = "stelcodes";
-            repo = "resize.nvim";
-            rev = "a0b28847f69d234de933685503df84a88e7ae514";
-            sha256 = "jGEVE9gfK4EirGDOFzSNXn60X+IldKASVoTD4/p7MBM=";
-          };
-        };
-        workspace-diagnostics-nvim = pkgs.vimUtils.buildVimPlugin {
-          pname = "workspace-diagnostics-nvim";
-          version = "unstable";
-          src = inputs.workspace-diagnostics-nvim;
-        };
-
       in
       [
 
@@ -69,16 +53,22 @@ in
           type = "lua";
           config = /* lua */ ''
             local gs = require('gitsigns')
-            gs.setup()
+            gs.setup({
+              signcolumn = false,
+              numhl = true,
+            })
             -- git reset
             vim.keymap.set('n', '<leader>gr', gs.reset_hunk)
             vim.keymap.set('v', '<leader>gr', function() gs.reset_hunk {vim.fn.line("."), vim.fn.line("v")} end)
             vim.keymap.set('n', '<leader>gR', gs.reset_buffer)
             -- git blame
             vim.keymap.set('n', '<leader>gb', function() gs.blame_line{full=true} end)
-            vim.keymap.set('n', '<leader>gB', gs.toggle_current_line_blame)
+            vim.keymap.set('n', '<leader>gB', gs.blame)
             -- navigating and viewing hunks
             vim.keymap.set('n', '<leader>gn', gs.next_hunk)
+            vim.keymap.set('n', ']g', gs.next_hunk)
+            vim.keymap.set('n', '<leader>gp', gs.prev_hunk)
+            vim.keymap.set('n', '[g', gs.prev_hunk)
             vim.keymap.set('n', '<leader>gp', gs.prev_hunk)
             vim.keymap.set('n', '<leader>gh', gs.preview_hunk)
           '';
@@ -161,14 +151,6 @@ in
           '';
         }
 
-        {
-          plugin = plugins.indent-blankline-nvim;
-          type = "lua";
-          config = /* lua */ ''
-            require("ibl").setup()
-          '';
-        }
-
         # TODO: Remove this eventually, just keeping in case I miss fugitive
         {
           plugin = plugins.vim-fugitive;
@@ -227,14 +209,6 @@ in
         }
 
         {
-          plugin = plugins.nvim-autopairs;
-          type = "lua";
-          config = /* lua */ ''
-            require("nvim-autopairs").setup {}
-          '';
-        }
-
-        {
           plugin = plugins.nvim-ts-autotag;
           type = "lua";
           config = /* lua */ ''
@@ -250,7 +224,7 @@ in
             require('trouble').setup({
               focus = true,
             })
-            vim.keymap.set('n', 'q', '<cmd>Trouble qflist<cr>')
+            -- vim.keymap.set('n', 'q', '<cmd>Trouble qflist<cr>')
           '';
         }
         plugins.plenary-nvim
@@ -295,43 +269,14 @@ in
           config = /* lua */ ''
             require('lualine').setup {
               options = {
-                icons_enabled = true,
                 theme = lualine_theme or 'auto',
                 component_separators = { left = "", right = ""},
                 section_separators = { left = "", right = ""},
-                disabled_filetypes = {},
-                always_divide_middle = true,
               },
               sections = {
-                lualine_a = {'mode'},
-                lualine_b = {'branch', 'diff', 'diagnostics'},
                 lualine_c = {'%f'},
                 lualine_x = {'filetype'},
-                lualine_y = {'progress'},
-                lualine_z = {'location'}
               },
-              inactive_sections = {
-                lualine_a = {},
-                lualine_b = {},
-                lualine_c = {'filename'},
-                lualine_x = {'location'},
-                lualine_y = {},
-                lualine_z = {}
-              },
-              tabline = {},
-              -- extensions = {'nvim-tree'}
-            }
-          '';
-        }
-
-        {
-          plugin = plugins.auto-session;
-          type = "lua";
-          config = /* lua */ ''
-            vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
-            require('auto-session').setup {
-              auto_save_enabled = true,
-              auto_restore_enabled = true
             }
           '';
         }
@@ -387,7 +332,7 @@ in
                 mode = "virtualtext", -- Set the display mode.
                 -- Available methods are false / true / "normal" / "lsp" / "both"
                 -- True is same as normal
-                tailwind = false, -- Enable tailwind colors
+                tailwind = "lsp", -- Enable tailwind colors
                 -- parsers can contain values used in |user_default_options|
                 sass = { enable = false, parsers = { "css" }, }, -- Enable sass colors
                 virtualtext = "■",
@@ -396,66 +341,79 @@ in
           '';
         }
 
-        {
-          plugin = resize-nvim;
-          type = "lua";
-          config = /* lua */ ''
-            local r = require('resize')
-            vim.keymap.set('n', '<s-left>', function() r.ResizeLeft(1) end)
-            vim.keymap.set('n', '<s-right>', function() r.ResizeRight(1) end)
-            vim.keymap.set('n', '<s-up>', function() r.ResizeUp(1) end)
-            vim.keymap.set('n', '<s-down>', function() r.ResizeDown(1) end)
-          '';
-        }
-
-        {
-          plugin = pkgs.vimUtils.buildVimPlugin {
-            pname = "nvim-listchars";
-            version = "unstable-2024-02-24";
-            src = pkgs.fetchFromGitHub {
-              owner = "0xfraso";
-              repo = "nvim-listchars";
-              rev = "40b05e8375af11253434376154a9e6b3e9400747";
-              hash = "sha256-SQPe1c3EzVdqpU41FqwR2owfstDqSLjNlrpJuaLZXNE=";
-            };
-          };
-          type = "lua";
-          config = /* lua */ ''
-            vim.opt.list = true
-            require("nvim-listchars").setup {
-              save_state = true,
-              notifications = false,
-              listchars = {
-                -- space = ' ',
-                eol = "↲",
-                tab = "» ",
-                trail = '·',
-                extends = '<',
-                precedes = '>',
-                conceal = '┊',
-                nbsp = '␣',
-              },
-            }
-            vim.cmd 'ListcharsDarkenColors'
-            vim.keymap.set('n', '<c-.>', '<cmd>ListcharsToggle<cr>')
-          '';
-        }
-
         plugins.nvim-hlslens
+
+        {
+          plugin = plugins.nvim-notify;
+          type = "lua";
+          config = /* lua */ ''
+            vim.notify = require("notify")
+          '';
+        }
+
+        {
+          plugin = plugins.auto-session;
+          type = "lua";
+          config = /* lua */ ''
+            vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+            require('auto-session').setup {
+              auto_save_enabled = true,
+              auto_restore_enabled = false,
+            }
+          '';
+        }
 
         {
           plugin = plugins.mini-nvim;
           type = "lua";
           config = /* lua */''
+            require('mini.basics').setup({
+              options = {
+                extra_ui = true,
+                win_borders = 'single',
+              },
+              mappings = {
+                windows = true,
+              },
+              autocommands = {
+                relnum_in_visual_mode = true,
+              },
+            })
+            vim.opt.swapfile = false          -- turn swapfiles off
+            vim.opt.scrolloff = 10            -- keep cursor centered vertically while scrolling
+            vim.opt.sidescrolloff = 20        -- How many columns between cursor and edge when scrolling starts horizontally
+            vim.opt.tabstop = 2               -- Insert 2 spaces for a tab
+            vim.opt.expandtab = true
+            vim.opt.shiftwidth = 2            -- Change the number of space characters inserted for indentation
+            vim.opt.updatetime = 300          -- Faster completion
+            vim.opt.timeout = false           -- Wait indefinitely for keymap continuation
+            vim.opt.clipboard = 'unnamedplus' -- Copy paste between vim and everything else
+            vim.opt.numberwidth = 1           -- Make minimum width for number column smallest value so it doesn't take up much room
+            vim.opt.winblend = 0              -- Remove winblend floating transparency
             require('mini.comment').setup()
             require('mini.pairs').setup()
             require('mini.trailspace').setup()
+            require('mini.pairs').setup()
+            require('mini.move').setup({
+              mappings = {
+                -- Move visual selection in Visual mode
+                left = '<c-h>',
+                right = '<c-l>',
+                down = '<c-j>',
+                up = '<c-k>',
+                -- Disable moving current line in Normal mode
+                line_left = "",
+                line_right = "",
+                line_down = "",
+                line_up = "",
+              },
+            })
+            require('mini.bracketed').setup()
+            require('mini.bufremove').setup()
           '';
         }
 
       ] ++ (lib.lists.optionals config.activities.coding [
-
-        workspace-diagnostics-nvim
 
         {
           plugin = plugins.nvim-treesitter.withAllGrammars;
@@ -505,7 +463,20 @@ in
           plugin = plugins.nvim-scrollbar;
           type = "lua";
           config = /* lua */ ''
-            require("scrollbar").setup()
+            require("scrollbar").setup({
+              show_in_active_only = true,
+              excluded_filetypes = {
+                "dropbar_menu",
+                "dropbar_menu_fzf",
+                "DressingInput",
+                "cmp_docs",
+                "cmp_menu",
+                "noice",
+                "prompt",
+                "TelescopePrompt",
+                "gitsigns-blame"
+              },
+            })
             -- requires nvim-hlslens, gitsigns
             require("scrollbar.handlers.search").setup()
             require("scrollbar.handlers.gitsigns").setup()
