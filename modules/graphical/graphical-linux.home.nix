@@ -1,4 +1,4 @@
-{ pkgs, config, inputs, lib, ... }:
+{ pkgs, config, lib, ... }:
 let
   theme = config.theme.set;
   waycfg = config.wayland.windowManager;
@@ -280,12 +280,7 @@ in
         defaultApplications =
           let
             browser = [ "librewolf.desktop" ];
-            archiver = [ "org.gnome.FileRoller.desktop" ];
             imageViewer = [ "org.gnome.eog.desktop" ];
-            musicPlayer = [ "audacious.desktop" ];
-            videoPlayer = [ "mpv.desktop" ];
-            documentViewer = [ "org.pwmt.zathura.desktop" ];
-            textEditor = [ "neovim.desktop" ];
           in
           {
             "application/http" = browser;
@@ -519,9 +514,23 @@ in
           };
           Service.ExecStart = "${pkgs.wlinhibit}/bin/wlinhibit";
         };
-        swaybg = lib.mkIf (waycfg.wallpaper != null) {
-          Service.ExecStart = "${lib.getExe pkgs.swaybg} -m fill -i ${waycfg.wallpaper}";
-        };
+        # swaybg = {
+        #   # lib.mkIf (waycfg.wallpaper != null)
+        #   Service.ExecStart = lib.getExe
+        #     (pkgs.writeShellApplication {
+        #       name = "swaybg-execstart";
+        #       runtimeInputs = [ pkgs.swaybg pkgs.coreutils ];
+        #       text = ''
+        #         if [ -f "$HOME/.wallpaper" ]; then
+        #           swaybg -m fill -i "$HOME/.wallpaper"
+        #         elif ${if waycfg.wallpaper != null then "true" else "false"}; then
+        #           swaybg -m fill -i ${waycfg.wallpaper}
+        #         else
+        #           swaybg -c "${theme.bg3}"
+        #         fi
+        #       '';
+        #     });
+        # };
         xwayland-satellite = {
           Service.ExecStart = "${lib.getExe pkgs.xwayland-satellite} :12";
         };
@@ -771,7 +780,6 @@ in
           monitorOn = "${pkgs.niri}/bin/niri msg output ${waycfg.mainMonitor} on";
           monitorOff = "${pkgs.niri}/bin/niri msg output ${waycfg.mainMonitor} off";
           services = sharedServices ++ [
-            "swaybg"
             "xwayland-satellite"
           ];
         };
