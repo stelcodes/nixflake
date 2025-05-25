@@ -60,6 +60,21 @@ layout {
     }
 }
 
+layer-rule {
+    opacity 0.9
+}
+// Block out mako notifications from screencasts.
+layer-rule {
+    match namespace="^notifications$"
+    block-out-from "screen-capture"
+}
+// Enable rounded corners for all windows.
+window-rule {
+    geometry-corner-radius 8
+    clip-to-geometry true
+    draw-border-with-background false
+    opacity 0.9
+}
 // Open picture-in-picture player as floating by default.
 window-rule {
     match title="^Picture-in-Picture$"
@@ -74,20 +89,10 @@ window-rule {
     match app-id=r#"^org\.keepassxc\.KeePassXC$"#
     block-out-from "screen-capture"
 }
-// Block out mako notifications from screencasts.
-layer-rule {
-    match namespace="^notifications$"
-    block-out-from "screen-capture"
-}
-// Enable rounded corners for all windows.
 window-rule {
-    geometry-corner-radius 8
-    clip-to-geometry true
-}
-window-rule {
-    match title="^btop$"
-    match app-id="^kitty$" // Necessary for some reason? ;-;
-    open-maximized true
+    match app-id="^kitty$"
+    min-width 1000
+    // open-maximized true
 }
 window-rule {
     match app-id="^qalculate-gtk$"
@@ -98,15 +103,15 @@ binds {
     // Use wev to find key names
     Super+Shift+Slash { show-hotkey-overlay; }
     Super+Return { spawn "kitty"; }
-    Super+D { spawn "wofi"; }
-    Super+Shift+D { spawn "wofi" "--show" "run"; }
+    Super+D { spawn "sh" "-c" "pkill wofi-wrapped || exec wofi"; }
+    Super+Shift+D { spawn "sh" "-c" "pkill wofi-wrapped || exec wofi --show run"; }
     Super+E { spawn "rofimoji"; }
     Super+Escape { spawn "swaylock"; }
     Super+Backspace { spawn "librewolf"; }
     Super+Shift+Backspace { spawn "librewolf" "--private-window"; }
     Super+Minus { spawn "niri-adjust-scale" "-0.1"; }
     Super+Equal { spawn "niri-adjust-scale" "+0.1"; }
-    Super+Shift+Equal { spawn "hyprpicker" "-a"; }
+    Super+Shift+Equal { spawn "niri-pick-color"; }
     XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "--limit" "1.0" "@DEFAULT_AUDIO_SINK@" "5%+"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "--limit" "1.0" "@DEFAULT_AUDIO_SINK@" "5%-"; }
     XF86AudioMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }

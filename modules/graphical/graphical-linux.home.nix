@@ -75,6 +75,14 @@ let
         '')
         waycfg.sessions);
   };
+  niri-pick-color = pkgs.writeShellApplication {
+    name = "niri-pick-color";
+    runtimeInputs = [ pkgs.wl-clipboard pkgs.niri pkgs.gnugrep ];
+    text = ''
+      set -o pipefail
+      niri msg pick-color | grep -oE '#[[:alnum:]]{6}' | wl-copy
+    '';
+  };
 in
 {
 
@@ -155,11 +163,11 @@ in
         pkgs.rofimoji # Great associated word hints with extensive symbol lists to choose from
         pkgs.wdisplays
         pkgs.libnotify # for notify-send
-        pkgs.hyprpicker
         # pkgs.kooha # Doesn't work with niri atm
         # pkgs.wl-screenrec # https://github.com/russelltg/wl-screenrec
         # pkgs.wlogout
         niri-adjust-scale
+        niri-pick-color
         monitor-power
       ] ++ (lib.lists.optionals config.profile.audio [
         pkgs.playerctl
