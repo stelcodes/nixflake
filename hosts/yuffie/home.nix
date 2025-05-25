@@ -8,7 +8,7 @@
     packages = [
       pkgs.signal-desktop
       pkgs.ungoogled-chromium
-      pkgs.gimp-with-plugins
+      pkgs.gimp3-with-plugins
       pkgs.jellyfin-media-player
       pkgs.musicpod
       pkgs.wineWowPackages.waylandFull
@@ -26,6 +26,9 @@
         runtimeInputs = [ pkgs.ffmpeg ];
         text = builtins.readFile ../../misc/video-with-subs.py;
       })
+      pkgs.d-spy
+      pkgs.lollypop
+      pkgs.bitwig-studio
     ];
   };
   wayland.windowManager = {

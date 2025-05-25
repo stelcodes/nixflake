@@ -83,6 +83,7 @@
         pkgs.mediainfo # for yazi
         inputs.agenix.packages.${pkgs.system}.default
         pkgs.git-cliff
+        pkgs.nix-inspect
       ]);
 
       sessionVariables = {
