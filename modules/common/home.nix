@@ -412,6 +412,8 @@
             if [ "$(uname)" = "Darwin" ]; then # If on MacOS...
               # Append homebrew to PATH when necessary
               if [ -e /opt/homebrew ]; then
+              export HOMEBREW_NO_AUTO_UPDATE=1
+              export HOMEBREW_NO_ANALYTICS=1
                 path+=(/opt/homebrew/bin /opt/homebrew/sbin)
               fi
               # Append local/bin to PATH if it exists
