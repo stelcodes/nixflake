@@ -1,7 +1,7 @@
 { lib, inputs, pkgs, ... }: {
   config = {
     nix = {
-      package = pkgs.nixVersions.latest;
+      package = pkgs.lixPackageSets.latest.lix;
       gc = {
         automatic = false; # replacing with nh systemd clean service
         options = "--delete-older-than 30d";
@@ -27,7 +27,7 @@
           allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
             "obsidian"
             "spotify"
-            "bitwig-studio"
+            "bitwig-studio-unwrapped"
             "graillon"
             "steam"
             "steam-original"
@@ -38,6 +38,7 @@
             "facetimehd-calibration"
             "vscode"
             "zsh-abbr"
+            "reaper"
           ];
         };
       in
