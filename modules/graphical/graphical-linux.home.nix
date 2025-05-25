@@ -350,13 +350,6 @@ in
         # };
       };
 
-      gnome-shell = {
-        theme = {
-          name = theme.gtkThemeName;
-          package = theme.gtkThemePackage;
-        };
-      };
-
       swaylock = {
         enable = true;
         settings = {
@@ -473,7 +466,6 @@ in
             format = "{capacity} {icon}";
             format-charging = "{capacity} ";
             format-icons = [ "" "" "" "" "" ];
-            max-length = 40;
           };
           idle_inhibitor = {
             format = "{icon}";
@@ -645,8 +637,6 @@ in
           outer-margin = "0,0,45,0";
           background-color = theme.bg;
           text-color = theme.fg;
-        };
-        criteria = {
           "urgency=low" = {
             border-color = theme.blue;
           };
