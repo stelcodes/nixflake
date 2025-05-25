@@ -303,6 +303,7 @@
             { on = [ "g" "t" ]; run = "cd ~/tmp"; desc = "Goto ~/tmp"; }
             { on = [ "g" "T" ]; run = "cd /tmp"; desc = "Goto /tmp"; }
             { on = [ "g" "m" ]; run = "cd ~/music"; desc = "Goto ~/Music"; }
+            { on = [ "g" "M" ]; run = "cd /run/media"; desc = "Goto /run/media"; }
             { on = [ "g" "r" ]; run = "cd ~/music/dj-tools/rekordbox"; desc = "Goto rekordbox"; }
           ] ++ lib.optionals pkgs.stdenv.isDarwin [
             { on = [ "g" "v" ]; run = "cd /Volumes"; desc = "Goto /Volumes"; }
