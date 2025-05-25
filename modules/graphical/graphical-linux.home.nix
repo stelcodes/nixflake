@@ -331,8 +331,10 @@ in
           osd-bar = "no";
           border = "no";
           sub-auto = "all";
-          demuxer-max-bytes = "2048MiB";
+          cache = "yes";
+          demuxer-max-bytes = "4096MiB";
           gapless-audio = "no";
+          hwdec = "yes";
         };
         scripts = let p = pkgs.mpvScripts; in [
           p.uosc
