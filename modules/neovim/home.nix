@@ -171,6 +171,22 @@ in
         }
 
         {
+          plugin = plugins.indent-blankline-nvim;
+          type = "lua";
+          config = /* lua */ ''
+            require("ibl").setup()
+          '';
+        }
+
+        {
+          plugin = plugins.nvim-autopairs;
+          type = "lua";
+          config = /* lua */ ''
+            require("nvim-autopairs").setup {}
+          '';
+        }
+
+        {
           plugin = plugins.yazi-nvim;
           type = "lua";
           config = /* lua */ ''
@@ -352,18 +368,6 @@ in
         }
 
         {
-          plugin = plugins.auto-session;
-          type = "lua";
-          config = /* lua */ ''
-            vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
-            require('auto-session').setup {
-              auto_save_enabled = true,
-              auto_restore_enabled = false,
-            }
-          '';
-        }
-
-        {
           plugin = plugins.mini-nvim;
           type = "lua";
           config = /* lua */''
@@ -382,18 +386,19 @@ in
             vim.opt.swapfile = false          -- turn swapfiles off
             vim.opt.scrolloff = 10            -- keep cursor centered vertically while scrolling
             vim.opt.sidescrolloff = 20        -- How many columns between cursor and edge when scrolling starts horizontally
-            vim.opt.tabstop = 2               -- Insert 2 spaces for a tab
-            vim.opt.expandtab = true
-            vim.opt.shiftwidth = 2            -- Change the number of space characters inserted for indentation
+            vim.opt.tabstop = 4               -- Show # spaces to represent a tab
+            vim.opt.expandtab = true          -- Insert spaces instead of tabs on tab key
+            vim.opt.shiftwidth = 2            -- Insert # spaces for tab key
             vim.opt.updatetime = 300          -- Faster completion
             vim.opt.timeout = false           -- Wait indefinitely for keymap continuation
             vim.opt.clipboard = 'unnamedplus' -- Copy paste between vim and everything else
             vim.opt.numberwidth = 1           -- Make minimum width for number column smallest value so it doesn't take up much room
             vim.opt.winblend = 0              -- Remove winblend floating transparency
+            vim.opt.whichwrap = 'h,l'         -- Allow left/right scrolling to jump lines
             require('mini.comment').setup()
-            require('mini.pairs').setup()
+            -- require('mini.pairs').setup()
             require('mini.trailspace').setup()
-            require('mini.pairs').setup()
+            vim.api.nvim_create_user_command('Trim', 'lua MiniTrailspace.trim()', {})
             require('mini.move').setup({
               mappings = {
                 -- Move visual selection in Visual mode
@@ -408,8 +413,20 @@ in
                 line_up = "",
               },
             })
+             -- Fallback, keeps selection active when indenting
+            vim.keymap.set('x', '>', '>gv')
+            vim.keymap.set('x', '<', '<gv')
             require('mini.bracketed').setup()
             require('mini.bufremove').setup()
+            require('mini.surround').setup()
+            require('mini.sessions').setup({
+              -- Once session has been created, automatically read and write to it
+              autoread = true,
+              autowrite = true,
+              force = { read = false, write = true, delete = true },
+            })
+            vim.api.nvim_create_user_command('SessionCreate', 'mksession', {})
+            vim.api.nvim_create_user_command('SessionDelete', 'lua MiniSessions.delete()', {})
           '';
         }
 
