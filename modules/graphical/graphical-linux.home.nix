@@ -497,7 +497,23 @@ in
     systemd.user.services = (lib.mkMerge [
       sessionServices
       {
+        trayscale = {
+          Unit = {
+            After = [ "waybar.service" ];
+            StartLimitIntervalSec = "5m";
+            StartLimitBurst = "100";
+          };
+          Service = {
+            ExecStartPre = "${pkgs.systemd}/bin/busctl --user --no-pager status fr.arouillard.waybar";
+            Restart = "on-failure";
+            RestartSec = "1s";
+          };
+        };
         ianny = {
+          Unit = {
+            BindsTo = [ "graphical-session.target" ];
+            After = [ "graphical-session.target" ];
+          };
           Service.ExecStart = lib.getExe pkgs.ianny;
         };
         wlinhibit = {
