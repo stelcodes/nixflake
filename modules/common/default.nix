@@ -126,19 +126,28 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
       };
       mutableUsers = false;
       users = {
-        root.hashedPassword = "!"; # Disable root login
-        ${config.admin.username} = {
+        root =
           # Default password is "password" unless system ssh key is in the public key registry file
           # In that case the encrypted age password should be available, use that instead
           # Override with hashedPasswordFile (use mkpasswd)
-          hashedPasswordFile = lib.mkIf (config.age.secrets ? admin-password) config.age.secrets.admin-password.path;
-          password = lib.mkIf (!config.age.secrets ? admin-password) "password";
-          isNormalUser = true;
-          # https://wiki.archlinux.org/title/Users_and_groups#Group_list
-          extraGroups = [ "networkmanager" "wheel" "tty" "dialout" "audio" "video" "cdrom" "multimedia" "libvirtd" ];
-          openssh.authorizedKeys.keys = sshPublicKeys.allAdminKeys;
-          shell = pkgs.zsh;
-        };
+          if (config.age.secrets ? admin-password) then {
+            hashedPasswordFile = config.age.secrets.admin-password.path;
+          } else {
+            password = "password";
+          };
+        ${config.admin.username} =
+          (if (config.age.secrets ? admin-password) then {
+            hashedPasswordFile = config.age.secrets.admin-password.path;
+          } else {
+            password = "password";
+          })
+          // {
+            isNormalUser = true;
+            # https://wiki.archlinux.org/title/Users_and_groups#Group_list
+            extraGroups = [ "networkmanager" "wheel" "tty" "dialout" "audio" "video" "cdrom" "multimedia" "libvirtd" ];
+            openssh.authorizedKeys.keys = sshPublicKeys.allAdminKeys;
+            shell = pkgs.zsh;
+          };
       };
     };
 
