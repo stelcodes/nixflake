@@ -25,7 +25,7 @@ window#waybar {
 }
 
 #workspaces button {
-  padding: 0;
+  padding: 0 1px;
 }
 
 #workspaces button:not(:last-child) {
@@ -34,6 +34,8 @@ window#waybar {
 
 /* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
 #workspaces button:hover {
+  box-shadow: inherit;
+  text-shadow: inherit;
   background: @bgTwo;
 }
 
