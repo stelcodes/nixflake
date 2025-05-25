@@ -251,15 +251,28 @@ in
       } // (if config.theme.set ? gtkConfigFiles then config.theme.set.gtkConfigFiles else { }); #catppuccin
       portal = {
         # https://mozilla.github.io/webrtc-landing/gum_test.html
+        # Config files: /etc/profiles/per-user/stel/share/xdg-desktop-portal
         enable = true;
         xdgOpenUsePortal = true;
         extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-wlr pkgs.xdg-desktop-portal-gnome ];
-        config.sway = {
-          default = "gtk";
-          "org.freedesktop.impl.portal.Screenshot" = "wlr";
-          "org.freedesktop.impl.portal.ScreenCast" = "wlr";
+        config = {
+          common = {
+            default = [ "gtk" ];
+          };
+          sway = {
+            default = [ "gtk" ];
+            "org.freedesktop.impl.portal.Screenshot" = "wlr";
+            "org.freedesktop.impl.portal.ScreenCast" = "wlr";
+          };
+          niri = {
+            default = [ "gnome" "gtk" ];
+            "org.freedesktop.impl.portal.Access" = "gtk";
+            "org.freedesktop.impl.portal.Notification" = "gtk";
+            "org.freedesktop.impl.portal.FileChooser" = "gtk";
+            "org.freedesktop.impl.portal.Secret" = "gnome-keyring";
+          };
         };
-        configPackages = [ pkgs.niri ];
+        # configPackages = [ pkgs.niri ];
       };
       mimeApps = {
         enable = true;
