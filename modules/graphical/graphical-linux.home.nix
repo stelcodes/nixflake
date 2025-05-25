@@ -603,7 +603,20 @@ in
         timeouts = lib.mkIf waycfg.sleep.auto.enable [
           {
             timeout = waycfg.sleep.auto.idleMinutes * 60;
-            command = "${pkgs.systemd}/bin/systemctl sleep";
+            # wlinhibit currently doesn't work with niri
+            # command = "${pkgs.systemd}/bin/systemctl sleep";
+            command = lib.getExe (pkgs.writeShellApplication {
+              name = "swayidle-idle-timeout";
+              runtimeInputs = [ pkgs.systemd pkgs.playerctl pkgs.coreutils ];
+              text = ''
+                if systemctl --user is-active -q wlinhibit.service; then
+                  systemctl --user restart swayidle.service
+                else
+                  playerctl -a pause || true
+                  systemctl sleep
+                fi
+              '';
+            });
           }
         ];
       };
