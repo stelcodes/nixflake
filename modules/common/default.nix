@@ -31,7 +31,26 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
         systemd-boot.enable = !config.profile.virtual;
         efi.canTouchEfiVariables = !config.profile.virtual;
       };
-      initrd.systemd.enable = !config.profile.virtual; # For booting from hibernation with encrypted swap
+      initrd.systemd = {
+        # For booting from hibernation with encrypted swap
+        enable = !config.profile.virtual;
+        # Root login shell if things go awry or if "emergency" is included in boot args
+        emergencyAccess = true;
+        services.cryptsetup-timeout = {
+          # man systemd-cryptsetup@.service
+          # https://github.com/NixOS/nixpkgs/blob/nixos-25.05/nixos/modules/system/boot/systemd/initrd.nix
+          # https://blog.decent.id/post/nixos-systemd-initrd/
+          # https://discourse.nixos.org/t/migrating-to-boot-initrd-systemd-and-debugging-stage-1-systemd-services/54444/7
+          # As root: nix shell nixpkgs#dracut, lsinitrd /boot/EFI/nixos/...
+          wantedBy = [ "sysinit.target" ];
+          bindsTo = [ "systemd-cryptsetup@crypted.service" ];
+          unitConfig.DefaultDependencies = "no";
+          serviceConfig = {
+            Type = "oneshot";
+            ExecStart = "/bin/sh -c 'sleep 180 && systemctl poweroff'";
+          };
+        };
+      };
     };
 
     # Without NetworkManager, machine will still obtain IP address via DHCP
