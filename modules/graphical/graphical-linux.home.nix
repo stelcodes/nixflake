@@ -667,6 +667,18 @@ in
         };
       };
 
+      wpaperd = {
+        enable = true;
+        settings = {
+          default = {
+            path = "/home/${config.admin.username}/pictures/wallpaper";
+            duration = "60s";
+            mode = "center";
+            sorting = "ascending";
+          };
+        };
+      };
+
     };
 
     dconf.settings =
@@ -743,9 +755,9 @@ in
           "blueman-applet"
           "wlsunset"
           "wayland-pipewire-idle-inhibit"
-          "ianny"
           "ssh-agent"
           "trayscale"
+          "wpaperd"
         ];
       in
       {
