@@ -28,7 +28,7 @@ let
   handle-sway-lid-on = pkgs.writers.writeBash "handle-sway-lid-on" ''
     swaymsg output eDP-1 power off
     playerctl --all-players pause
-    swaylock -f
+    gtklock -d
   '';
   handle-sway-lid-off = pkgs.writers.writeBash "handle-sway-lid-off" ''
     swaymsg output eDP-1 power on
@@ -161,7 +161,7 @@ in
           "${mod}+shift+a" = "exec ${lib.getExe pkgs.toggle-service} record-playback";
           "${mod}+shift+v" = "exec ${pkgs.wg-quick-wofi}";
           "${mod}+backslash" = "exec ${lib.getExe cycle-sway-scale}";
-          "${mod}+delete" = "exec swaylock";
+          "${mod}+delete" = "exec gtklock -d";
 
           # Function key keymaps
           XF86MonBrightnessDown = "exec brightnessctl set 5%-";

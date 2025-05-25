@@ -20,6 +20,13 @@
 
       niri.enable = lib.mkDefault true;
 
+      gtklock = {
+        enable = true;
+        modules = [
+          pkgs.gtklock-powerbar-module
+        ];
+      };
+
       chromium = {
         # This only creates the default policies JSON file, doesn't install chromium
         enable = false;

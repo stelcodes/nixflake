@@ -350,18 +350,6 @@ in
         # };
       };
 
-      swaylock = {
-        enable = true;
-        settings = {
-          color = theme.bgx;
-          image = lib.mkIf (waycfg.wallpaper != null) "${waycfg.wallpaper}";
-          font-size = 24;
-          indicator-idle-visible = false;
-          indicator-radius = 100;
-          show-failed-attempts = true;
-        };
-      };
-
       waybar = {
         enable = true;
         style = ''
@@ -597,7 +585,7 @@ in
         ] ++ lib.lists.optionals waycfg.sleep.lockBefore [
           {
             event = "before-sleep";
-            command = "${pkgs.swaylock}/bin/swaylock -f";
+            command = "${pkgs.gtklock}/bin/gtklock -d";
           }
         ];
         timeouts = lib.mkIf waycfg.sleep.auto.enable [

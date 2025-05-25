@@ -110,7 +110,7 @@
 
   security.pam.pam-parallel = {
     enable = true;
-    applyToModules = [ "swaylock" "ly" ];
+    applyToModules = [ "gtklock" "ly" ];
     methods = {
       fprint = {
         description = "Fingerprint";
