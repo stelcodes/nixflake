@@ -33,6 +33,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+    # For accessing `deploy-rs`'s utility Nix functions
+    deploy-rs.url = "github:serokell/deploy-rs";
     yazi-plugins = {
       url = "github:yazi-rs/plugins";
       flake = false;
@@ -118,28 +120,28 @@
           system = "x86_64-linux";
         };
         # desktop tower
-        terra = nixosMachine {
-          hostName = "terra";
-          system = "x86_64-linux";
-        };
+        # terra = nixosMachine {
+        #   hostName = "terra";
+        #   system = "x86_64-linux";
+        # };
         # 2013 macbook air
-        aerith = nixosMachine {
-          hostName = "aerith";
-          system = "x86_64-linux";
-        };
+        # aerith = nixosMachine {
+        #   hostName = "aerith";
+        #   system = "x86_64-linux";
+        # };
         # mac mini 2011 beatrix
-        beatrix = nixosMachine {
-          hostName = "beatrix";
-          system = "x86_64-linux";
-        };
+        # beatrix = nixosMachine {
+        #   hostName = "beatrix";
+        #   system = "x86_64-linux";
+        # };
         # raspberry pi 3B+
         # nix build .#nixosConfigurations.boko.config.formats.sd-aarch64 (build is failing atm)
         # https://hydra.nixos.org/job/nixos/trunk-combined/nixos.sd_image.aarch64-linux
         # https://nix.dev/tutorials/nixos/installing-nixos-on-a-raspberry-pi.html
-        boko = nixosMachine {
-          hostName = "boko";
-          system = "aarch64-linux";
-        };
+        # boko = nixosMachine {
+        #   hostName = "boko";
+        #   system = "aarch64-linux";
+        # };
         hetznercloud = nixosMachine {
           hostName = "hetznercloud";
           system = "x86_64-linux";
@@ -149,10 +151,10 @@
           system = "x86_64-linux";
         };
         # basic virtual machine for experimenting
-        sandbox = nixosMachine {
-          hostName = "sandbox";
-          system = "x86_64-linux";
-        };
+        # sandbox = nixosMachine {
+        #   hostName = "sandbox";
+        #   system = "x86_64-linux";
+        # };
         installer = inputs.nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
@@ -167,8 +169,39 @@
             })
           ];
         };
-
       };
+
+    # https://github.com/serokell/deploy-rs?tab=readme-ov-file#overall-usage
+    deploy.nodes =
+      let
+        system = "x86_64-linux";
+        pkgs = import inputs.nixpkgs { inherit system; };
+        deployPkgs = import inputs.nixpkgs {
+          inherit system;
+          overlays = [
+            inputs.deploy-rs.overlay
+            (self: super: { deploy-rs = { inherit (pkgs) deploy-rs; lib = super.deploy-rs.lib; }; })
+          ];
+        };
+      in
+      {
+        sora = {
+          hostname = "5.78.141.196";
+          # hostname = "sora";
+          profiles.system = {
+            user = "root";
+            path = deployPkgs.deploy-rs.lib.activate.nixos
+              inputs.self.nixosConfigurations.sora;
+            # interactiveSudo = true;
+            remoteBuild = false; # default is false
+          };
+        };
+      };
+
+    # This is highly advised by deploy-rs
+    checks = builtins.mapAttrs
+      (system: deployLib: deployLib.deployChecks inputs.self.deploy)
+      inputs.deploy-rs.lib;
 
   };
 }
