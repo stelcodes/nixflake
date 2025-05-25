@@ -2,37 +2,17 @@
 
 Feel free to take a look around 🌷✨
 
-## Inspiration
-
-https://github.com/Xe/nixos-configs
-
-https://github.com/MatthiasBenaets/nixos-config
-
-https://git.2li.ch/Nebucatnetzer/nixos
-
-https://github.com/emmanuelrosa/erosanix
-
-https://github.com/LongerHV/nixos-configuration
-
-https://github.com/TLATER/dotfiles
-
-https://git.eisfunke.com/config/nixos
-
 ## Essential Resources
 
 ### Nix
 
-https://nixos.org/manual/nixos/stable/
+[NixOS Manual](https://nixos.org/manual/nixos/stable/)
 
-https://nixos.org/manual/nixos/stable/options
+[Nixpkgs Manual](https://nixos.org/manual/nixpkgs/stable/)
 
-https://nixos.org/manual/nixpkgs/stable/
+[Nix Packages + Options Search](https://search.nixos.org)
 
-https://nix.dev/manual/nix/2.18/
-
-https://search.nixos.org
-
-https://noogle.dev
+[Nix Language Reference](https://noogle.dev)
 
 https://nixos-and-flakes.thiscute.world
 
@@ -231,24 +211,6 @@ https://atar-axis.github.io/xpadneo/
 
 https://emulation.gametechwiki.com/index.php/Main_Page
 
-## Media
-
-https://nixos.wiki/wiki/Kodi
-
-My preferred setup:
-```
-Services -> Weather -> Gismeteo
-Interface -> Skin -> Colors -> Concrete
-Media -> Library -> Update library on startup
-Media -> Music -> Show Song and Album Artists -> False
-Media -> Music -> Split Albums into Discs -> False
-Media -> Music -> Default provider for albums -> Local Only
-Media -> Music -> Default provider for artists -> Local Only
-Media -> Music -> Visualisations -> On
-Player -> Music -> Visualisation -> Goom
-```
-This music sources don't purge missing tracks even when cleaned so you have to remove .kodi/userdata/Database/MyMusic.db all the time. Seems fixable? 🤔
-
 ## Compatibility
 
 `pkgs.appimage-run`
@@ -356,9 +318,22 @@ https://librearts.org/
 
 https://diskprices.com
 
-https://www.backblaze.com/cloud-storage/resources/hard-drive-test-data
-
 https://modcase.com.au
 
 https://frame.work
 
+## Inspiration
+
+https://github.com/Xe/nixos-configs
+
+https://github.com/MatthiasBenaets/nixos-config
+
+https://git.2li.ch/Nebucatnetzer/nixos
+
+https://github.com/emmanuelrosa/erosanix
+
+https://github.com/LongerHV/nixos-configuration
+
+https://github.com/TLATER/dotfiles
+
+https://git.eisfunke.com/config/nixos
