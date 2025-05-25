@@ -1,7 +1,6 @@
 import argparse
 import os
-from pprint import pprint
-from subprocess import run
+import subprocess
 import sys
 
 
@@ -28,8 +27,10 @@ def main():
         "-k",
         "--keep-subs",
         type=int,
-        dest="subs_stream",
-        help="Subtitle stream index to keep",
+        nargs="*",
+        default=[],
+        dest="subs_streams",
+        help="Subtitle stream indices to keep",
     )
     parser.add_argument(
         "-f",
@@ -40,6 +41,15 @@ def main():
         help="Subtitle offset in seconds",
     )
     parser.add_argument(
+        "-K",
+        "--keep-audio",
+        type=int,
+        nargs="*",
+        default=[0],
+        dest="audio_streams",
+        help="Audio stream indices to keep",
+    )
+    parser.add_argument(
         "-o",
         "--output",
         type=str,
@@ -48,48 +58,65 @@ def main():
     )
     args = parser.parse_args()
 
-    ffmpeg_cmd_raw = [
-        "ffmpeg",
-        "-hide_banner",
+    input_args = [
         "-i",
         args.video_path,
-        args.subs_offset and "-itsoffset",
-        args.subs_offset and str(args.subs_offset),
-        args.subs_path and "-i",
-        args.subs_path,
+    ]
+    if args.subs_path:
+        if args.subs_offset:
+            input_args.append("-itsoffset")
+            input_args.append(str(args.subs_offset))
+        input_args.append("-i")
+        input_args.append(args.subs_path)
+
+    map_args = [
         "-map",
         "0:v:0",
-        "-map",
-        "0:a:0",
-        args.subs_path and "-map",
-        args.subs_path and "1:s:0",
-        args.subs_stream is not None and "-map",
-        args.subs_stream is not None and f"0:s:{args.subs_stream}",
+    ]
+    for audio_stream in args.audio_streams:
+        map_args.append("-map")
+        map_args.append(f"0:a:{audio_stream}")
+    # Put the subs file first so it becomes s:0 default if given
+    if args.subs_path:
+        map_args.append("-map")
+        map_args.append("1:s:0")
+    for subs_stream in args.subs_streams:
+        map_args.append("-map")
+        map_args.append(f"0:s:{subs_stream}")
+
+    meta_args = [
         "-disposition:v:0",
         "default",
-        "-disposition:a:0",
-        "default",
-        "-disposition:s:0",
-        "default",
-        "-metadata:s:s:0",
-        "language=eng",
-        "-metadata:s:s:0",
-        "title=English",
-        args.subs_path and args.subs_stream is not None and "-disposition:s:1",
-        args.subs_path and args.subs_stream is not None and "0",
-        args.subs_path and args.subs_stream is not None and "-metadata:s:s:1",
-        args.subs_path and args.subs_stream is not None and "language=eng",
-        args.subs_path and args.subs_stream is not None and "-metadata:s:s:1",
-        args.subs_path and args.subs_stream is not None and "title=English_Alt",
-        "-c",
-        "copy",
-        args.output_path or os.path.splitext(args.video_path)[0] + ".vws.mkv",
     ]
-    ffmpeg_cmd = [x for x in ffmpeg_cmd_raw if isinstance(x, str)]
-    pprint(ffmpeg_cmd)
+    audio_count = len(args.audio_streams)
+    for audio_index in range(audio_count):
+        meta_args.append(f"-disposition:a:{audio_index}")
+        meta_args.append("default" if audio_index == 0 else "0")
+    subs_count = len(args.subs_streams) + (1 if args.subs_path else 0)
+    for subs_index in range(subs_count):
+        meta_args.append(f"-disposition:s:{subs_index}")
+        meta_args.append("default" if subs_index == 0 else "0")
+        meta_args.append(f"-metadata:s:s:{subs_index}")
+        meta_args.append("language=eng")
+        meta_args.append(f"-metadata:s:s:{subs_index}")
+        meta_args.append(f"title=English{'_Alt' if subs_index != 0 else ''}")
+
+    output_path: str = (
+        args.output_path or os.path.splitext(args.video_path)[0] + ".vws.mkv"
+    )
+
+    ffmpeg_cmd = (
+        ["ffmpeg", "-hide_banner"]
+        + input_args
+        + map_args
+        + meta_args
+        + ["-c", "copy", output_path]
+    )
+
+    print("\n" + " ".join(ffmpeg_cmd) + "\n")
     response = input("Run? [Y/n]")
     if response.lower() != "n":
-        ffmpeg_result = run(ffmpeg_cmd)
+        ffmpeg_result = subprocess.run(ffmpeg_cmd)
         sys.exit(ffmpeg_result.returncode)
 
 

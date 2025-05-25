@@ -22,7 +22,7 @@
       pkgs.mgba
       pkgs.duckstation
       (pkgs.writePythonApplication {
-        name = "video-with-subs";
+        name = "vws";
         runtimeInputs = [ pkgs.ffmpeg ];
         text = builtins.readFile ../../misc/video-with-subs.py;
       })
