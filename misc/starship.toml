@@ -46,3 +46,4 @@ style = "blue"
 
 [nix_shell]
 heuristic = false
+impure_msg = ""
