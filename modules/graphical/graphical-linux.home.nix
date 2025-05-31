@@ -83,6 +83,22 @@ let
       niri msg pick-color | grep -oE '#[[:alnum:]]{6}' | wl-copy
     '';
   };
+  lock-session = pkgs.writeShellApplication {
+    name = "lock-session";
+    runtimeInputs = [ pkgs.gtklock pkgs.procps ];
+    text = ''
+      if ! pgrep gtklock &> /dev/null; then
+        gtklock -d
+      fi
+    '';
+  };
+  wofi-toggle = pkgs.writeShellApplication {
+    name = "wofi-toggle";
+    runtimeInputs = [ pkgs.wofi pkgs.procps ];
+    text = ''
+      pkill wofi-wrapped || exec wofi "$@"
+    '';
+  };
 in
 {
 
@@ -169,6 +185,8 @@ in
         niri-adjust-scale
         niri-pick-color
         monitor-power
+        lock-session
+        wofi-toggle
       ] ++ (lib.lists.optionals config.profile.audio [
         pkgs.playerctl
         pkgs.helvum # better looking than qpwgraph
@@ -594,7 +612,7 @@ in
         ] ++ lib.lists.optionals waycfg.sleep.lockBefore [
           {
             event = "before-sleep";
-            command = "${pkgs.gtklock}/bin/gtklock -d";
+            command = lib.getExe lock-session;
           }
         ];
         timeouts = lib.mkIf waycfg.sleep.auto.enable [
