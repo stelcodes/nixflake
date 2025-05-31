@@ -19,6 +19,9 @@
         settings = {
           MEM_SLEEP_ON_BAT = "deep";
           MEM_SLEEP_ON_AC = "deep";
+          # Prevent clicks: https://linrunner.de/tlp/faq/audio.html
+          SOUND_POWER_SAVE_ON_AC = 0;
+          SOUND_POWER_SAVE_ON_BAT = 0;
         };
       };
     };
