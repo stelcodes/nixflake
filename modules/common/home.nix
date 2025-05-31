@@ -221,6 +221,9 @@
             { id = "git"; name = "*"; run = "git"; }
             { id = "git"; name = "*/"; run = "git"; }
           ];
+          plugin.prepend_preloaders = [
+            { mime = "video/*"; run = "noop"; }
+          ];
           opener = {
             play = lib.mkIf config.profile.graphical [
               # mpv-unify script from mpv package prevents simultaneous playback
@@ -242,19 +245,19 @@
         };
         plugins =
           let
-            p = inputs.yazi-plugins;
+            yp = pkgs.yaziPlugins;
             _mkYaziPlugin = (initLua:
-              "${(pkgs.writeTextDir "plugin/init.lua" initLua)}/plugin"
+              "${(pkgs.writeTextDir "plugin/main.lua" initLua)}/plugin"
             );
           in
           {
-            chmod = "${p}/chmod.yazi";
-            full-border = "${p}/full-border.yazi";
-            toggle-pane = "${p}/toggle-pane.yazi";
-            mount = "${p}/mount.yazi";
-            git = "${p}/git.yazi";
-            starship = "${inputs.starship-yazi}";
-            smart-enter = "${p}/smart-enter.yazi";
+            chmod = yp.chmod;
+            full-border = yp.full-border;
+            toggle-pane = yp.toggle-pane;
+            mount = yp.mount;
+            git = yp.git;
+            starship = yp.starship;
+            smart-enter = yp.smart-enter;
           };
         initLua = /* lua */ ''
           require("starship"):setup()

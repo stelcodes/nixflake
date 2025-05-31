@@ -35,14 +35,6 @@
     };
     # For accessing `deploy-rs`'s utility Nix functions
     deploy-rs.url = "github:serokell/deploy-rs";
-    yazi-plugins = {
-      url = "github:yazi-rs/plugins";
-      flake = false;
-    };
-    starship-yazi = {
-      url = "github:Rolv-Apneseth/starship.yazi";
-      flake = false;
-    };
     nixos-generators = {
       url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
