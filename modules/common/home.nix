@@ -204,17 +204,15 @@
 
       yazi = {
         enable = true;
-        # Remove all media preview deps when machine is a server
-        package = lib.mkIf config.profile.virtual (pkgs.yazi.override { optionalDeps = [ ]; });
+        # Remove all media preview deps when machine is headless
+        package = lib.mkIf config.profile.graphical (pkgs.yazi.override { optionalDeps = [ ]; });
         shellWrapperName = "y";
         # Defaults: https://github.com/sxyazi/yazi/tree/main/yazi-config/preset
         settings = {
-          manager = {
+          mgr = {
             show_hidden = false;
             sort_by = "natural";
             sort_translit = true;
-            sort_dir_first = false;
-            sort_reverse = false;
           };
           plugin.prepend_fetchers = [
             # https://github.com/yazi-rs/plugins/tree/main/git.yazi#setup
@@ -260,11 +258,22 @@
             smart-enter = yp.smart-enter;
           };
         initLua = /* lua */ ''
+          -- Old tab bar style https://github.com/sxyazi/yazi/pull/2782
+          function Tabs.height() return 0 end
+          Header:children_add(function()
+            if #cx.tabs == 1 then return "" end
+            local spans = {}
+            for i = 1, #cx.tabs do
+              spans[#spans + 1] = ui.Span(" " .. i .. " ")
+            end
+            spans[cx.tabs.idx]:reverse()
+            return ui.Line(spans)
+          end, 9000, Header.RIGHT)
           require("starship"):setup()
           require("git"):setup()
         '';
         keymap = {
-          manager.prepend_keymap = [
+          mgr.prepend_keymap = [
             {
               on = "M";
               run = "plugin mount";
