@@ -51,10 +51,6 @@
       url = "github:catppuccin/btop";
       flake = false;
     };
-    workspace-diagnostics-nvim = {
-      url = "github:artemave/workspace-diagnostics.nvim";
-      flake = false;
-    };
   };
 
   outputs = inputs: {
