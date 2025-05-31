@@ -92,11 +92,24 @@ window-rule {
 window-rule {
     match app-id="^kitty$"
     min-width 1000
-    // open-maximized true
+}
+window-rule {
+    match app-id="^kitty$" title="^btop$"
+    open-maximized true
 }
 window-rule {
     match app-id="^qalculate-gtk$"
     default-window-height { fixed 500; }
+}
+window-rule {
+    match app-id="^(chrome|chromium)-"
+    scroll-factor 0.33 // chromium scrolling is absurdly fast
+}
+window-rule {
+    match app-id=r#"^chrome-weatherstar\.netbymatt\.com"#
+    // 4x3 interface
+    default-column-width { fixed 800; }
+    default-window-height { fixed 600; }
 }
 
 binds {
@@ -112,6 +125,9 @@ binds {
     Super+Minus { spawn "niri-adjust-scale" "-0.1"; }
     Super+Equal { spawn "niri-adjust-scale" "+0.1"; }
     Super+Shift+Equal { spawn "niri-pick-color"; }
+    Super+M { spawn "gnome-disks"; }
+    Super+B { spawn "blueman-manager"; }
+    Super+N { spawn "keepassxc"; }
     XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "--limit" "1.0" "@DEFAULT_AUDIO_SINK@" "5%+"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "--limit" "1.0" "@DEFAULT_AUDIO_SINK@" "5%-"; }
     XF86AudioMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
