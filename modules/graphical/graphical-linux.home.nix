@@ -168,7 +168,6 @@ in
         pkgs.gnome-disk-utility
         pkgs.eog
         pkgs.qalculate-gtk
-        pkgs.gnome-weather
         pkgs.font-manager
         pkgs.file-roller
         pkgs.brightnessctl
@@ -202,6 +201,8 @@ in
         SSH_ASKPASS_REQUIRE = "prefer";
         ELECTRON_OZONE_PLATFORM_HINT = "wayland";
         QT_QPA_PLATFORM = "wayland";
+        # QT6 only https://github.com/NixOS/nixpkgs/issues/342115
+        QT_QPA_PLATFORMTHEME = "gtk3";
         NIXOS_OZONE_WL = "1";
         _JAVA_AWT_WM_NONREPARENTING = "1";
       };
@@ -215,7 +216,6 @@ in
 
     xdg = {
       configFile = {
-        # "niri/config.kdl".source = ./niri.kdl;
         "niri/config.kdl".source = pkgs.writeTextFile {
           name = "config.kdl";
           checkPhase = ''
@@ -254,18 +254,6 @@ in
               color: ${theme.red};
           }
         '';
-        "swappy/config".text = ''
-          [Default]
-          save_dir=$XDG_PICTURES_DIR/screenshots
-          save_filename_format=swappy-%FT%X.png
-          show_panel=false
-          line_size=5
-          text_size=20
-          text_font=sans-serif
-          paint_mode=brush
-          early_exit=true
-          fill_shape=false
-        '';
       } // (if config.theme.set ? gtkConfigFiles then config.theme.set.gtkConfigFiles else { }); #catppuccin
       portal = {
         # https://mozilla.github.io/webrtc-landing/gum_test.html
@@ -290,7 +278,6 @@ in
             "org.freedesktop.impl.portal.Secret" = "gnome-keyring";
           };
         };
-        # configPackages = [ pkgs.niri ];
       };
       mimeApps = {
         enable = true;
@@ -374,9 +361,6 @@ in
           @define-color fg ${theme.fg};
           ${builtins.readFile ./waybar.css}
         '';
-        # Stopped working when switching between Cinnamon and Sway
-        # [error] Bar need to run under Wayland
-        # GTK4 get_default_display was saying it was still X11
         systemd.enable = true;
         settings = [{
           layer = "bottom";
@@ -532,23 +516,6 @@ in
           };
           Service.ExecStart = "${pkgs.wlinhibit}/bin/wlinhibit";
         };
-        # swaybg = {
-        #   # lib.mkIf (waycfg.wallpaper != null)
-        #   Service.ExecStart = lib.getExe
-        #     (pkgs.writeShellApplication {
-        #       name = "swaybg-execstart";
-        #       runtimeInputs = [ pkgs.swaybg pkgs.coreutils ];
-        #       text = ''
-        #         if [ -f "$HOME/.wallpaper" ]; then
-        #           swaybg -m fill -i "$HOME/.wallpaper"
-        #         elif ${if waycfg.wallpaper != null then "true" else "false"}; then
-        #           swaybg -m fill -i ${waycfg.wallpaper}
-        #         else
-        #           swaybg -c "${theme.bg3}"
-        #         fi
-        #       '';
-        #     });
-        # };
         xwayland-satellite = {
           Service.ExecStart = "${lib.getExe pkgs.xwayland-satellite} :12";
         };
@@ -748,13 +715,6 @@ in
           picture-uri-dark = "file://${pkgs.wallpaper.anime-girl-coffee}";
         };
       };
-
-    qt = {
-      # Necessary for keepassxc, qpwgrapgh, etc to theme correctly
-      enable = true;
-      platformTheme.name = "gtk";
-      style.name = "gtk2";
-    };
 
     gtk = {
       enable = true;

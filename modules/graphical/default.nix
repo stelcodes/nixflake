@@ -1,4 +1,4 @@
-{ pkgs, inputs, config, lib, ... }: {
+{ pkgs, config, lib, ... }: {
 
 
   config = lib.mkIf config.profile.graphical {
@@ -44,7 +44,7 @@
           DefaultSearchProviderNewTabURL = "https://duckduckgo.com";
           DNSInterceptionChecksEnabled = false;
           BuiltInDnsClientEnabled = false; # Defer to system DNS
-          EnableMediaRouter = false; # Google cast
+          EnableMediaRouter = true; # Google cast
           HardwareAccelerationModeEnabled = true;
           HighEfficiencyModeEnabled = true;
           HttpsOnlyMode = "force_balanced_enabled"; # Allow user to select http
@@ -109,6 +109,11 @@
         # https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/data/fonts/nerdfonts/shas.nix
         pkgs.nerd-fonts.fira-mono
       ];
+    };
+
+    environment.variables = {
+      # https://github.com/thomX75/nixos-modules/tree/main/Glib-Schemas-Fix
+      GSETTINGS_SCHEMA_DIR = "${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}/glib-2.0/schemas";
     };
 
     # xserver.desktopManager.gnome.enable = true;
