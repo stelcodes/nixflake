@@ -28,6 +28,10 @@ window#waybar {
   padding: 0 1px;
 }
 
+#workspaces button label {
+  font-size: 12px;
+}
+
 #workspaces button:not(:last-child) {
   margin-right: 6px;
 }

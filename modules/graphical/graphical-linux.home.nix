@@ -83,6 +83,22 @@ let
       niri msg pick-color | grep -oE '#[[:alnum:]]{6}' | wl-copy
     '';
   };
+  niri-rename-workspace = pkgs.writeShellApplication {
+    name = "niri-rename-workspace";
+    runtimeInputs = [ pkgs.niri pkgs.wofi pkgs.gawk ];
+    text = ''
+      # If wofi is canceled, abort and do nothing
+      # If wofi input is empty, unset workspace name
+      # Else rename workspace with provided name
+      response=$(wofi --dmenu --hide-scroll --lines=1)
+      trimmed=$(awk '{$1=$1;print}' <<< "$response")
+      if [ -z "$trimmed" ]; then
+        niri msg action unset-workspace-name
+      else
+        niri msg action set-workspace-name "$response"
+      fi
+    '';
+  };
   lock-session = pkgs.writeShellApplication {
     name = "lock-session";
     runtimeInputs = [ pkgs.gtklock pkgs.procps ];
@@ -184,6 +200,7 @@ in
         # pkgs.wlogout
         niri-adjust-scale
         niri-pick-color
+        niri-rename-workspace
         monitor-power
         lock-session
         wofi-toggle
@@ -232,10 +249,10 @@ in
         '';
         "wofi/config".text = /* ini */ ''
           allow_images=true
-          width=800
-          height=400
           term=kitty
           show=drun
+          no_actions=true
+          key_expand=Tab
         '';
         "wofi/style.css".source = ./wofi.css;
         "gajim/theme/default.css".text = ''

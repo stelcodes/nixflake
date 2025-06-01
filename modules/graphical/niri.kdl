@@ -128,6 +128,7 @@ binds {
     Super+M { spawn "gnome-disks"; }
     Super+B { spawn "blueman-manager"; }
     Super+N { spawn "keepassxc"; }
+    Super+Semicolon  { spawn "niri-rename-workspace"; }
     XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "--limit" "1.0" "@DEFAULT_AUDIO_SINK@" "5%+"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "--limit" "1.0" "@DEFAULT_AUDIO_SINK@" "5%-"; }
     XF86AudioMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
