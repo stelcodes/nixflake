@@ -32,6 +32,7 @@
       pkgs.bitwig-studio
       pkgs.fractal
       pkgs.mkvtoolnix
+      pkgs.oniux
     ];
   };
   wayland.windowManager = {
@@ -44,5 +45,24 @@
       };
     };
     wallpaper = pkgs.wallpaper.anime-girl-coffee;
+  };
+  programs.nushell = {
+    enable = true;
+    settings = {
+      show_banner = false;
+      edit_mode = "vi";
+      cursor_shape = {
+        vi_insert = "blink_line";
+        vi_normal = "blink_block";
+      };
+      completions.external = {
+        enable = true;
+        max_results = 200;
+      };
+    };
+    envFile.text = ''
+      $env.PROMPT_INDICATOR_VI_INSERT = ""
+      $env.PROMPT_INDICATOR_VI_NORMAL = ""
+    '';
   };
 }
