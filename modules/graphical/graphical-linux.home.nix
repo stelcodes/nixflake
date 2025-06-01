@@ -178,6 +178,7 @@ in
         pkgs.rofimoji # Great associated word hints with extensive symbol lists to choose from
         pkgs.wdisplays
         pkgs.libnotify # for notify-send
+        pkgs.chafa # images in terminal, telescope-media-files dep
         # pkgs.kooha # Doesn't work with niri atm
         # pkgs.wl-screenrec # https://github.com/russelltg/wl-screenrec
         # pkgs.wlogout
@@ -209,8 +210,8 @@ in
       pointerCursor = {
         package = theme.cursorThemePackage;
         name = theme.cursorThemeName;
-        size = 24;
-        gtk.enable = true;
+        # size = 24;
+        # gtk.enable = true;
       };
     };
 

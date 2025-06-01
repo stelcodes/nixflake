@@ -346,7 +346,6 @@
             gs = "git status";
             gl = "git log";
             glf = "git log --pretty=format:'%C(yellow)%h%C(reset) %C(blue)%an%C(reset) %C(cyan)%cr%C(reset) %s %C(green)%d%C(reset)' --graph";
-            config = "cd ~/.config/nixflake; nvim";
             d = "dua --stay-on-filesystem interactive";
             ssh-key-create = "ssh-keygen -a 100 -t ed25519 -f ./id_ed25519 -C \"$(whoami)@$(hostname)@$(date +'%Y-%m-%d')\"";
             date-sortable = "date +%Y-%m-%dT%H:%M:%S%Z"; # ISO 8601 date format with local timezone
@@ -443,6 +442,10 @@
             function copy() { ${if pkgs.stdenv.isDarwin then "pbcopy" else "wl-copy"}; }
             function paste() { ${if pkgs.stdenv.isDarwin then "pbpaste" else "wl-paste"}; }
             ${builtins.readFile ./zvm-clipboard.sh}
+
+            # Use functions to have better kitty tab names
+            function config() { cd ~/.config/nixflake && nvim; }
+            function notebox() { cd ~/sync/notebox && nvim; }
           '';
           plugins = [
             {

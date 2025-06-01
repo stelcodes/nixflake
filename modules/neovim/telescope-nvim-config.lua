@@ -46,14 +46,21 @@ tele.setup {
       override_generic_sorter = true, -- override the generic sorter
       override_file_sorter = true,    -- override the file sorter
       case_mode = "smart_case",       -- or "ignore_case" or "respect_case"
+    },
+    ["ui-select"] = {
+      require("telescope.themes").get_dropdown()
     }
   }
 }
 tele.load_extension('ui-select')
 tele.load_extension('fzf')
 tele.load_extension('undo')
+tele.load_extension('media_files')
 vim.keymap.set('n', '<leader><leader>', function() builtin.resume { initial_mode = 'normal' } end)
 vim.keymap.set('n', '<leader>f', builtin.find_files)
+vim.keymap.set('n', '<leader>F', function()
+  builtin.find_files({ no_ignore = true, hidden = true })
+end)
 vim.keymap.set('n', '<leader>s', function() builtin.live_grep { hidden = true } end)
 vim.keymap.set('n', '<leader>S', function()
   builtin.live_grep { hidden = true, additional_args = { "--max-count", "1" } }

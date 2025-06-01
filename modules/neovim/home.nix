@@ -1,4 +1,4 @@
-{ pkgs, lib, config, inputs, ... }:
+{ pkgs, lib, config, ... }:
 let
   theme = config.theme.set;
   plugins = pkgs.vimPlugins;
@@ -43,6 +43,16 @@ in
             repo = "paredit";
             rev = "27d2ea61ac6117e9ba827bfccfbd14296c889c37";
             sha256 = "1bj5m1b4n2nnzvwbz0dhzg1alha2chbbdhfhl6rcngiprbdv0xi6";
+          };
+        };
+        telekasten-calendar = pkgs.vimUtils.buildVimPlugin {
+          pname = "telekasten-calendar";
+          version = "unstable-2021-11-27";
+          src = pkgs.fetchFromGitHub {
+            owner = "nvim-telekasten";
+            repo = "calendar-vim";
+            rev = "a7e73e02c92566bf427b2a1d6a61a8f23542cc21";
+            sha256 = "sha256-4XeDd+myM+wtHUsr3s1H9+GAwIjK8fAqBbFnBCeatPo=";
           };
         };
       in
@@ -244,8 +254,9 @@ in
           '';
         }
         plugins.plenary-nvim
-        plugins.telescope-file-browser-nvim
         plugins.telescope-ui-select-nvim
+        plugins.popup-nvim
+        plugins.telescope-media-files-nvim
         plugins.telescope-fzf-native-nvim
         plugins.telescope-undo-nvim
         {
@@ -364,6 +375,38 @@ in
           type = "lua";
           config = /* lua */ ''
             vim.notify = require("notify")
+          '';
+        }
+
+        telekasten-calendar
+        {
+          plugin = plugins.telekasten-nvim;
+          type = "lua";
+          config = /* lua */ ''
+            local notebox = vim.fn.expand("~/sync/notebox")
+            require('telekasten').setup({
+              home = notebox,
+              templates = notebox.."/.templates",
+              template_new_note = notebox.."/.templates/default.md",
+              template_new_daily = notebox.."/.templates/daily.md",
+              template_new_weekly = notebox.."/.templates/weekly.md",
+            })
+            vim.api.nvim_create_autocmd('FileType', {
+              pattern = 'calendar',
+              command = 'setlocal sidescrolloff=0',
+            })
+            vim.keymap.set("n", "<leader>np", "<cmd>Telekasten panel<CR>")
+            vim.keymap.set("n", "<leader>nf", "<cmd>Telekasten find_notes<CR>")
+            vim.keymap.set("n", "<leader>ns", "<cmd>Telekasten search_notes<CR>")
+            vim.keymap.set("n", "<leader>nt", "<cmd>Telekasten goto_today<CR>")
+            vim.keymap.set("n", "<leader>nw", "<cmd>Telekasten goto_thisweek<CR>")
+            vim.keymap.set("n", "<leader>nl", "<cmd>Telekasten insert_link<CR>")
+            vim.keymap.set("n", "<leader>nL", "<cmd>Telekasten insert_img_link<CR>")
+            vim.keymap.set("n", "<leader>ng", "<cmd>Telekasten follow_link<CR>")
+            vim.keymap.set("n", "<leader>nn", "<cmd>Telekasten new_note<CR>")
+            vim.keymap.set("n", "<leader>nc", "<cmd>Telekasten show_calendar<CR>")
+            vim.keymap.set("n", "<leader>nb", "<cmd>Telekasten show_backlinks<CR>")
+            vim.keymap.set("n", "<leader>nr", "<cmd>Telekasten rename_note<CR>")
           '';
         }
 
