@@ -91,7 +91,7 @@ window-rule {
 }
 window-rule {
     match app-id="^kitty$"
-    min-width 1000
+    default-column-width { fixed 800; }
 }
 window-rule {
     match app-id="^kitty$" title="^btop$"
@@ -110,6 +110,24 @@ window-rule {
     // 4x3 interface
     default-column-width { fixed 800; }
     default-window-height { fixed 600; }
+}
+window-rule {
+    match is-window-cast-target=true
+    focus-ring {
+        active-color "#f38ba8"
+        inactive-color "#7d0d2d"
+    }
+    shadow {
+        on
+        softness 30
+        spread 4
+        offset x=0 y=0
+        color "#7d0d2d70"
+    }
+    tab-indicator {
+        active-color "#f38ba8"
+        inactive-color "#7d0d2d"
+    }
 }
 
 binds {
