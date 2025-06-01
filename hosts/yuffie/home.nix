@@ -15,7 +15,7 @@
       pkgs.thunderbird
       (pkgs.createBrowserApp { name = "Bandcamp"; url = "https://bandcamp.com"; })
       (pkgs.createBrowserApp { name = "Discord"; url = "https://app.discord.com"; })
-      (pkgs.createBrowserApp { name = "Weather"; url = "https://weatherstar.netbymatt.com/?kiosk=true"; })
+      (pkgs.createBrowserApp { name = "Weather"; icon = "weather"; url = "https://weatherstar.netbymatt.com/?kiosk=true"; })
       pkgs.kdePackages.k3b
       pkgs.calibre
       pkgs.deploy-rs
