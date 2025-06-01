@@ -65,12 +65,13 @@ vim.keymap.set('n', '<leader>s', function() builtin.live_grep { hidden = true } 
 vim.keymap.set('n', '<leader>S', function()
   builtin.live_grep { hidden = true, additional_args = { "--max-count", "1" } }
 end)
-vim.keymap.set('n', '<leader>b', function()
-  builtin.live_grep { search_dirs = { vim.fn.expand("%:p") } }
-end)
+-- vim.keymap.set('n', '<leader>b', function()
+--   builtin.live_grep { search_dirs = { vim.fn.expand("%:p") } }
+-- end)
+vim.keymap.set('n', '<leader>b', builtin.buffers)
 vim.keymap.set('n', '<leader>B', builtin.current_buffer_fuzzy_find)
 vim.keymap.set('n', '<leader>dd', builtin.diagnostics)
-vim.keymap.set('n', '<leader>R', builtin.registers)
+vim.keymap.set('n', '<leader>r', builtin.registers)
 vim.keymap.set('n', '<leader>m', builtin.marks)
 vim.keymap.set('n', '<leader>c', builtin.commands)
 vim.keymap.set('n', '<leader>C', function() builtin.colorscheme { enable_preview = true } end)
