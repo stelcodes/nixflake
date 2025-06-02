@@ -1,4 +1,10 @@
-{ pkgs, config, lib, ... }: {
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+{
 
   config = lib.mkIf config.profile.bluetooth {
 

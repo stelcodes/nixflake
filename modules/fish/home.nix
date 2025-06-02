@@ -1,4 +1,10 @@
-{ pkgs, lib, inputs, ... }: {
+{
+  pkgs,
+  lib,
+  inputs,
+  ...
+}:
+{
   home.packages = [ pkgs.starship ];
   xdg.configFile."fish/themes/base16.theme" = {
     onChange = "${pkgs.fish}/bin/fish -c 'echo y | fish_config theme save base16'";
@@ -45,38 +51,39 @@
   };
   programs.fish = {
     # enable = true;
-    interactiveShellInit = /* fish */ ''
-      if test "$(uname)" = "Darwin"; # If on MacOS...
-        # Make sure the Nix environment is sourced when fish isn't the login shell
-        if test -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish;
-          source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
+    interactiveShellInit = # fish
+      ''
+        if test "$(uname)" = "Darwin"; # If on MacOS...
+          # Make sure the Nix environment is sourced when fish isn't the login shell
+          if test -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish;
+            source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
+          end
+          # Set fish as the psuedo-default shell
+          if test "$SHELL" = "/bin/zsh";
+            set -x SHELL ${pkgs.fish}/bin/fish
+          end
+          # Add homebrew to PATH when necessary
+          if test -e /opt/homebrew;
+            fish_add_path --append /opt/homebrew/bin /opt/homebrew/sbin
+          end
+          # Add local/bin to PATH if it exists
+          if test -e "$HOME/.local/bin";
+            fish_add_path --append "$HOME/.local/bin"
+          end
         end
-        # Set fish as the psuedo-default shell
-        if test "$SHELL" = "/bin/zsh";
-          set -x SHELL ${pkgs.fish}/bin/fish
+        # Fix comma falling back to 'nixpkgs' channel when NIX_PATH not set (MacOS)
+        if ! set --query NIX_PATH;
+          set --export NIX_PATH 'nixpkgs=flake:${inputs.nixpkgs}'
         end
-        # Add homebrew to PATH when necessary
-        if test -e /opt/homebrew;
-          fish_add_path --append /opt/homebrew/bin /opt/homebrew/sbin
+        # If ssh'ing from kitty, use kitten to automatically install kitty terminfo on remote host
+        if test "$TERM" = "xterm-kitty";
+          abbr ssh "kitty +kitten ssh"
         end
-        # Add local/bin to PATH if it exists
-        if test -e "$HOME/.local/bin";
-          fish_add_path --append "$HOME/.local/bin"
-        end
-      end
-      # Fix comma falling back to 'nixpkgs' channel when NIX_PATH not set (MacOS)
-      if ! set --query NIX_PATH;
-        set --export NIX_PATH 'nixpkgs=flake:${inputs.nixpkgs}'
-      end
-      # If ssh'ing from kitty, use kitten to automatically install kitty terminfo on remote host
-      if test "$TERM" = "xterm-kitty";
-        abbr ssh "kitty +kitten ssh"
-      end
-      set -g fish_greeting (printf (_ '🐟 don\'t be afraid to ask for %shelp%s 💞') (set_color green) (set_color normal))
-      fish_vi_key_bindings
-      # By default the vi mode insert cursor is a beam which I don't really like
-      set fish_cursor_insert block
-    '';
+        set -g fish_greeting (printf (_ '🐟 don\'t be afraid to ask for %shelp%s 💞') (set_color green) (set_color normal))
+        fish_vi_key_bindings
+        # By default the vi mode insert cursor is a beam which I don't really like
+        set fish_cursor_insert block
+      '';
     loginShellInit = lib.mkDefault ''
       ${pkgs.fastfetch}/bin/fastfetch
     '';
@@ -113,7 +120,10 @@
       dl-audio-yt = "${dl-base} --format 'bestaudio[acodec=opus]' --extract-audio";
       dl-yarn = "${dl-base} --extract-audio --output \"$HOME/music/samples/yarn/$(read).%(ext)s\"";
       noansi = "sed \"s,\\x1B\\[[0-9;]*[a-zA-Z],,g\"";
-      loggy = { position = "anywhere"; expansion = " &| tee /tmp/loggy-$(${date-sortable}).log"; };
+      loggy = {
+        position = "anywhere";
+        expansion = " &| tee /tmp/loggy-$(${date-sortable}).log";
+      };
       network-test = "ping -c 1 -W 5 8.8.8.8";
       rebuild = lib.mkDefault "sudo nixos-rebuild switch --flake \"$HOME/.config/nixflake#\"";
       rebuild_ = "systemctl start --user nixos-rebuild.service";
@@ -136,9 +146,10 @@
       t = "tmux-startup";
     };
     functions = {
-      wallpaper = /* fish */ ''
-        cp -i "$argv[1]" "$HOME/.wallpaper"
-      '';
+      wallpaper = # fish
+        ''
+          cp -i "$argv[1]" "$HOME/.wallpaper"
+        '';
     };
   };
 }

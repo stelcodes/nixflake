@@ -1,4 +1,5 @@
-{ ... }: {
+{ ... }:
+{
   profile = {
     virtual = true;
   };

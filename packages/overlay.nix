@@ -41,7 +41,10 @@ final: prev: {
   devflake = final.callPackage ./devflake { };
   truecolor-test = final.writeShellApplication {
     name = "truecolor-test";
-    runtimeInputs = [ final.coreutils final.gawk ];
+    runtimeInputs = [
+      final.coreutils
+      final.gawk
+    ];
     text = ''
       awk 'BEGIN{
           s="/\\/\\/\\/\\/\\"; s=s s s s s s s s s s s s s s s s s s s s s s s;
@@ -91,7 +94,13 @@ final: prev: {
     '';
   };
   wg-killswitch = final.callPackage ./wg-killswitch { };
-  createBrowserApp = { name, url, package ? final.ungoogled-chromium, icon ? "browser" }:
+  createBrowserApp =
+    {
+      name,
+      url,
+      package ? final.ungoogled-chromium,
+      icon ? "browser",
+    }:
     let
       pname = final.lib.replaceStrings [ " " ] [ "-" ] (final.lib.toLower name);
       exec = final.writeShellApplication {
@@ -116,40 +125,55 @@ final: prev: {
   audacious = final.audacious.overrideAttrs {
     meta.mainProgram = "audacious";
   };
-  firejailWrapper = { executable, desktop ? null, profile ? null, extraArgs ? [ ] }: final.runCommand "firejail-wrap"
+  firejailWrapper =
     {
-      preferLocalBuild = true;
-      allowSubstitutes = false;
-      meta.priority = -1; # take precedence over non-firejailed versions
-    }
-    (
-      let
-        firejailArgs = final.lib.concatStringsSep " " (
-          extraArgs ++ (final.lib.optional (profile != null) "--profile=${toString profile}")
-        );
-      in
-      ''
-        command_path="$out/bin/$(basename ${executable})-jailed"
-        mkdir -p $out/bin
-        mkdir -p $out/share/applications
-        cat <<'_EOF' >"$command_path"
-        #! ${final.runtimeShell} -e
-        exec /run/wrappers/bin/firejail ${firejailArgs} -- ${toString executable} "\$@"
-        _EOF
-        chmod 0755 "$command_path"
-      '' + final.lib.optionalString (desktop != null) ''
-        substitute ${desktop} $out/share/applications/$(basename ${desktop}) \
-          --replace ${executable} "$command_path"
-      ''
-    );
+      executable,
+      desktop ? null,
+      profile ? null,
+      extraArgs ? [ ],
+    }:
+    final.runCommand "firejail-wrap"
+      {
+        preferLocalBuild = true;
+        allowSubstitutes = false;
+        meta.priority = -1; # take precedence over non-firejailed versions
+      }
+      (
+        let
+          firejailArgs = final.lib.concatStringsSep " " (
+            extraArgs ++ (final.lib.optional (profile != null) "--profile=${toString profile}")
+          );
+        in
+        ''
+          command_path="$out/bin/$(basename ${executable})-jailed"
+          mkdir -p $out/bin
+          mkdir -p $out/share/applications
+          cat <<'_EOF' >"$command_path"
+          #! ${final.runtimeShell} -e
+          exec /run/wrappers/bin/firejail ${firejailArgs} -- ${toString executable} "\$@"
+          _EOF
+          chmod 0755 "$command_path"
+        ''
+        + final.lib.optionalString (desktop != null) ''
+          substitute ${desktop} $out/share/applications/$(basename ${desktop}) \
+            --replace ${executable} "$command_path"
+        ''
+      );
   obsidian-jailed = final.firejailWrapper {
     executable = "${final.obsidian}/bin/obsidian";
     desktop = "${final.obsidian}/share/applications/obsidian.desktop";
-    extraArgs = [ "--noprofile" "--whitelist=\"$HOME/notes\"" "--whitelist=\"$HOME/.config/obsidian\"" ];
+    extraArgs = [
+      "--noprofile"
+      "--whitelist=\"$HOME/notes\""
+      "--whitelist=\"$HOME/.config/obsidian\""
+    ];
   };
   desktop-entries = final.writeShellApplication {
     name = "desktop-entries";
-    runtimeInputs = [ final.coreutils-full final.findutils ];
+    runtimeInputs = [
+      final.coreutils-full
+      final.findutils
+    ];
     text = ''
       data_dirs="$XDG_DATA_DIRS:$HOME/.local/share"
       matches=""
@@ -166,12 +190,13 @@ final: prev: {
   pam-parallel = final.callPackage ./pam-parallel { };
   writePythonApplication =
     # My own custom python writer that uses ruff instead of flake8. Name collision purposefully avoided.
-    { name
-    , runtimeInputs ? [ ]
-    , libraries ? [ ]
-    , checkIgnore ? [ ]
-    , doCheck ? true
-    , text
+    {
+      name,
+      runtimeInputs ? [ ],
+      libraries ? [ ],
+      checkIgnore ? [ ],
+      doCheck ? true,
+      text,
     }:
     let
       python = final.python3;
@@ -179,24 +204,26 @@ final: prev: {
         final.lib.optionalString (checkIgnore != [ ])
           "--ignore ${final.lib.concatMapStringsSep "," final.lib.escapeShellArg checkIgnore}";
     in
-    final.writers.makeScriptWriter
-      {
-        interpreter = (python.withPackages (ps: libraries)).interpreter;
-        makeWrapperArgs =
-          if runtimeInputs != [ ] then
-            [ "--prefix PATH : ${final.lib.makeBinPath runtimeInputs}" ]
-          else [ ];
-        check = final.lib.optionalString doCheck (
-          final.writers.writeDash "pythoncheck.sh" ''
-            exec ${final.ruff}/bin/ruff check ${ignoreAttribute} "$1"
-          ''
-        );
-      }
-      "/bin/${name}"
-      text;
+    final.writers.makeScriptWriter {
+      interpreter = (python.withPackages (ps: libraries)).interpreter;
+      makeWrapperArgs =
+        if runtimeInputs != [ ] then [ "--prefix PATH : ${final.lib.makeBinPath runtimeInputs}" ] else [ ];
+      check = final.lib.optionalString doCheck (
+        final.writers.writeDash "pythoncheck.sh" ''
+          exec ${final.ruff}/bin/ruff check ${ignoreAttribute} "$1"
+        ''
+      );
+    } "/bin/${name}" text;
   wg-quick-wofi = final.writeShellApplication {
     name = "wg-quick-wofi";
-    runtimeInputs = [ final.coreutils-full final.systemd final.gnugrep final.gnused final.wofi final.libnotify ];
+    runtimeInputs = [
+      final.coreutils-full
+      final.systemd
+      final.gnugrep
+      final.gnused
+      final.wofi
+      final.libnotify
+    ];
     text = ''
       # Services that aren't enabled are never listed with list-unit command unless active
       services="$(systemctl list-unit-files --type service --no-legend 'wg-quick-*' | grep wg-quick- | cut -d ' ' -f1)"
@@ -228,6 +255,7 @@ final: prev: {
     '';
   };
   everforest-gtk-theme = final.callPackage ./everforest-gtk-theme.nix { };
+  everforest-cursors = final.callPackage ./everforest-cursors { };
   open-browser-app = final.writeShellApplication {
     # I would use luakit if there was an easy way to open new windows
     # https://github.com/luakit/luakit/issues/509

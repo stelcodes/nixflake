@@ -1,4 +1,10 @@
-{ lib, inputs, pkgs, ... }: {
+{
+  lib,
+  inputs,
+  pkgs,
+  ...
+}:
+{
   config = {
     nix = {
       package = pkgs.lixPackageSets.latest.lix;
@@ -10,7 +16,10 @@
         # Toggling auto-optimise-store actually corrupted my Nix store!
         # Fix: sudo nix-store --verify --check-contents --repair
         auto-optimise-store = false; # Dangerous!
-        experimental-features = [ "nix-command" "flakes" ];
+        experimental-features = [
+          "nix-command"
+          "flakes"
+        ];
         flake-registry = ""; # Disable global flake registry
         keep-outputs = true; # Keep build artifacts around to avoid rebuilding
       };
@@ -24,22 +33,24 @@
       let
         config = {
           permittedInsecurePackages = [ ];
-          allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-            "obsidian"
-            "spotify"
-            "bitwig-studio-unwrapped"
-            "graillon"
-            "steam"
-            "steam-original"
-            "steam-run"
-            "vital"
-            "broadcom-sta"
-            "facetimehd-firmware"
-            "facetimehd-calibration"
-            "vscode"
-            "zsh-abbr"
-            "reaper"
-          ];
+          allowUnfreePredicate =
+            pkg:
+            builtins.elem (lib.getName pkg) [
+              "obsidian"
+              "spotify"
+              "bitwig-studio-unwrapped"
+              "graillon"
+              "steam"
+              "steam-original"
+              "steam-run"
+              "vital"
+              "broadcom-sta"
+              "facetimehd-firmware"
+              "facetimehd-calibration"
+              "vscode"
+              "zsh-abbr"
+              "reaper"
+            ];
         };
       in
       {

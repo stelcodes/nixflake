@@ -1,4 +1,11 @@
-{ pkgs, config, lib, inputs, ... }: {
+{
+  pkgs,
+  config,
+  lib,
+  inputs,
+  ...
+}:
+{
 
   imports = [
     inputs.nixos-hardware.nixosModules.common-cpu-amd
@@ -97,22 +104,22 @@
     #   '';
     # };
 
-
     samba = {
       # https://nixos.wiki/wiki/Samba
       # smbpasswd -a my_user
       enable = true;
       securityType = "user";
       openFirewall = true;
-      extraConfig = /* ini */ ''
-        # Guests are disabled by default
-        server string = smbnix
-        netbios name = smbnix
-        # Speed increase?
-        use sendfile = yes
-        hosts allow = 192.168.0. 192.168.1. 127.0.0.1 localhost
-        hosts deny = 0.0.0.0/0
-      '';
+      extraConfig = # ini
+        ''
+          # Guests are disabled by default
+          server string = smbnix
+          netbios name = smbnix
+          # Speed increase?
+          use sendfile = yes
+          hosts allow = 192.168.0. 192.168.1. 127.0.0.1 localhost
+          hosts deny = 0.0.0.0/0
+        '';
       shares = {
         private = {
           # path = "/var/lib/samba/private";
@@ -176,7 +183,8 @@
   '';
 
   # Enable swap on luks
-  boot.initrd.luks.devices."luks-9cb8c555-ba9c-4ae7-880f-5b16bf71579d".device = "/dev/disk/by-uuid/9cb8c555-ba9c-4ae7-880f-5b16bf71579d";
+  boot.initrd.luks.devices."luks-9cb8c555-ba9c-4ae7-880f-5b16bf71579d".device =
+    "/dev/disk/by-uuid/9cb8c555-ba9c-4ae7-880f-5b16bf71579d";
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

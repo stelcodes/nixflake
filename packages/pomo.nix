@@ -1,9 +1,10 @@
-{ stdenv
-, lib
-, fetchFromGitHub
-, makeWrapper
-, coreutils
-, libnotify
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  makeWrapper,
+  coreutils,
+  libnotify,
 }:
 
 stdenv.mkDerivation {
@@ -32,7 +33,12 @@ stdenv.mkDerivation {
   '';
 
   postFixup = ''
-    wrapProgram $out/bin/pomo --prefix PATH : ${lib.makeBinPath [ coreutils libnotify ]}
+    wrapProgram $out/bin/pomo --prefix PATH : ${
+      lib.makeBinPath [
+        coreutils
+        libnotify
+      ]
+    }
   '';
 
   meta = {

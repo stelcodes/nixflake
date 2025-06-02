@@ -1,36 +1,46 @@
-{ pkgs, config, lib, ... }:
-let theme = config.theme.set; in
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+let
+  theme = config.theme.set;
+in
 {
   imports = [ ./graphical-linux.home.nix ];
   config = lib.mkIf config.profile.graphical {
     home = {
       # Need to create aliases because Launchbar doesn't look through symlinks.
       # Enable Other in Spotlight to see Nix apps
-      activation.link-apps = lib.mkIf pkgs.stdenv.isDarwin (lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-        new_nix_apps="${config.home.homeDirectory}/Applications/Nix"
-        rm -rf "$new_nix_apps"
-        mkdir -p "$new_nix_apps"
-        find -H -L "$newGenPath/home-files/Applications" -name "*.app" -type d -print | while read -r app; do
-          real_app=$(readlink -f "$app")
-          app_name=$(basename "$app")
-          target_app="$new_nix_apps/$app_name"
-          echo "Alias '$real_app' to '$target_app'"
-          ${pkgs.mkalias}/bin/mkalias "$real_app" "$target_app"
-        done
-      '');
+      activation.link-apps = lib.mkIf pkgs.stdenv.isDarwin (
+        lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+          new_nix_apps="${config.home.homeDirectory}/Applications/Nix"
+          rm -rf "$new_nix_apps"
+          mkdir -p "$new_nix_apps"
+          find -H -L "$newGenPath/home-files/Applications" -name "*.app" -type d -print | while read -r app; do
+            real_app=$(readlink -f "$app")
+            app_name=$(basename "$app")
+            target_app="$new_nix_apps/$app_name"
+            echo "Alias '$real_app' to '$target_app'"
+            ${pkgs.mkalias}/bin/mkalias "$real_app" "$target_app"
+          done
+        ''
+      );
       file = {
         # https://librewolf.net/docs/settings/
         # pref activates upon every librewolf startup but can be changed while running
-        ".librewolf/librewolf.overrides.cfg".text = /* js */ ''
-          pref("browser.tabs.insertAfterCurrent", true);
-          pref("browser.uidensity", 1);
-          pref("browser.toolbars.bookmarks.visibility", "never")
-          pref("browser.fullscreen.autohide", false)
-          pref("privacy.clearOnShutdown.history", true);
-          pref("privacy.clearOnShutdown.downloads", true);
-          pref("browser.sessionstore.resume_from_crash", false);
-          pref("webgl.disabled", true);
-        '';
+        ".librewolf/librewolf.overrides.cfg".text = # js
+          ''
+            pref("browser.tabs.insertAfterCurrent", true);
+            pref("browser.uidensity", 1);
+            pref("browser.toolbars.bookmarks.visibility", "never")
+            pref("browser.fullscreen.autohide", false)
+            pref("privacy.clearOnShutdown.history", true);
+            pref("privacy.clearOnShutdown.downloads", true);
+            pref("browser.sessionstore.resume_from_crash", false);
+            pref("webgl.disabled", true);
+          '';
       };
     };
     programs.kitty = {

@@ -32,7 +32,7 @@ input {
 }
 
 cursor {
-    xcursor-theme "Capitaine Cursors (Nord)"
+    xcursor-theme "everforest-cursors"
     xcursor-size 36
 }
 

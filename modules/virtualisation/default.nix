@@ -1,4 +1,10 @@
-{ pkgs, lib, config, ... }: {
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
+{
 
   config = lib.mkIf config.profile.virtualHost {
 
@@ -13,7 +19,7 @@
       pkgs.distrobox
     ];
 
-    virtualisation =  {
+    virtualisation = {
       libvirtd = {
         enable = true;
         qemu = {
@@ -26,6 +32,5 @@
       spiceUSBRedirection.enable = true;
     };
   };
-
 
 }

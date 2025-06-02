@@ -17,7 +17,9 @@ in
         extraConfig = ''
           set -g @thumbs-key f
           # Try to copy to every clipboard just to keep the command string simple
-          set -g @thumbs-command 'tmux set-buffer -- {}; echo -n {} | ${if pkgs.stdenv.isDarwin then "pbcopy" else "wl-copy"}'
+          set -g @thumbs-command 'tmux set-buffer -- {}; echo -n {} | ${
+            if pkgs.stdenv.isDarwin then "pbcopy" else "wl-copy"
+          }'
           set -g @thumbs-upcase-command '${if pkgs.stdenv.isDarwin then "open" else "xdg-open"} {}'
           set -g @thumbs-unique enabled
           set -g @thumbs-contrast 1

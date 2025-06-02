@@ -1,12 +1,14 @@
-{ lib
-, stdenvNoCC
-, fetchFromGitHub
-, makeWrapper
-, installShellFiles
-, coreutils
-, gawk
-, git
-}: stdenvNoCC.mkDerivation {
+{
+  lib,
+  stdenvNoCC,
+  fetchFromGitHub,
+  makeWrapper,
+  installShellFiles,
+  coreutils,
+  gawk,
+  git,
+}:
+stdenvNoCC.mkDerivation {
 
   pname = "git-fiddle";
   version = "unstable-2017-02-03";
@@ -21,7 +23,10 @@
     hash = "sha256-rIx2SjtiRMfKseegdH7NjAATBNFOyqPp+cbmDjMrwxE=";
   };
 
-  nativeBuildInputs = [ makeWrapper installShellFiles ];
+  nativeBuildInputs = [
+    makeWrapper
+    installShellFiles
+  ];
 
   # TODO: Patch script to avoid installing _fiddle_seq_editor to $out/bin
   installPhase = ''
@@ -36,7 +41,13 @@
   '';
 
   postFixup = ''
-    wrapProgram $out/bin/git-fiddle --prefix PATH : ${lib.makeBinPath [ coreutils gawk git ]}
+    wrapProgram $out/bin/git-fiddle --prefix PATH : ${
+      lib.makeBinPath [
+        coreutils
+        gawk
+        git
+      ]
+    }
   '';
 
   meta = {

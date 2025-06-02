@@ -1,10 +1,11 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, runCommand
-, coreutils
-, gnugrep
-, gawk
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  runCommand,
+  coreutils,
+  gnugrep,
+  gawk,
 }:
 
 buildGoModule rec {
@@ -22,11 +23,13 @@ buildGoModule rec {
 
   ldflags =
     let
-      ferretVersion = lib.readFile (runCommand "foo" { } ''
-        ${coreutils}/bin/cat ${src}/go.mod \
-        | ${gnugrep}/bin/grep 'github.com/MontFerret/ferret v' \
-        | ${gawk}/bin/awk -F 'v' '{print $2}' > $out
-      '');
+      ferretVersion = lib.readFile (
+        runCommand "foo" { } ''
+          ${coreutils}/bin/cat ${src}/go.mod \
+          | ${gnugrep}/bin/grep 'github.com/MontFerret/ferret v' \
+          | ${gawk}/bin/awk -F 'v' '{print $2}' > $out
+        ''
+      );
     in
     [
       "-X main.version=v${version}"

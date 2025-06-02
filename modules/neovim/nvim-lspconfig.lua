@@ -25,20 +25,25 @@ vim.lsp.enable('gopls')
 vim.lsp.enable('ts_ls')
 vim.lsp.enable('svelte')
 vim.lsp.enable('denols')
-vim.lsp.enable('denols', {
+vim.lsp.config('denols', {
   autostart = false,
 })
 vim.lsp.enable('java_language_server')
 vim.lsp.enable('rust_analyzer')
 vim.lsp.enable('nil_ls')
+-- https://github.com/oxalica/nil/blob/main/docs/configuration.md
 vim.lsp.config('nil_ls', {
   settings = {
     ['nil'] = {
-      autoArchive = true,
       formatting = {
-        command = { "nixpkgs-fmt" },
+        command = { "nixfmt" },
       },
     },
+    nix = {
+      flake = {
+        autoArchive = nil,
+      },
+    }
   },
 })
 vim.lsp.enable('lua_ls')

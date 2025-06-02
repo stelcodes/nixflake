@@ -1,13 +1,14 @@
-{ mkDerivation
-, lib
-, fetchFromGitHub
-, pkg-config
-, SDL2
-, qtdeclarative
-, libpulseaudio
-, glm
-, cmake
-, which
+{
+  mkDerivation,
+  lib,
+  fetchFromGitHub,
+  pkg-config,
+  SDL2,
+  qtdeclarative,
+  libpulseaudio,
+  glm,
+  cmake,
+  which,
 }:
 
 mkDerivation rec {

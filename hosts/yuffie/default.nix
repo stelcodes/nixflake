@@ -1,4 +1,11 @@
-{ pkgs, lib, config, inputs, ... }: {
+{
+  pkgs,
+  lib,
+  config,
+  inputs,
+  ...
+}:
+{
 
   imports = [
     # See https://github.com/NixOS/nixos-hardware/blob/master/flake.nix
@@ -110,7 +117,10 @@
 
   security.pam.pam-parallel = {
     enable = true;
-    applyToModules = [ "gtklock" "ly" ];
+    applyToModules = [
+      "gtklock"
+      "ly"
+    ];
     methods = {
       fprint = {
         description = "Fingerprint";

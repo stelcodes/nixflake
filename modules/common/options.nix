@@ -1,4 +1,10 @@
-{ lib, pkgs, config, ... }: {
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
+{
   options = {
     profile = {
       graphical = lib.mkOption {

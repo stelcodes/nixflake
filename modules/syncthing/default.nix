@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 let
   cfg = config.services.syncthing;
   dataDir = "/home/${config.admin.username}/sync";
@@ -56,7 +61,13 @@ let
     notes = {
       versioning = staggeredMonth;
       path = "${dataDir}/notes";
-      devices = [ "beatrix" "celes" "yuffie" "aerith" "marlene" ];
+      devices = [
+        "beatrix"
+        "celes"
+        "yuffie"
+        "aerith"
+        "marlene"
+      ];
     };
   };
 in

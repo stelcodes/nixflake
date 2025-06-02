@@ -1,5 +1,10 @@
-{ pkgs, config, lib, ... }: {
-
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+{
 
   config = lib.mkIf config.profile.graphical {
 
@@ -117,27 +122,30 @@
     };
 
     # xserver.desktopManager.gnome.enable = true;
-    environment.gnome.excludePackages = (with pkgs; [
-      seahorse
-      gnome-backgrounds
-      gnome-shell-extensions
-      gnome-tour # GNOME Shell detects the .desktop file on first log-in.
-      gnome-user-docs
-      epiphany
-      gnome-text-editor
-      gnome-calendar
-      gnome-characters
-      gnome-console
-      gnome-contacts
-      gnome-maps
-      gnome-music
-      gnome-connections
-      simple-scan
-      snapshot
-      totem
-      yelp
-      gnome-software
-    ]);
+    environment.gnome.excludePackages = (
+      with pkgs;
+      [
+        seahorse
+        gnome-backgrounds
+        gnome-shell-extensions
+        gnome-tour # GNOME Shell detects the .desktop file on first log-in.
+        gnome-user-docs
+        epiphany
+        gnome-text-editor
+        gnome-calendar
+        gnome-characters
+        gnome-console
+        gnome-contacts
+        gnome-maps
+        gnome-music
+        gnome-connections
+        simple-scan
+        snapshot
+        totem
+        yelp
+        gnome-software
+      ]
+    );
 
   };
 }

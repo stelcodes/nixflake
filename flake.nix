@@ -60,21 +60,31 @@
   outputs = inputs: {
 
     nixosModules = {
-      generators-custom-formats = { config, ... }: {
-        imports = [ inputs.nixos-generators.nixosModules.all-formats ];
-        formatConfigs = {
-          install-iso-plasma = { modulesPath, ... }: {
-            formatAttr = "isoImage";
-            fileExtension = ".iso";
-            imports = [ "${toString modulesPath}/installer/cd-dvd/installation-cd-graphical-calamares-plasma5.nix" ];
-          };
-          install-iso-gnome = { modulesPath, ... }: {
-            formatAttr = "isoImage";
-            fileExtension = ".iso";
-            imports = [ "${toString modulesPath}/installer/cd-dvd/installation-cd-graphical-calamares-gnome.nix" ];
+      generators-custom-formats =
+        { config, ... }:
+        {
+          imports = [ inputs.nixos-generators.nixosModules.all-formats ];
+          formatConfigs = {
+            install-iso-plasma =
+              { modulesPath, ... }:
+              {
+                formatAttr = "isoImage";
+                fileExtension = ".iso";
+                imports = [
+                  "${toString modulesPath}/installer/cd-dvd/installation-cd-graphical-calamares-plasma5.nix"
+                ];
+              };
+            install-iso-gnome =
+              { modulesPath, ... }:
+              {
+                formatAttr = "isoImage";
+                fileExtension = ".iso";
+                imports = [
+                  "${toString modulesPath}/installer/cd-dvd/installation-cd-graphical-calamares-gnome.nix"
+                ];
+              };
           };
         };
-      };
     };
 
     homeConfigurations = {
@@ -94,7 +104,8 @@
 
     nixosConfigurations =
       let
-        nixosMachine = { system, hostName }:
+        nixosMachine =
+          { system, hostName }:
           inputs.nixpkgs.lib.nixosSystem {
             inherit system;
             specialArgs = { inherit inputs; };
@@ -151,14 +162,20 @@
           system = "x86_64-linux";
           modules = [
             inputs.self.nixosModules.generators-custom-formats
-            ({ pkgs, config, ... }: {
-              nixpkgs.config.allowUnfree = true;
-              environment.systemPackages = [ pkgs.git pkgs.neovim ];
-              boot = {
-                kernelModules = [ "wl" ];
-                extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];
-              };
-            })
+            (
+              { pkgs, config, ... }:
+              {
+                nixpkgs.config.allowUnfree = true;
+                environment.systemPackages = [
+                  pkgs.git
+                  pkgs.neovim
+                ];
+                boot = {
+                  kernelModules = [ "wl" ];
+                  extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];
+                };
+              }
+            )
           ];
         };
       };
@@ -172,7 +189,12 @@
           inherit system;
           overlays = [
             inputs.deploy-rs.overlay
-            (self: super: { deploy-rs = { inherit (pkgs) deploy-rs; lib = super.deploy-rs.lib; }; })
+            (self: super: {
+              deploy-rs = {
+                inherit (pkgs) deploy-rs;
+                lib = super.deploy-rs.lib;
+              };
+            })
           ];
         };
       in
@@ -182,8 +204,7 @@
           # hostname = "sora";
           profiles.system = {
             user = "root";
-            path = deployPkgs.deploy-rs.lib.activate.nixos
-              inputs.self.nixosConfigurations.sora;
+            path = deployPkgs.deploy-rs.lib.activate.nixos inputs.self.nixosConfigurations.sora;
             # interactiveSudo = true;
             remoteBuild = false; # default is false
           };
@@ -191,9 +212,9 @@
       };
 
     # This is highly advised by deploy-rs
-    checks = builtins.mapAttrs
-      (system: deployLib: deployLib.deployChecks inputs.self.deploy)
-      inputs.deploy-rs.lib;
+    checks = builtins.mapAttrs (
+      system: deployLib: deployLib.deployChecks inputs.self.deploy
+    ) inputs.deploy-rs.lib;
 
   };
 }

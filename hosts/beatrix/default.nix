@@ -1,4 +1,10 @@
-{ pkgs, config, inputs, ... }: {
+{
+  pkgs,
+  config,
+  inputs,
+  ...
+}:
+{
 
   imports = [
     ./hardware-configuration.nix
@@ -30,15 +36,16 @@
       enable = true;
       securityType = "user";
       openFirewall = true;
-      extraConfig = /* ini */ ''
-        # Guests are disabled by default
-        server string = smbnix
-        netbios name = smbnix
-        # Speed increase?
-        use sendfile = yes
-        hosts allow = 192.168.0. 192.168.1. 127.0.0.1 localhost marlene.local
-        hosts deny = 0.0.0.0/0
-      '';
+      extraConfig = # ini
+        ''
+          # Guests are disabled by default
+          server string = smbnix
+          netbios name = smbnix
+          # Speed increase?
+          use sendfile = yes
+          hosts allow = 192.168.0. 192.168.1. 127.0.0.1 localhost marlene.local
+          hosts deny = 0.0.0.0/0
+        '';
       shares = {
         private = {
           # path = "/var/lib/samba/private";
@@ -82,8 +89,20 @@
 
   networking = {
     firewall = {
-      allowedTCPPorts = [ 111 2049 4000 4001 4002 ];
-      allowedUDPPorts = [ 111 2049 4000 4001 4002 ];
+      allowedTCPPorts = [
+        111
+        2049
+        4000
+        4001
+        4002
+      ];
+      allowedUDPPorts = [
+        111
+        2049
+        4000
+        4001
+        4002
+      ];
     };
   };
 
@@ -95,16 +114,28 @@
   fileSystems = {
     "/jellyfin" = {
       device = "/run/media/archive/videos";
-      options = [ "ro" "bind" "nofail" "noatime" ];
+      options = [
+        "ro"
+        "bind"
+        "nofail"
+        "noatime"
+      ];
     };
     "/nfs/archive" = {
       device = "/run/media/archive";
-      options = [ "bind" "nofail" "noatime" ];
+      options = [
+        "bind"
+        "nofail"
+        "noatime"
+      ];
     };
     "/run/media/archive" = {
       device = "/dev/disk/by-uuid/fabb5a38-c104-4e34-8652-04864df28799";
       fsType = "btrfs";
-      options = [ "nofail" "noatime" ];
+      options = [
+        "nofail"
+        "noatime"
+      ];
     };
   };
 

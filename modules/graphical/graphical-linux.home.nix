@@ -1,4 +1,9 @@
-{ pkgs, config, lib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 let
   theme = config.theme.set;
   waycfg = config.wayland.windowManager;
@@ -6,14 +11,14 @@ let
     name = "niri-adjust-scale";
     text = builtins.readFile ./niri-adjust-scale.py;
   };
-  sessionTargets = lib.foldlAttrs
-    (acc: sessionName: sessionOpts: acc // {
+  sessionTargets = lib.foldlAttrs (
+    acc: sessionName: sessionOpts:
+    acc
+    // {
       "${sessionName}-session" = {
         Unit =
           let
-            servicesFull = lib.map
-              (serviceName: "${serviceName}.service")
-              sessionOpts.services;
+            servicesFull = lib.map (serviceName: "${serviceName}.service") sessionOpts.services;
           in
           {
             BindsTo = [ "graphical-session.target" ];
@@ -21,26 +26,25 @@ let
             Before = servicesFull;
           };
       };
-    })
-    { }
-    waycfg.sessions;
-  sessionServices = lib.foldlAttrs
-    (acc: sessionName: sessionOpts: acc // (lib.lists.foldl
-      (acc: serviceName: acc //
-        {
-          "${serviceName}" = {
-            Unit = {
-              BindsTo = lib.mkForce [ "graphical-session.target" ];
-              After = lib.mkForce [ "graphical-session.target" ];
-            };
-            Install = lib.mkForce { };
+    }
+  ) { } waycfg.sessions;
+  sessionServices = lib.foldlAttrs (
+    acc: sessionName: sessionOpts:
+    acc
+    // (lib.lists.foldl (
+      acc: serviceName:
+      acc
+      // {
+        "${serviceName}" = {
+          Unit = {
+            BindsTo = lib.mkForce [ "graphical-session.target" ];
+            After = lib.mkForce [ "graphical-session.target" ];
           };
-        })
-      { }
-      sessionOpts.services
-    ))
-    { }
-    waycfg.sessions;
+          Install = lib.mkForce { };
+        };
+      }
+    ) { } sessionOpts.services)
+  ) { } waycfg.sessions;
   # https://gitlab.gnome.org/GNOME/glib/-/blob/2.76.2/gio/gdesktopappinfo.c#L2701-2713
   # Might require xdg-desktop-portal-gnome as default xdg-open method
   xdg-terminal-exec = pkgs.writeShellApplication {
@@ -56,15 +60,24 @@ let
   };
   pw-rotate-sink = pkgs.writeShellApplication {
     name = "pw-rotate-sink";
-    runtimeInputs = [ pkgs.coreutils-full pkgs.jq pkgs.wireplumber pkgs.pipewire ];
+    runtimeInputs = [
+      pkgs.coreutils-full
+      pkgs.jq
+      pkgs.wireplumber
+      pkgs.pipewire
+    ];
     text = builtins.readFile ./pw-rotate-sink.sh;
   };
   monitor-power = pkgs.writeShellApplication {
     name = "monitor-power";
-    runtimeInputs = [ pkgs.coreutils-full pkgs.systemd ];
-    text = builtins.concatStringsSep "\n"
-      (lib.mapAttrsToList
-        (sessionName: sessionOpts: /* sh */ ''
+    runtimeInputs = [
+      pkgs.coreutils-full
+      pkgs.systemd
+    ];
+    text = builtins.concatStringsSep "\n" (
+      lib.mapAttrsToList (
+        sessionName: sessionOpts: # sh
+        ''
           if systemctl --user -q is-active ${sessionName}.service; then
             if [ "$1" = "on" ]; then
               ${sessionOpts.monitorOn}
@@ -72,12 +85,16 @@ let
               ${sessionOpts.monitorOff}
             fi
           fi
-        '')
-        waycfg.sessions);
+        '') waycfg.sessions
+    );
   };
   niri-pick-color = pkgs.writeShellApplication {
     name = "niri-pick-color";
-    runtimeInputs = [ pkgs.wl-clipboard pkgs.niri pkgs.gnugrep ];
+    runtimeInputs = [
+      pkgs.wl-clipboard
+      pkgs.niri
+      pkgs.gnugrep
+    ];
     text = ''
       set -o pipefail
       niri msg pick-color | grep -oE '#[[:alnum:]]{6}' | wl-copy
@@ -85,7 +102,11 @@ let
   };
   niri-rename-workspace = pkgs.writeShellApplication {
     name = "niri-rename-workspace";
-    runtimeInputs = [ pkgs.niri pkgs.wofi pkgs.gawk ];
+    runtimeInputs = [
+      pkgs.niri
+      pkgs.wofi
+      pkgs.gawk
+    ];
     text = ''
       # If wofi is canceled, abort and do nothing
       # If wofi input is empty, unset workspace name
@@ -101,7 +122,10 @@ let
   };
   lock-session = pkgs.writeShellApplication {
     name = "lock-session";
-    runtimeInputs = [ pkgs.gtklock pkgs.procps ];
+    runtimeInputs = [
+      pkgs.gtklock
+      pkgs.procps
+    ];
     text = ''
       if ! pgrep gtklock &> /dev/null; then
         gtklock -d
@@ -110,7 +134,10 @@ let
   };
   wofi-toggle = pkgs.writeShellApplication {
     name = "wofi-toggle";
-    runtimeInputs = [ pkgs.wofi pkgs.procps ];
+    runtimeInputs = [
+      pkgs.wofi
+      pkgs.procps
+    ];
     text = ''
       pkill wofi-wrapped || exec wofi "$@"
     '';
@@ -153,19 +180,21 @@ in
         default = pkgs.librewolf;
       };
       sessions = lib.mkOption {
-        type = lib.types.attrsOf (lib.types.submodule {
-          options = {
-            monitorOn = lib.mkOption {
-              type = lib.types.str;
+        type = lib.types.attrsOf (
+          lib.types.submodule {
+            options = {
+              monitorOn = lib.mkOption {
+                type = lib.types.str;
+              };
+              monitorOff = lib.mkOption {
+                type = lib.types.str;
+              };
+              services = lib.mkOption {
+                type = lib.types.listOf lib.types.str;
+              };
             };
-            monitorOff = lib.mkOption {
-              type = lib.types.str;
-            };
-            services = lib.mkOption {
-              type = lib.types.listOf lib.types.str;
-            };
-          };
-        });
+          }
+        );
         default = { };
       };
     };
@@ -174,42 +203,45 @@ in
   config = lib.mkIf (config.profile.graphical && pkgs.stdenv.isLinux) {
 
     home = {
-      packages = ([
-        waycfg.terminal
-        xdg-terminal-exec
-        waycfg.browser
-        pkgs.material-icons # for mpv uosc
-        # pkgs.mpv-unify # custom mpv python wrapper
-        pkgs.keepassxc
-        pkgs.gnome-disk-utility
-        pkgs.eog
-        pkgs.qalculate-gtk
-        pkgs.font-manager
-        pkgs.file-roller
-        pkgs.brightnessctl
-        pkgs.wev
-        pkgs.wl-clipboard
-        pkgs.wofi
-        pkgs.adwaita-icon-theme # for the two icons in the default wofi setup
-        pkgs.rofimoji # Great associated word hints with extensive symbol lists to choose from
-        pkgs.wdisplays
-        pkgs.libnotify # for notify-send
-        pkgs.chafa # images in terminal, telescope-media-files dep
-        # pkgs.kooha # Doesn't work with niri atm
-        # pkgs.wl-screenrec # https://github.com/russelltg/wl-screenrec
-        # pkgs.wlogout
-        niri-adjust-scale
-        niri-pick-color
-        niri-rename-workspace
-        monitor-power
-        lock-session
-        wofi-toggle
-      ] ++ (lib.lists.optionals config.profile.audio [
-        pkgs.playerctl
-        pkgs.helvum # better looking than qpwgraph
-        pkgs.pavucontrol
-        pw-rotate-sink
-      ]));
+      packages = (
+        [
+          waycfg.terminal
+          xdg-terminal-exec
+          waycfg.browser
+          pkgs.material-icons # for mpv uosc
+          # pkgs.mpv-unify # custom mpv python wrapper
+          pkgs.keepassxc
+          pkgs.gnome-disk-utility
+          pkgs.eog
+          pkgs.qalculate-gtk
+          pkgs.font-manager
+          pkgs.file-roller
+          pkgs.brightnessctl
+          pkgs.wev
+          pkgs.wl-clipboard
+          pkgs.wofi
+          pkgs.adwaita-icon-theme # for the two icons in the default wofi setup
+          pkgs.rofimoji # Great associated word hints with extensive symbol lists to choose from
+          pkgs.wdisplays
+          pkgs.libnotify # for notify-send
+          pkgs.chafa # images in terminal, telescope-media-files dep
+          # pkgs.kooha # Doesn't work with niri atm
+          # pkgs.wl-screenrec # https://github.com/russelltg/wl-screenrec
+          # pkgs.wlogout
+          niri-adjust-scale
+          niri-pick-color
+          niri-rename-workspace
+          monitor-power
+          lock-session
+          wofi-toggle
+        ]
+        ++ (lib.lists.optionals config.profile.audio [
+          pkgs.playerctl
+          pkgs.helvum # better looking than qpwgraph
+          pkgs.pavucontrol
+          pw-rotate-sink
+        ])
+      );
       sessionVariables = {
         TERMINAL = lib.getExe waycfg.terminal;
         BROWSER = lib.getExe waycfg.browser;
@@ -243,19 +275,21 @@ in
           '';
           text = builtins.readFile ./niri.kdl;
         };
-        "rofimoji.rc".text = /* ini */ ''
-          action = copy
-          selector = wofi
-          files = [emojis]
-          skin-tone = neutral
-        '';
-        "wofi/config".text = /* ini */ ''
-          allow_images=true
-          term=kitty
-          show=drun
-          no_actions=true
-          key_expand=Tab
-        '';
+        "rofimoji.rc".text = # ini
+          ''
+            action = copy
+            selector = wofi
+            files = [emojis]
+            skin-tone = neutral
+          '';
+        "wofi/config".text = # ini
+          ''
+            allow_images=true
+            term=kitty
+            show=drun
+            no_actions=true
+            key_expand=Tab
+          '';
         "wofi/style.css".source = ./wofi.css;
         "gajim/theme/default.css".text = ''
           .gajim-outgoing-nickname {
@@ -274,13 +308,17 @@ in
               color: ${theme.red};
           }
         '';
-      } // (if config.theme.set ? gtkConfigFiles then config.theme.set.gtkConfigFiles else { }); #catppuccin
+      } // (if config.theme.set ? gtkConfigFiles then config.theme.set.gtkConfigFiles else { }); # catppuccin
       portal = {
         # https://mozilla.github.io/webrtc-landing/gum_test.html
         # Config files: /etc/profiles/per-user/stel/share/xdg-desktop-portal
         enable = true;
         xdgOpenUsePortal = true;
-        extraPortals = [ pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-wlr pkgs.xdg-desktop-portal-gnome ];
+        extraPortals = [
+          pkgs.xdg-desktop-portal-gtk
+          pkgs.xdg-desktop-portal-wlr
+          pkgs.xdg-desktop-portal-gnome
+        ];
         config = {
           common = {
             default = [ "gtk" ];
@@ -291,7 +329,10 @@ in
             "org.freedesktop.impl.portal.ScreenCast" = "wlr";
           };
           niri = {
-            default = [ "gnome" "gtk" ];
+            default = [
+              "gnome"
+              "gtk"
+            ];
             "org.freedesktop.impl.portal.Access" = "gtk";
             "org.freedesktop.impl.portal.Notification" = "gtk";
             "org.freedesktop.impl.portal.FileChooser" = "gtk";
@@ -357,14 +398,19 @@ in
           hwdec = "yes";
           gpu-context = lib.mkIf pkgs.stdenv.isLinux "wayland";
         };
-        scripts = let p = pkgs.mpvScripts; in [
-          p.uosc
-          p.thumbfast
-          p.mpv-cheatsheet
-          p.videoclip
-        ] ++ lib.lists.optionals pkgs.stdenv.isLinux [
-          p.mpris
-        ];
+        scripts =
+          let
+            p = pkgs.mpvScripts;
+          in
+          [
+            p.uosc
+            p.thumbfast
+            p.mpv-cheatsheet
+            p.videoclip
+          ]
+          ++ lib.lists.optionals pkgs.stdenv.isLinux [
+            p.mpris
+          ];
         # scriptOpts = {
         #   videoclip = {
         #   };
@@ -383,120 +429,145 @@ in
           ${builtins.readFile ./waybar.css}
         '';
         systemd.enable = true;
-        settings = [{
-          layer = "bottom";
-          position = "bottom";
-          height = 20;
-          margin = "0px 5px 5px 5px";
-          modules-left = [
-            "tray"
-            "custom/ianny"
-            "custom/wlsunset"
-            "custom/wlinhibit"
-            "custom/recordplayback"
-            "sway/mode"
-            "sway/workspaces"
-            "niri/workspaces"
-          ];
-          modules-right = [
-            "cpu"
-            "backlight"
-            "battery"
-          ] ++ (lib.lists.optionals config.profile.audio [
-            "wireplumber"
-          ]) ++ [
-            "clock"
-          ];
-          "custom/ianny" = {
-            exec = /* sh */ "if systemctl --user --quiet is-active ianny.service; then echo '🩷'; else echo '🩶'; fi";
-            interval = 1;
-            on-click = "${lib.getExe pkgs.toggle-service} ianny";
-          };
-          "custom/recordplayback" = {
-            format = "{}";
-            max-length = 3;
-            interval = 1;
-            exec = lib.getExe (pkgs.writeShellApplication {
-              name = "waybar-record-playback";
-              text = ''
-                if systemctl --user is-active --quiet record-playback.service; then
-                  echo "🔴";
-                fi
-              '';
-            });
-          };
-          "custom/wlinhibit" = {
-            exec = /* sh */ "if systemctl --user --quiet is-active wlinhibit.service; then printf '☕'; else printf '💤'; fi";
-            interval = 1;
-            on-click = "${lib.getExe pkgs.toggle-service} wlinhibit";
-          };
-          "custom/wlsunset" = {
-            exec = /* sh */ "if systemctl --user --quiet is-active wlsunset.service; then echo '🌙'; else echo '☀️'; fi";
-            interval = 1;
-            on-click = "${lib.getExe pkgs.toggle-service} wlsunset";
-          };
-          "sway/workspaces" = {
-            disable-scroll = true;
-            all-outputs = true;
-            format = "{icon}";
-          };
-          cpu = {
-            interval = 10;
-            format = "{usage} ";
-            on-click = "kitty --app-id=system_monitor btop";
-          };
-          memory = {
-            interval = 30;
-            format = "{} ";
-          };
-          disk = {
-            interval = 30;
-            format = "{percentage_used} ";
-          };
-          wireplumber = lib.mkIf config.profile.audio {
-            format = "{node_name} {volume} {icon}";
-            format-muted = "{volume} ";
-            format-icons = { default = [ "" "" ]; };
-            on-click = lib.getExe pw-rotate-sink;
-            on-click-right = lib.getExe pkgs.pavucontrol;
-            on-click-middle = lib.getExe pkgs.helvum;
-            max-volume = 100;
-            scroll-step = 5;
-          };
-          clock = {
-            format = "{:%I:%M %p} 󱛡";
-            format-alt = "{:%a %b %d} 󱛡";
-            calendar = {
-              mode = "year";
-              mode-mon-col = 3;
-              weeks-pos = "right";
-              format = {
-                months = "<b>{}</b>";
-                weekdays = "<span color='${theme.yellow}'><b>{}</b></span>";
-                weeks = "<span color='${theme.green}'><b>W{}</b></span>";
-                today = "<span color='${theme.red}'><b>{}</b></span>";
+        settings = [
+          {
+            layer = "bottom";
+            position = "bottom";
+            height = 20;
+            margin = "0px 5px 5px 5px";
+            modules-left = [
+              "tray"
+              "custom/ianny"
+              "custom/wlsunset"
+              "custom/wlinhibit"
+              "custom/recordplayback"
+              "sway/mode"
+              "sway/workspaces"
+              "niri/workspaces"
+            ];
+            modules-right =
+              [
+                "cpu"
+                "backlight"
+                "battery"
+              ]
+              ++ (lib.lists.optionals config.profile.audio [
+                "wireplumber"
+              ])
+              ++ [
+                "clock"
+              ];
+            "custom/ianny" = {
+              exec = # sh
+                "if systemctl --user --quiet is-active ianny.service; then echo '🩷'; else echo '🩶'; fi";
+              interval = 1;
+              on-click = "${lib.getExe pkgs.toggle-service} ianny";
+            };
+            "custom/recordplayback" = {
+              format = "{}";
+              max-length = 3;
+              interval = 1;
+              exec = lib.getExe (
+                pkgs.writeShellApplication {
+                  name = "waybar-record-playback";
+                  text = ''
+                    if systemctl --user is-active --quiet record-playback.service; then
+                      echo "🔴";
+                    fi
+                  '';
+                }
+              );
+            };
+            "custom/wlinhibit" = {
+              exec = # sh
+                "if systemctl --user --quiet is-active wlinhibit.service; then printf '☕'; else printf '💤'; fi";
+              interval = 1;
+              on-click = "${lib.getExe pkgs.toggle-service} wlinhibit";
+            };
+            "custom/wlsunset" = {
+              exec = # sh
+                "if systemctl --user --quiet is-active wlsunset.service; then echo '🌙'; else echo '☀️'; fi";
+              interval = 1;
+              on-click = "${lib.getExe pkgs.toggle-service} wlsunset";
+            };
+            "sway/workspaces" = {
+              disable-scroll = true;
+              all-outputs = true;
+              format = "{icon}";
+            };
+            cpu = {
+              interval = 10;
+              format = "{usage} ";
+              on-click = "kitty --app-id=system_monitor btop";
+            };
+            memory = {
+              interval = 30;
+              format = "{} ";
+            };
+            disk = {
+              interval = 30;
+              format = "{percentage_used} ";
+            };
+            wireplumber = lib.mkIf config.profile.audio {
+              format = "{node_name} {volume} {icon}";
+              format-muted = "{volume} ";
+              format-icons = {
+                default = [
+                  ""
+                  ""
+                ];
+              };
+              on-click = lib.getExe pw-rotate-sink;
+              on-click-right = lib.getExe pkgs.pavucontrol;
+              on-click-middle = lib.getExe pkgs.helvum;
+              max-volume = 100;
+              scroll-step = 5;
+            };
+            clock = {
+              format = "{:%I:%M %p} 󱛡";
+              format-alt = "{:%a %b %d} 󱛡";
+              calendar = {
+                mode = "month";
+                mode-mon-col = 3;
+                weeks-pos = "right";
+                format = {
+                  months = "<b>{}</b>";
+                  weekdays = "<span color='${theme.yellow}'><b>{}</b></span>";
+                  weeks = "<span color='${theme.green}'><b>W{}</b></span>";
+                  today = "<span color='${theme.red}'><b>{}</b></span>";
+                };
+              };
+              tooltip-format = "<tt><small>{calendar}</small></tt>";
+            };
+            battery = {
+              format = "{capacity} {icon}";
+              format-charging = "{capacity} ";
+              format-icons = [
+                ""
+                ""
+                ""
+                ""
+                ""
+              ];
+            };
+            idle_inhibitor = {
+              format = "{icon}";
+              format-icons = {
+                activated = "";
+                deactivated = "";
               };
             };
-            tooltip-format = "<tt><small>{calendar}</small></tt>";
-          };
-          battery = {
-            format = "{capacity} {icon}";
-            format-charging = "{capacity} ";
-            format-icons = [ "" "" "" "" "" ];
-          };
-          idle_inhibitor = {
-            format = "{icon}";
-            format-icons = {
-              activated = "";
-              deactivated = "";
+            backlight = {
+              interval = 5;
+              format = "{percent} {icon}";
+              format-icons = [
+                ""
+                ""
+                ""
+              ];
             };
-          };
-          backlight = {
-            interval = 5;
-            format = "{percent} {icon}";
-            format-icons = [ "" "" "" ];
-          };
-        }];
+          }
+        ];
       };
 
       zathura = {
@@ -518,80 +589,92 @@ in
 
     systemd.user.targets = sessionTargets;
 
-    systemd.user.services = (lib.mkMerge [
-      sessionServices
-      {
-        trayscale = {
-          Unit = {
-            After = [ "waybar.service" ];
-            StartLimitIntervalSec = "5m";
-            StartLimitBurst = "100";
+    systemd.user.services = (
+      lib.mkMerge [
+        sessionServices
+        {
+          trayscale = {
+            Unit = {
+              After = [ "waybar.service" ];
+              StartLimitIntervalSec = "5m";
+              StartLimitBurst = "100";
+            };
+            Service = {
+              ExecStartPre = "${pkgs.systemd}/bin/busctl --user --no-pager status fr.arouillard.waybar";
+              Restart = "on-failure";
+              RestartSec = "1s";
+            };
           };
-          Service = {
-            ExecStartPre = "${pkgs.systemd}/bin/busctl --user --no-pager status fr.arouillard.waybar";
-            Restart = "on-failure";
-            RestartSec = "1s";
+          ianny = {
+            Unit = {
+              BindsTo = [ "graphical-session.target" ];
+              After = [ "graphical-session.target" ];
+            };
+            Service.ExecStart = lib.getExe pkgs.ianny;
           };
-        };
-        ianny = {
-          Unit = {
-            BindsTo = [ "graphical-session.target" ];
-            After = [ "graphical-session.target" ];
+          wlinhibit = {
+            # Service is off by default, only started upon user request
+            Unit = {
+              BindsTo = [ "graphical-session.target" ];
+              After = [ "graphical-session.target" ];
+            };
+            Service.ExecStart = "${pkgs.wlinhibit}/bin/wlinhibit";
           };
-          Service.ExecStart = lib.getExe pkgs.ianny;
-        };
-        wlinhibit = {
-          # Service is off by default, only started upon user request
-          Unit = {
-            BindsTo = [ "graphical-session.target" ];
-            After = [ "graphical-session.target" ];
+          xwayland-satellite = {
+            Service.ExecStart = "${lib.getExe pkgs.xwayland-satellite} :12";
           };
-          Service.ExecStart = "${pkgs.wlinhibit}/bin/wlinhibit";
-        };
-        xwayland-satellite = {
-          Service.ExecStart = "${lib.getExe pkgs.xwayland-satellite} :12";
-        };
-        record-playback = lib.mkIf config.profile.audio {
-          Unit = {
-            Description = "playback recording from default pulseaudio monitor";
+          record-playback = lib.mkIf config.profile.audio {
+            Unit = {
+              Description = "playback recording from default pulseaudio monitor";
+            };
+            Service = {
+              RuntimeMaxSec = 500;
+              Type = "forking";
+              ExecStart = lib.getExe (
+                pkgs.writeShellApplication {
+                  name = "record-playback-exec-start";
+                  runtimeInputs = [
+                    pkgs.pulseaudio
+                    pkgs.coreutils-full
+                    pkgs.libnotify
+                  ];
+                  text = ''
+                    SAVEDIR="''${XDG_DATA_HOME:-$HOME/.local/share}/record-playback"
+                    mkdir -p "$SAVEDIR"
+                    SAVEPATH="$SAVEDIR/$(date +%Y-%m-%dT%H:%M:%S%Z).wav"
+                    notify-send "Starting audio recording..."
+                    parecord --device=@DEFAULT_MONITOR@ "$SAVEPATH" &
+                  '';
+                }
+              );
+              ExecStop = lib.getExe (
+                pkgs.writeShellApplication {
+                  name = "record-playback-exec-stop";
+                  text = ''
+                    # The last couple seconds of audio gets lost so wait a lil bit before killing
+                    sleep 2 && kill -INT "$MAINPID"
+                  '';
+                }
+              );
+              ExecStopPost = lib.getExe (
+                pkgs.writeShellApplication {
+                  name = "record-playback-exec-stop-post";
+                  runtimeInputs = [ pkgs.libnotify ];
+                  text = ''
+                    if [ "$EXIT_STATUS" -eq 0 ]; then
+                      notify-send "Stopped recording successfully"
+                    else
+                      notify-send --urgency=critical "Recording failed"
+                    fi
+                  '';
+                }
+              );
+              Restart = "no";
+            };
           };
-          Service = {
-            RuntimeMaxSec = 500;
-            Type = "forking";
-            ExecStart = lib.getExe (pkgs.writeShellApplication {
-              name = "record-playback-exec-start";
-              runtimeInputs = [ pkgs.pulseaudio pkgs.coreutils-full pkgs.libnotify ];
-              text = ''
-                SAVEDIR="''${XDG_DATA_HOME:-$HOME/.local/share}/record-playback"
-                mkdir -p "$SAVEDIR"
-                SAVEPATH="$SAVEDIR/$(date +%Y-%m-%dT%H:%M:%S%Z).wav"
-                notify-send "Starting audio recording..."
-                parecord --device=@DEFAULT_MONITOR@ "$SAVEPATH" &
-              '';
-            });
-            ExecStop = lib.getExe (pkgs.writeShellApplication {
-              name = "record-playback-exec-stop";
-              text = ''
-                # The last couple seconds of audio gets lost so wait a lil bit before killing
-                sleep 2 && kill -INT "$MAINPID"
-              '';
-            });
-            ExecStopPost = lib.getExe (pkgs.writeShellApplication {
-              name = "record-playback-exec-stop-post";
-              runtimeInputs = [ pkgs.libnotify ];
-              text = ''
-                if [ "$EXIT_STATUS" -eq 0 ]; then
-                  notify-send "Stopped recording successfully"
-                else
-                  notify-send --urgency=critical "Recording failed"
-                fi
-              '';
-            });
-            Restart = "no";
-          };
-        };
-      }
-    ]);
+        }
+      ]
+    );
 
     services = {
       network-manager-applet.enable = true;
@@ -603,34 +686,42 @@ in
       swayidle = {
         enable = true;
         # Waits for commands to finish (-w) by default
-        events = [
-          {
-            event = "after-resume";
-            command = "${lib.getExe monitor-power} on"; # In case monitor powered off before sleep started
-          }
-        ] ++ lib.lists.optionals waycfg.sleep.lockBefore [
-          {
-            event = "before-sleep";
-            command = lib.getExe lock-session;
-          }
-        ];
+        events =
+          [
+            {
+              event = "after-resume";
+              command = "${lib.getExe monitor-power} on"; # In case monitor powered off before sleep started
+            }
+          ]
+          ++ lib.lists.optionals waycfg.sleep.lockBefore [
+            {
+              event = "before-sleep";
+              command = lib.getExe lock-session;
+            }
+          ];
         timeouts = lib.mkIf waycfg.sleep.auto.enable [
           {
             timeout = waycfg.sleep.auto.idleMinutes * 60;
             # wlinhibit currently doesn't work with niri
             # command = "${pkgs.systemd}/bin/systemctl sleep";
-            command = lib.getExe (pkgs.writeShellApplication {
-              name = "swayidle-idle-timeout";
-              runtimeInputs = [ pkgs.systemd pkgs.playerctl pkgs.coreutils ];
-              text = ''
-                if systemctl --user is-active -q wlinhibit.service; then
-                  systemctl --user restart swayidle.service
-                else
-                  playerctl -a pause || true
-                  systemctl sleep
-                fi
-              '';
-            });
+            command = lib.getExe (
+              pkgs.writeShellApplication {
+                name = "swayidle-idle-timeout";
+                runtimeInputs = [
+                  pkgs.systemd
+                  pkgs.playerctl
+                  pkgs.coreutils
+                ];
+                text = ''
+                  if systemctl --user is-active -q wlinhibit.service; then
+                    systemctl --user restart swayidle.service
+                  else
+                    playerctl -a pause || true
+                    systemctl sleep
+                  fi
+                '';
+              }
+            );
           }
         ];
       };

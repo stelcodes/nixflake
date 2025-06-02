@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 let
   waycfg = config.wayland.windowManager;
   theme = config.theme.set;
@@ -8,23 +13,19 @@ let
   appleKeyboardIdentifiers = [
     "1452:657:Apple_Inc._Apple_Internal_Keyboard_/_Trackpad"
   ];
-  appleKeyboardConfig = lib.strings.concatMapStrings
-    (id: ''
-      input "${id}" {
-        xkb_layout us
-        xkb_options caps:escape_shifted_capslock
-        xkb_variant mac
-      }
-    '')
-    appleKeyboardIdentifiers;
-  cycle-sway-output = pkgs.writers.writePython3Bin
-    "cycle-sway-output"
-    { doCheck = false; }
-    (builtins.readFile ../../misc/cycle-sway-output.py);
-  cycle-sway-scale = pkgs.writers.writePython3Bin
-    "cycle-sway-scale"
-    { doCheck = false; }
-    (builtins.readFile ../../misc/cycle-sway-scale.py);
+  appleKeyboardConfig = lib.strings.concatMapStrings (id: ''
+    input "${id}" {
+      xkb_layout us
+      xkb_options caps:escape_shifted_capslock
+      xkb_variant mac
+    }
+  '') appleKeyboardIdentifiers;
+  cycle-sway-output = pkgs.writers.writePython3Bin "cycle-sway-output" { doCheck = false; } (
+    builtins.readFile ../../misc/cycle-sway-output.py
+  );
+  cycle-sway-scale = pkgs.writers.writePython3Bin "cycle-sway-scale" { doCheck = false; } (
+    builtins.readFile ../../misc/cycle-sway-scale.py
+  );
   handle-sway-lid-on = pkgs.writers.writeBash "handle-sway-lid-on" ''
     swaymsg output eDP-1 power off
     playerctl --all-players pause
@@ -142,7 +143,8 @@ in
           "${mod}+period" = "split none";
           "${mod}+shift+tab" = "exec ${lib.getExe cycle-sway-output}";
           "${mod}+shift+r" = "reload; exec systemctl --user restart waybar";
-          "${mod}+shift+e" = "exec swaynag -t warning -m 'Do you really want to exit sway?' -b 'Yes, exit sway' 'swaymsg exit'";
+          "${mod}+shift+e" =
+            "exec swaynag -t warning -m 'Do you really want to exit sway?' -b 'Yes, exit sway' 'swaymsg exit'";
           "${mod}+shift+s" = "sticky toggle";
           "--locked ${mod}+shift+delete" = "exec systemctl sleep";
           "--locked ${mod}+o" = "output ${waycfg.mainMonitor} power toggle";
@@ -170,23 +172,42 @@ in
           XF86AudioMute = "exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
           XF86AudioLowerVolume = "exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-";
           XF86AudioRaiseVolume = "exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+";
-          "${mod}+Print" = "exec " + lib.getExe (pkgs.writeShellApplication {
-            name = "sway-screenshot-selection";
-            runtimeInputs = [ pkgs.coreutils-full pkgs.slurp pkgs.grim pkgs.swappy ];
-            text = ''
-              mkdir -p "$XDG_PICTURES_DIR/screenshots"
-              grim -cg "$(slurp)" - | swappy -f -
-            '';
-          });
-          Print = "exec " + lib.getExe (pkgs.writeShellApplication {
-            name = "sway-screenshot";
-            runtimeInputs = [ pkgs.coreutils-full pkgs.sway pkgs.jq pkgs.grim pkgs.swappy ];
-            text = ''
-              mkdir -p "$XDG_PICTURES_DIR/screenshots"
-              current_output=$(swaymsg -t get_outputs | jq -r '.[] | select(.focused) | .name')
-              grim -co "$current_output" - | swappy -f -
-            '';
-          });
+          "${mod}+Print" =
+            "exec "
+            + lib.getExe (
+              pkgs.writeShellApplication {
+                name = "sway-screenshot-selection";
+                runtimeInputs = [
+                  pkgs.coreutils-full
+                  pkgs.slurp
+                  pkgs.grim
+                  pkgs.swappy
+                ];
+                text = ''
+                  mkdir -p "$XDG_PICTURES_DIR/screenshots"
+                  grim -cg "$(slurp)" - | swappy -f -
+                '';
+              }
+            );
+          Print =
+            "exec "
+            + lib.getExe (
+              pkgs.writeShellApplication {
+                name = "sway-screenshot";
+                runtimeInputs = [
+                  pkgs.coreutils-full
+                  pkgs.sway
+                  pkgs.jq
+                  pkgs.grim
+                  pkgs.swappy
+                ];
+                text = ''
+                  mkdir -p "$XDG_PICTURES_DIR/screenshots"
+                  current_output=$(swaymsg -t get_outputs | jq -r '.[] | select(.focused) | .name')
+                  grim -co "$current_output" - | swappy -f -
+                '';
+              }
+            );
         };
         modes = {
           resize = {
@@ -220,7 +241,11 @@ in
         };
         output = {
           "*" = {
-            background = if (waycfg.wallpaper != null) then "${waycfg.wallpaper} fill ${theme.bg}" else "${theme.bg} solid_color";
+            background =
+              if (waycfg.wallpaper != null) then
+                "${waycfg.wallpaper} fill ${theme.bg}"
+              else
+                "${theme.bg} solid_color";
           };
           # Framework screen
           "BOE 0x095F Unknown" = {
@@ -234,7 +259,9 @@ in
         };
         startup = [
           # Import sway-related environment variables into systemd user services
-          { command = "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP SWAYSOCK I3SOCK DISPLAY"; }
+          {
+            command = "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP SWAYSOCK I3SOCK DISPLAY";
+          }
         ];
       };
       extraConfig = ''

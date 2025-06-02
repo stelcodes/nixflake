@@ -1,4 +1,5 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+{
   profile = {
     graphical = true;
     battery = true;
@@ -28,4 +29,3 @@
 
   # brew install --cask obsidian kitty syncthing calibre discord firefox gimp musescore protonvpn signal spotify zoom visual-studio-code
 }
-

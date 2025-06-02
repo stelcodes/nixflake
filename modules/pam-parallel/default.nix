@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 let
   cfg = config.security.pam.pam-parallel;
 in
@@ -19,8 +24,8 @@ in
         default = "One";
       };
       methods = lib.mkOption {
-        type = lib.types.attrsOf
-          (lib.types.submodule {
+        type = lib.types.attrsOf (
+          lib.types.submodule {
             options = {
               description = lib.mkOption {
                 type = lib.types.str;
@@ -29,7 +34,8 @@ in
                 type = lib.types.str;
               };
             };
-          });
+          }
+        );
         default = { };
         example = lib.literalExample ''
           {
@@ -52,28 +58,30 @@ in
       let
         jsonSettings = builtins.toJSON {
           mode = cfg.mode;
-          modules = lib.mapAttrs'
-            (methodName: methodValue: (lib.nameValuePair "${methodName}_parallel" methodValue.description))
-            cfg.methods;
+          modules = lib.mapAttrs' (
+            methodName: methodValue: (lib.nameValuePair "${methodName}_parallel" methodValue.description)
+          ) cfg.methods;
         };
         serviceCfg = service: {
           rules.auth.pam-parallel = {
             order = cfg.order;
             control = "sufficient";
             modulePath = "${pkgs.pam-parallel}/lib/security/pam_parallel.so";
-            args = [ "debug" jsonSettings ];
+            args = [
+              "debug"
+              jsonSettings
+            ];
           };
         };
       in
       (lib.flip lib.genAttrs serviceCfg cfg.applyToModules);
 
-    environment.etc = lib.mapAttrs'
-      (methodName: methodValue: lib.nameValuePair
-        "pam.d/${methodName}_parallel"
-        {
-          source = pkgs.writeText "${methodName}_parallel.pam" methodValue.rule;
-        })
-      cfg.methods;
+    environment.etc = lib.mapAttrs' (
+      methodName: methodValue:
+      lib.nameValuePair "pam.d/${methodName}_parallel" {
+        source = pkgs.writeText "${methodName}_parallel.pam" methodValue.rule;
+      }
+    ) cfg.methods;
   };
 
 }

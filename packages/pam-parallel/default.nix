@@ -1,8 +1,9 @@
-{ lib
-, stdenv
-, pam
-, jansson
-, fetchFromGitHub
+{
+  lib,
+  stdenv,
+  pam,
+  jansson,
+  fetchFromGitHub,
 }:
 
 # https://github.com/furiLabs/pam-parallel
@@ -19,7 +20,10 @@ stdenv.mkDerivation rec {
     hash = "sha256-fnxmRF4h73HglngfshTUgvTxjurYw8rO+DOxkToUxNk=";
   };
 
-  buildInputs = [ jansson pam ];
+  buildInputs = [
+    jansson
+    pam
+  ];
 
   dontConfigure = true;
 

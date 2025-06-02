@@ -1,4 +1,5 @@
-{ pkgs, inputs, ... }: {
+{ pkgs, inputs, ... }:
+{
 
   home = {
     stateVersion = "23.05";
@@ -43,7 +44,12 @@
       pkgs.git-fiddle
       (pkgs.firejailWrapper {
         executable = "${pkgs.vscode}/bin/code";
-        extraArgs = [ "--noprofile" "--whitelist=\"$HOME/code\"" "--whitelist=\"$HOME/.config\"" "--whitelist=\"$HOME/.local\"" ];
+        extraArgs = [
+          "--noprofile"
+          "--whitelist=\"$HOME/code\""
+          "--whitelist=\"$HOME/.config\""
+          "--whitelist=\"$HOME/.local\""
+        ];
       })
       pkgs.yazi
       pkgs.nix-tree
@@ -55,7 +61,10 @@
   };
   wayland.windowManager.sway = {
     config.workspaceOutputAssign = [
-      { output = "HDMI-A-1"; workspace = "5"; }
+      {
+        output = "HDMI-A-1";
+        workspace = "5";
+      }
     ];
     mainMonitor = "DP-1";
     sleep = {

@@ -1,4 +1,10 @@
-{ pkgs, lib, config, ... }: {
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
+{
 
   home.packages = lib.mkIf config.profile.audio [
     pkgs.ffmpeg

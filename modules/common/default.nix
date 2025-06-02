@@ -1,6 +1,14 @@
-{ pkgs, lib, config, inputs, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  inputs,
+  ...
+}:
 
-let sshPublicKeys = (import ../../secrets/keys.nix); in
+let
+  sshPublicKeys = (import ../../secrets/keys.nix);
+in
 
 {
   imports = [
@@ -130,21 +138,39 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
           # Default password is "password" unless system ssh key is in the public key registry file
           # In that case the encrypted age password should be available, use that instead
           # Override with hashedPasswordFile (use mkpasswd)
-          if (config.age.secrets ? admin-password) then {
-            hashedPasswordFile = config.age.secrets.admin-password.path;
-          } else {
-            password = "password";
-          };
+          if (config.age.secrets ? admin-password) then
+            {
+              hashedPasswordFile = config.age.secrets.admin-password.path;
+            }
+          else
+            {
+              password = "password";
+            };
         ${config.admin.username} =
-          (if (config.age.secrets ? admin-password) then {
-            hashedPasswordFile = config.age.secrets.admin-password.path;
-          } else {
-            password = "password";
-          })
+          (
+            if (config.age.secrets ? admin-password) then
+              {
+                hashedPasswordFile = config.age.secrets.admin-password.path;
+              }
+            else
+              {
+                password = "password";
+              }
+          )
           // {
             isNormalUser = true;
             # https://wiki.archlinux.org/title/Users_and_groups#Group_list
-            extraGroups = [ "networkmanager" "wheel" "tty" "dialout" "audio" "video" "cdrom" "multimedia" "libvirtd" ];
+            extraGroups = [
+              "networkmanager"
+              "wheel"
+              "tty"
+              "dialout"
+              "audio"
+              "video"
+              "cdrom"
+              "multimedia"
+              "libvirtd"
+            ];
             openssh.authorizedKeys.keys = sshPublicKeys.allAdminKeys;
             shell = pkgs.zsh;
           };
@@ -242,7 +268,8 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
       networking.wg-quick.interfaces = lib.mkForce { };
       users.users = {
         root.hashedPassword = lib.mkForce "$y$j9T$GAOQggBNWKTXXoCXQCGiw0$wVVmGFS2rI.9QDGe51MQHYcEr02FqHVJ1alHig9Y475";
-        ${config.admin.username}.hashedPassword = lib.mkForce "$y$j9T$GAOQggBNWKTXXoCXQCGiw0$wVVmGFS2rI.9QDGe51MQHYcEr02FqHVJ1alHig9Y475";
+        ${config.admin.username}.hashedPassword =
+          lib.mkForce "$y$j9T$GAOQggBNWKTXXoCXQCGiw0$wVVmGFS2rI.9QDGe51MQHYcEr02FqHVJ1alHig9Y475";
       };
     };
 
