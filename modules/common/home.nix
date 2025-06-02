@@ -256,6 +256,7 @@
             git = yp.git;
             starship = yp.starship;
             smart-enter = yp.smart-enter;
+            rsync-ng = inputs.rsync-ng-yazi;
           };
         initLua = /* lua */ ''
           -- Old tab bar style https://github.com/sxyazi/yazi/pull/2782
@@ -309,6 +310,11 @@
               run = "plugin smart-enter";
               desc = "Enter the child directory, or open the file";
             }
+            {
+              on = "R";
+              run = "plugin rsync-ng";
+              desc = "Copy files using rsync";
+            }
             # Bookmarks (g, h, c, d, <space> are preserved from default keymap)
             { on = [ "g" "n" ]; run = "cd /nix/store"; desc = "Goto /nix/store"; }
             { on = [ "g" "C" ]; run = "cd ~/.config/nixflake"; desc = "Goto nixflake"; }
@@ -342,7 +348,7 @@
             la = "ls -A";
             rm = "rm -i";
             mv = "mv -n";
-            r = "rsync -rltxhv"; # use --delete-delay when necessary
+            r = "rsync -ah"; # use --delete-delay when necessary
             gs = "git status";
             gl = "git log";
             glf = "git log --pretty=format:'%C(yellow)%h%C(reset) %C(blue)%an%C(reset) %C(cyan)%cr%C(reset) %s %C(green)%d%C(reset)' --graph";

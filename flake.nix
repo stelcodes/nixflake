@@ -51,6 +51,10 @@
       url = "github:catppuccin/btop";
       flake = false;
     };
+    rsync-ng-yazi = {
+      url = "github:stelcodes/rsync-ng.yazi";
+      flake = false;
+    };
   };
 
   outputs = inputs: {
