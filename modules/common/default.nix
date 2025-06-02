@@ -160,8 +160,10 @@ let sshPublicKeys = (import ../../secrets/keys.nix); in
       git.enable = true;
       nh = {
         enable = true;
-        clean.enable = true;
-        clean.extraArgs = "--keep-since 7d --keep 5";
+        clean = {
+          enable = true;
+          extraArgs = "--keep-since 7d --keep 7";
+        };
         flake = "/home/${config.admin.username}/.config/nixflake";
       };
     };

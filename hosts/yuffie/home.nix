@@ -9,10 +9,7 @@
       pkgs.signal-desktop
       pkgs.ungoogled-chromium
       pkgs.gimp3-with-plugins
-      pkgs.jellyfin-media-player
-      pkgs.musicpod
       pkgs.wineWowPackages.waylandFull
-      pkgs.thunderbird
       (pkgs.createBrowserApp { name = "Bandcamp"; url = "https://bandcamp.com"; })
       (pkgs.createBrowserApp { name = "Discord"; url = "https://app.discord.com"; })
       (pkgs.createBrowserApp { name = "Weather"; icon = "weather"; url = "https://weatherstar.netbymatt.com/?kiosk=true"; })
@@ -29,7 +26,7 @@
       })
       pkgs.d-spy
       pkgs.lollypop
-      pkgs.bitwig-studio
+      pkgs.gnome-podcasts
       pkgs.fractal
       pkgs.mkvtoolnix
       pkgs.oniux
