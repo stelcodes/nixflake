@@ -20,11 +20,16 @@ let theme = config.theme.set; in
       '');
       file = {
         # https://librewolf.net/docs/settings/
+        # pref activates upon every librewolf startup but can be changed while running
         ".librewolf/librewolf.overrides.cfg".text = /* js */ ''
           pref("browser.tabs.insertAfterCurrent", true);
           pref("browser.uidensity", 1);
           pref("browser.toolbars.bookmarks.visibility", "never")
           pref("browser.fullscreen.autohide", false)
+          pref("privacy.clearOnShutdown.history", true);
+          pref("privacy.clearOnShutdown.downloads", true);
+          pref("browser.sessionstore.resume_from_crash", false);
+          pref("webgl.disabled", true);
         '';
       };
     };
