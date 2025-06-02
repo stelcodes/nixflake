@@ -462,8 +462,19 @@ in
             scroll-step = 5;
           };
           clock = {
-            format = "{:%I:%M %p %b %d} 󱛡";
-            format-alt = "{:%A} 󱛡";
+            format = "{:%I:%M %p} 󱛡";
+            format-alt = "{:%a %b %d} 󱛡";
+            calendar = {
+              mode = "year";
+              mode-mon-col = 3;
+              weeks-pos = "right";
+              format = {
+                months = "<b>{}</b>";
+                weekdays = "<span color='${theme.yellow}'><b>{}</b></span>";
+                weeks = "<span color='${theme.green}'><b>W{}</b></span>";
+                today = "<span color='${theme.red}'><b>{}</b></span>";
+              };
+            };
             tooltip-format = "<tt><small>{calendar}</small></tt>";
           };
           battery = {
