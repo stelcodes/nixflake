@@ -39,10 +39,9 @@ let theme = config.theme.set; in
         package = pkgs.nerd-fonts.fira-mono;
       };
       actionAliases = {
-        new_tab_cwd = "launch --cwd=current --type=tab";
-        new_window_cwd = "launch --cwd=current --type=window";
+        new_tab_after = "launch --type=tab --cwd=current --location=after";
+        new_window_after = "launch --type=window --cwd=current --location=after";
       };
-      # enableGitIntegration = true;
       # man 5 kitty.conf
       settings = {
         scrollback_pager_history_size = "10"; # 10MB ~= 100000 lines
@@ -73,14 +72,14 @@ let theme = config.theme.set; in
         "kitty_mod+]" = "scroll_to_prompt 1";
         "kitty_mod+space" = "show_scrollback";
         "kitty_mod+shift+space" = "show_first_command_output_on_screen";
-        "kitty_mod+x" = "new_window_cwd";
+        "kitty_mod+x" = "new_window_after";
         "kitty_mod+q" = "close_window_with_confirmation ignore-shell";
         "kitty_mod+n" = "next_window";
         "kitty_mod+j" = "next_window";
         "kitty_mod+k" = "previous_window";
         "kitty_mod+shift+j" = "focus_visible_window";
         "kitty_mod+shift+k" = "swap_with_window";
-        "kitty_mod+t" = "new_tab_cwd";
+        "kitty_mod+t" = "new_tab_after";
         "kitty_mod+l" = "next_tab";
         "kitty_mod+h" = "previous_tab";
         "kitty_mod+shift+l" = "move_tab_forward";
