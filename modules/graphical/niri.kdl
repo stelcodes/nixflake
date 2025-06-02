@@ -94,6 +94,10 @@ window-rule {
     default-column-width { fixed 800; }
 }
 window-rule {
+    match app-id="^signal$"
+    default-column-width { fixed 600; }
+}
+window-rule {
     match app-id="^kitty$" title="^btop$"
     open-maximized true
 }
