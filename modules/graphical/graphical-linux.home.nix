@@ -353,6 +353,7 @@ in
           demuxer-max-bytes = "4096MiB";
           gapless-audio = "no";
           hwdec = "yes";
+          gpu-context = lib.mkIf pkgs.stdenv.isLinux "wayland";
         };
         scripts = let p = pkgs.mpvScripts; in [
           p.uosc
