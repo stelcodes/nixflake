@@ -55,8 +55,6 @@ in
           size = 8.0;
         };
         bars = [ ];
-        seat.seat0.xcursor_theme = lib.mkIf (config.home.pointerCursor != null)
-          "${config.home.pointerCursor.name} ${builtins.toString config.home.pointerCursor.size}";
         colors = {
           focused = {
             background = theme.bg;

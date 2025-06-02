@@ -225,10 +225,12 @@ in
         _JAVA_AWT_WM_NONREPARENTING = "1";
       };
       pointerCursor = {
+        # https://vibhorjaiswal.github.io/Cursor-Test/
+        enable = true;
         package = theme.cursorThemePackage;
         name = theme.cursorThemeName;
-        # size = 24;
-        # gtk.enable = true;
+        size = 24;
+        gtk.enable = true;
       };
     };
 

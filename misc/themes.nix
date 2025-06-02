@@ -171,8 +171,8 @@
     };
     iconThemeName = "Everforest-Dark";
     iconThemePackage = gtkThemePackage;
-    cursorThemeName = "Nordzy-cursors";
-    cursorThemePackage = pkgs.nordzy-cursor-theme;
+    cursorThemeName = "Capitaine Cursors (Nord)";
+    cursorThemePackage = pkgs.capitaine-cursors-themed;
 
     neovimPlugin = {
       plugin = pkgs.vimPlugins.everforest;

@@ -31,6 +31,11 @@ input {
     disable-power-key-handling
 }
 
+cursor {
+    xcursor-theme "Capitaine Cursors (Nord)"
+    xcursor-size 36
+}
+
 // https://github.com/YaLTeR/niri/wiki/Configuration:-Switch-Events
 switch-events {
     // Should automatically handle monitor on/off for internal monitor soon
