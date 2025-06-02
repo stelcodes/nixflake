@@ -398,7 +398,7 @@ in
             vim.keymap.set("n", "<leader>np", "<cmd>Telekasten panel<CR>")
             vim.keymap.set("n", "<leader>nf", "<cmd>Telekasten find_notes<CR>")
             vim.keymap.set("n", "<leader>ns", "<cmd>Telekasten search_notes<CR>")
-            vim.keymap.set("n", "<leader>nt", "<cmd>Telekasten goto_today<CR>")
+            vim.keymap.set("n", "<leader>nd", "<cmd>Telekasten goto_today<CR>")
             vim.keymap.set("n", "<leader>nw", "<cmd>Telekasten goto_thisweek<CR>")
             vim.keymap.set("n", "<leader>nl", "<cmd>Telekasten insert_link<CR>")
             vim.keymap.set("n", "<leader>nL", "<cmd>Telekasten insert_img_link<CR>")
@@ -407,6 +407,8 @@ in
             vim.keymap.set("n", "<leader>nc", "<cmd>Telekasten show_calendar<CR>")
             vim.keymap.set("n", "<leader>nb", "<cmd>Telekasten show_backlinks<CR>")
             vim.keymap.set("n", "<leader>nr", "<cmd>Telekasten rename_note<CR>")
+            vim.keymap.set("n", "<leader>nt", "<cmd>Telekasten show_tags<CR>")
+            vim.keymap.set("n", "<leader>nx", "<cmd>Telekasten toggle_todo<CR>")
           '';
         }
 
