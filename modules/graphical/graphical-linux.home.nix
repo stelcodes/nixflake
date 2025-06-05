@@ -276,7 +276,6 @@ in
             show=drun
             no_actions=true
             key_expand=Tab
-            matching=fuzzy
             insensitive=true
           '';
         "wofi/style.css".source = ./wofi.css;
