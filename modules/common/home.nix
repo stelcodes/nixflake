@@ -219,7 +219,7 @@
       yazi = {
         enable = true;
         # Remove all media preview deps when machine is headless
-        package = lib.mkIf config.profile.graphical (pkgs.yazi.override { optionalDeps = [ ]; });
+        package = lib.mkIf (!config.profile.graphical) (pkgs.yazi.override { optionalDeps = [ ]; });
         shellWrapperName = "y";
         # Defaults: https://github.com/sxyazi/yazi/tree/main/yazi-config/preset
         settings = {
@@ -525,6 +525,7 @@
               swayinputs = "swaymsg -t get_inputs | nvim -R";
               swayoutputs = "swaymsg -t get_outputs | nvim -R";
               play = "audacious --enqueue-to-temp";
+              icon-search = "yazi /etc/profiles/per-user/stel/share/icons/Everforest-Dark/categories/64";
             };
         in
         {
