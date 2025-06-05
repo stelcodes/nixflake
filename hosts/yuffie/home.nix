@@ -13,16 +13,33 @@
       pkgs.wineWowPackages.waylandFull
       (pkgs.createBrowserApp {
         name = "Bandcamp";
+        icon = "music";
         url = "https://bandcamp.com";
       })
       (pkgs.createBrowserApp {
         name = "Discord";
+        icon = "discord";
         url = "https://app.discord.com";
       })
       (pkgs.createBrowserApp {
         name = "Weather";
         icon = "weather";
         url = "https://weatherstar.netbymatt.com/?kiosk=true";
+      })
+      (pkgs.createBrowserApp {
+        name = "Excalidraw";
+        icon = "draw.io";
+        url = "https://excalidraw.com";
+      })
+      (pkgs.createBrowserApp {
+        name = "Photopea";
+        icon = "color-picker";
+        url = "https://www.photopea.com";
+      })
+      (pkgs.createBrowserApp {
+        name = "Squoosh";
+        icon = "image-optimizer";
+        url = "https://www.squoosh.app";
       })
       pkgs.kdePackages.k3b
       pkgs.calibre
@@ -41,6 +58,9 @@
       pkgs.fractal
       pkgs.mkvtoolnix
       pkgs.oniux
+      (pkgs.typst.withPackages (p: [ p.touying ]))
+      pkgs.pympress
+      pkgs.tuba
     ];
   };
   wayland.windowManager = {

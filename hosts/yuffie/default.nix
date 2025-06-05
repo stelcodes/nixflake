@@ -40,6 +40,10 @@
     };
   };
 
+  programs = {
+    sniffnet.enable = true;
+  };
+
   services = {
     # https://bitsheriff.dev/posts/2025-01-05_how-to-use-the-fingerprint-reader-on-arch/
     # https://wiki.archlinux.org/title/Fprint
