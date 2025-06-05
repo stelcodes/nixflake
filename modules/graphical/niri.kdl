@@ -39,7 +39,7 @@ cursor {
 // https://github.com/YaLTeR/niri/wiki/Configuration:-Switch-Events
 switch-events {
     // Should automatically handle monitor on/off for internal monitor soon
-    lid-close { spawn "bash" "-c" "niri msg action power-off-monitors; lock-session"; }
+    lid-close { spawn "bash" "-c" "niri msg action power-off-monitors; systemctl --user start gtklock;"; }
     lid-open { spawn "bash" "-c" "niri msg action power-on-monitors"; }
 }
 
@@ -146,7 +146,7 @@ binds {
     Super+D { spawn "wofi-toggle"; }
     Super+Shift+D { spawn "wofi-toggle" "--show" "run"; }
     Super+E { spawn "rofimoji"; }
-    Super+Delete { spawn "lock-session"; }
+    Super+Delete { spawn "systemctl" "--user" "start" "gtklock"; }
     Super+Backspace { spawn "librewolf"; }
     Super+Shift+Backspace { spawn "librewolf" "--private-window"; }
     Super+Minus { spawn "niri-adjust-scale" "-0.1"; }

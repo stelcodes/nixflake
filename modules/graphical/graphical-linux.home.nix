@@ -120,18 +120,6 @@ let
       fi
     '';
   };
-  lock-session = pkgs.writeShellApplication {
-    name = "lock-session";
-    runtimeInputs = [
-      pkgs.gtklock
-      pkgs.procps
-    ];
-    text = ''
-      if ! pgrep gtklock &> /dev/null; then
-        gtklock -d
-      fi
-    '';
-  };
   wofi-toggle = pkgs.writeShellApplication {
     name = "wofi-toggle";
     runtimeInputs = [
@@ -232,7 +220,6 @@ in
           niri-pick-color
           niri-rename-workspace
           monitor-power
-          lock-session
           wofi-toggle
         ]
         ++ (lib.lists.optionals config.profile.audio [
@@ -623,6 +610,9 @@ in
           xwayland-satellite = {
             Service.ExecStart = "${lib.getExe pkgs.xwayland-satellite} :12";
           };
+          gtklock = {
+            Service.ExecStart = lib.getExe pkgs.gtklock;
+          };
           record-playback = lib.mkIf config.profile.audio {
             Unit = {
               Description = "playback recording from default pulseaudio monitor";
@@ -696,7 +686,21 @@ in
           ++ lib.lists.optionals waycfg.sleep.lockBefore [
             {
               event = "before-sleep";
-              command = lib.getExe lock-session;
+              command = lib.getExe (
+                pkgs.writeShellApplication {
+                  name = "swayidle-before-sleep";
+                  runtimeInputs = [
+                    pkgs.coreutils
+                    pkgs.playerctl
+                    pkgs.systemd
+                  ];
+                  text = ''
+                    playerctl -a pause || true
+                    systemctl --user start gtklock
+                  '';
+                }
+
+              );
             }
           ];
         timeouts = lib.mkIf waycfg.sleep.auto.enable [
