@@ -185,6 +185,8 @@ in
                 end
               end
               vim.keymap.set('n', '<c-g>', toggle_fugitive)
+              vim.keymap.set('n', '<leader>gl', '<cmd>Git log -p %<cr>' )
+              vim.keymap.set('n', '<leader>gL', '<cmd>Git log -p<cr>' )
               -- vim.keymap.set('n', '<leader>gD', '<cmd>Git difftool<cr>')
             '';
         }
@@ -463,6 +465,7 @@ in
               vim.opt.clipboard = 'unnamedplus' -- Copy paste between vim and everything else
               vim.opt.numberwidth = 1           -- Make minimum width for number column smallest value so it doesn't take up much room
               vim.opt.winblend = 0              -- Remove winblend floating transparency
+              vim.opt.listchars = 'tab:» ,extends:…,precedes:…,nbsp:␣'
               vim.opt.whichwrap = 'h,l'         -- Allow left/right scrolling to jump lines
               require('mini.comment').setup()
               -- require('mini.pairs').setup()
