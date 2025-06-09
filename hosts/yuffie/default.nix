@@ -42,6 +42,7 @@
 
   programs = {
     sniffnet.enable = true;
+    nix-ld.enable = true;
   };
 
   fonts.packages = [ pkgs.google-fonts ];
