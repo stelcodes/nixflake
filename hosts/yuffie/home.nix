@@ -61,6 +61,7 @@
       (pkgs.typst.withPackages (p: [ p.touying ]))
       pkgs.pympress
       pkgs.tuba
+      pkgs.inkscape-with-extensions
     ];
   };
   wayland.windowManager = {
