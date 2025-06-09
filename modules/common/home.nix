@@ -227,6 +227,11 @@
             show_hidden = false;
             sort_by = "natural";
             sort_translit = true;
+            ratio = [
+              1
+              3
+              3
+            ];
           };
           plugin.prepend_fetchers = [
             # https://github.com/yazi-rs/plugins/tree/main/git.yazi#setup
@@ -245,6 +250,12 @@
             {
               mime = "video/*";
               run = "noop";
+            }
+          ];
+          plugin.prepend_previewers = [
+            {
+              name = "*.md";
+              run = "piper -- bat --plain --color=always --wrap=character --terminal-width=$w \"$1\"";
             }
           ];
           opener = {
@@ -307,6 +318,7 @@
             git = yp.git;
             starship = yp.starship;
             smart-enter = yp.smart-enter;
+            piper = yp.piper;
             rsync-ng = inputs.rsync-ng-yazi;
           };
         initLua = # lua
@@ -335,12 +347,22 @@
               }
               {
                 on = "=";
+                run = "plugin toggle-pane rest";
+                desc = "Maximize or restore the current pane";
+              }
+              {
+                on = "+";
                 run = "plugin toggle-pane max-current";
                 desc = "Maximize or restore the preview pane";
               }
               {
-                on = "+";
-                run = "plugin toggle-pane max-preview";
+                on = "-";
+                run = "plugin toggle-pane min-parent";
+                desc = "Maximize or restore the preview pane";
+              }
+              {
+                on = "_";
+                run = "plugin toggle-pane min-preview";
                 desc = "Maximize or restore the preview pane";
               }
               {
