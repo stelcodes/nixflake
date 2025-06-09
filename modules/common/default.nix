@@ -80,10 +80,13 @@ in
     };
 
     systemd = {
+      # DefaultLimitNOFILE= defaults to 1024:524288
+      # Set limits for systemd units (not systemd itself).
       extraConfig = ''
         [Manager]
         DefaultTimeoutStopSec=10
         DefaultTimeoutAbortSec=10
+        DefaultLimitNOFILE=8192:524288
       '';
       sleep.extraConfig = ''
         MemorySleepMode=deep s2idle
@@ -134,6 +137,14 @@ in
     # security.sudo.enable = false;
     # security.acme.email = "sysadmin@stelclementine.com";
     # security.acme.acceptTerms = true;
+    security.pam.loginLimits = [
+      {
+        domain = "*";
+        type = "soft";
+        item = "nofile";
+        value = "8192"; # ulimit -n (default is 1024)
+      }
+    ];
 
     # If the host's system public key is in the key registry file, assume the core age secrets are available
     age.secrets = lib.mkIf (sshPublicKeys.systemKeys ? "${config.networking.hostName}") {
