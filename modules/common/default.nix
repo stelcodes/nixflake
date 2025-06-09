@@ -61,10 +61,22 @@ in
       };
     };
 
-    # Without NetworkManager, machine will still obtain IP address via DHCP
-    networking.networkmanager = {
-      enable = !config.profile.virtual; # Only for physical machines
-      dns = "systemd-resolved";
+    networking = {
+      # For resolved DoT resolving
+      # https://github.com/curl/curl/wiki/DNS-over-HTTPS
+      nameservers = [
+        "9.9.9.9#dns.quad9.net"
+        "149.112.112.112#dns.quad9.net"
+        "116.202.176.26#dot.libredns.gr"
+        "81.169.136.222#ns3.opennameserver.org"
+        "185.181.61.24#ns4.opennameserver.org"
+        # dnscry.pt and mullvlad are other options
+      ];
+      # Without NetworkManager, machine will still obtain IP address via DHCP
+      networkmanager = {
+        enable = !config.profile.virtual; # Only for physical machines
+        dns = "systemd-resolved";
+      };
     };
 
     systemd = {
@@ -223,7 +235,14 @@ in
         powerKeyLongPress = "poweroff";
       };
 
-      resolved.enable = true;
+      # https://dnscheck.tools/
+      # Quad9 shows up as WoodyNet
+      # https://wiki.archlinux.org/title/Systemd-resolved#DNS_over_TLS
+      # Test with `ngrep port 53` and `ngrep port 883`
+      resolved = {
+        enable = true;
+        dnsovertls = "true";
+      };
 
       openssh = {
         enable = true;
