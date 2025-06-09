@@ -147,8 +147,8 @@ binds {
     Super+Shift+D { spawn "wofi-toggle" "--show" "run"; }
     Super+E { spawn "rofimoji"; }
     Super+Delete { spawn "systemctl" "--user" "start" "gtklock"; }
-    Super+Backspace { spawn "librewolf"; }
-    Super+Shift+Backspace { spawn "librewolf" "--private-window"; }
+    Super+Backspace { spawn "librewolf" "--private-window"; }
+    Super+Shift+Backspace { spawn "librewolf"; }
     Super+Minus { spawn "niri-adjust-scale" "-0.1"; }
     Super+Equal { spawn "niri-adjust-scale" "+0.1"; }
     Super+Shift+Equal { spawn "niri-pick-color"; }

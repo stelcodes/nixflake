@@ -130,6 +130,27 @@ let
       pkill wofi-wrapped || exec wofi "$@"
     '';
   };
+  librewolf-private-desktop = pkgs.makeDesktopItem {
+    desktopName = "LibreWolf Private";
+    name = "librewolf-private";
+    genericName = "Web Browser";
+    exec = "librewolf --name librewolf-private --private-window %U";
+    icon = "librewolf";
+    terminal = false;
+    type = "Application";
+    categories = [
+      "Network"
+      "WebBrowser"
+    ];
+    mimeTypes = [
+      "text/html"
+      "text/xml"
+      "application/xhtml+xml"
+      "application/vnd.mozilla.xul+xml"
+      "x-scheme-handler/http"
+      "x-scheme-handler/https"
+    ];
+  };
 in
 {
 
@@ -213,6 +234,7 @@ in
           pkgs.wdisplays
           pkgs.libnotify # for notify-send
           pkgs.chafa # images in terminal, telescope-media-files dep
+          pkgs.seahorse # pulled in anyway by SSH_ASKPASS confirmation prompt
           # pkgs.kooha # Doesn't work with niri atm
           # pkgs.wl-screenrec # https://github.com/russelltg/wl-screenrec
           # pkgs.wlogout
@@ -221,6 +243,7 @@ in
           niri-rename-workspace
           monitor-power
           wofi-toggle
+          librewolf-private-desktop
         ]
         ++ (lib.lists.optionals config.profile.audio [
           pkgs.playerctl
@@ -333,7 +356,8 @@ in
         # Works with xdgOpenUsePortal true or false
         defaultApplications =
           let
-            browser = [ "librewolf.desktop" ];
+
+            browser = [ "librewolf-private.desktop" ];
             imageViewer = [ "org.gnome.eog.desktop" ];
           in
           {

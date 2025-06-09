@@ -40,6 +40,10 @@ in
             pref("privacy.clearOnShutdown.downloads", true);
             pref("browser.sessionstore.resume_from_crash", false);
             pref("webgl.disabled", true);
+            pref("clipboard.autocopy", false);
+            pref("middlemouse.paste", false);
+            pref("browser.newtabpage.enabled", false);
+            pref("browser.startup.homepage", "chrome:\/\/browser/content/blanktab.html");
           '';
       };
     };
