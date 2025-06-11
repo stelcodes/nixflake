@@ -452,6 +452,7 @@ in
               "custom/ianny"
               "custom/wlsunset"
               "custom/wlinhibit"
+              "custom/recordscreen"
               "custom/recordplayback"
               "sway/mode"
               "sway/workspaces"
@@ -475,20 +476,17 @@ in
               interval = 1;
               on-click = "${lib.getExe pkgs.toggle-service} ianny";
             };
-            "custom/recordplayback" = {
-              format = "{}";
-              max-length = 3;
+            "custom/recordscreen" = {
+              exec = # sh
+                "systemctl --user --quiet is-active record-screen.service && echo '🔴'";
               interval = 1;
-              exec = lib.getExe (
-                pkgs.writeShellApplication {
-                  name = "waybar-record-playback";
-                  text = ''
-                    if systemctl --user is-active --quiet record-playback.service; then
-                      echo "🔴";
-                    fi
-                  '';
-                }
-              );
+              on-click = "systemctl --user stop record-screen";
+            };
+            "custom/recordplayback" = {
+              exec = # sh
+                "systemctl --user --quiet is-active record-playback.service && echo '🟠'";
+              interval = 1;
+              on-click = "systemctl --user stop record-playback";
             };
             "custom/wlinhibit" = {
               exec = # sh
@@ -638,12 +636,39 @@ in
           gtklock = {
             Service.ExecStart = lib.getExe pkgs.gtklock;
           };
+          record-screen = {
+            Unit = {
+              BindsTo = [ "graphical-session.target" ];
+              After = [ "graphical-session.target" ];
+            };
+            Service = {
+              RuntimeMaxSec = 60 * 5; # 5 minutes
+              KillSignal = "SIGINT";
+              ExecStart = lib.getExe (
+                pkgs.writeShellApplication {
+                  name = "record-screen-exec-start";
+                  runtimeInputs = [
+                    pkgs.gpu-screen-recorder
+                    pkgs.coreutils
+                  ];
+                  text = ''
+                    output_dir="$HOME/videos/screen-recorder"
+                    timestamp=$(date +%Y-%m-%dT%H:%M:%S%Z)
+                    mkdir -p "$output_dir"
+                    gpu-screen-recorder -w portal -o "$output_dir/$timestamp.mp4"
+                  '';
+                }
+              );
+            };
+          };
           record-playback = lib.mkIf config.profile.audio {
             Unit = {
               Description = "playback recording from default pulseaudio monitor";
+              BindsTo = [ "graphical-session.target" ];
+              After = [ "graphical-session.target" ];
             };
             Service = {
-              RuntimeMaxSec = 500;
+              RuntimeMaxSec = 60 * 5; # 5 minutes
               Type = "forking";
               ExecStart = lib.getExe (
                 pkgs.writeShellApplication {
