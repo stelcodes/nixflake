@@ -45,6 +45,11 @@ in
             pref("browser.newtabpage.enabled", false);
             pref("browser.startup.homepage", "chrome:\/\/browser/content/blanktab.html");
           '';
+        # Vimium keymaps:
+        # map H previousTab
+        # map L nextTab
+        # map J goForward
+        # map K goBack
       };
     };
     programs.kitty = {
