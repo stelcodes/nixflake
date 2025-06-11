@@ -64,7 +64,6 @@
       pkgs.inkscape-with-extensions
       pkgs.nvtopPackages.intel # integrated intel gpu usage
       pkgs.gpu-screen-recorder-gtk # super easy screen recorder
-      pkgs.dnsutils # dig
     ];
   };
   wayland.windowManager = {
