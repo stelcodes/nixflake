@@ -55,6 +55,10 @@
       url = "github:stelcodes/rsync-ng.yazi";
       flake = false;
     };
+    audio = {
+      url = "github:polygon/audio.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs: {
