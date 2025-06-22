@@ -75,6 +75,8 @@ in
         # dnscry.pt and mullvlad are other options
       ];
       # Without NetworkManager, machine will still obtain IP address via DHCP
+      # Issues:
+      # https://github.com/tailscale/tailscale/issues/12936
       networkmanager = {
         enable = !config.profile.virtual; # Only for physical machines
         dns = "systemd-resolved";

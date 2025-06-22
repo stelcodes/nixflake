@@ -233,6 +233,11 @@
               3
             ];
           };
+          preview = {
+            # yazi --clear-cache
+            max_width = 1600;
+            max_height = 1600;
+          };
           plugin.prepend_fetchers = [
             # https://github.com/yazi-rs/plugins/tree/main/git.yazi#setup
             {
