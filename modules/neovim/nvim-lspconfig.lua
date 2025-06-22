@@ -17,12 +17,13 @@ vim.lsp.enable('eslint')
 --   buffer = bufnr,
 --   command = "EslintFixAll",
 -- })
-vim.lsp.enable('jsonls')
+-- vim.lsp.enable('jsonls')
 vim.lsp.enable('clojure_lsp')
 vim.lsp.enable('ruff')
 vim.lsp.enable('pyright')
 vim.lsp.enable('gopls')
 vim.lsp.enable('ts_ls')
+vim.lsp.enable('biome')
 vim.lsp.enable('svelte')
 vim.lsp.enable('denols')
 vim.lsp.config('denols', {
@@ -67,7 +68,11 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set('n', '<leader>la', vim.lsp.buf.code_action, opts)
     vim.keymap.set('n', '<leader>ln', vim.lsp.buf.rename, opts)
     vim.keymap.set({ 'n', 'v' }, '<leader>lf', function()
-      vim.lsp.buf.format({ async = true })
+      vim.lsp.buf.format({
+        async = true,
+        -- Never request typescript-language-server for formatting
+        filter = function(client) return client.name ~= "ts_ls" end,
+      })
     end, opts)
     -- vim.keymap.set('n', '<leader>ld', vim.lsp.buf.definition, opts)
     -- vim.keymap.set('n', '<leader>lD', vim.lsp.buf.declaration, opts)

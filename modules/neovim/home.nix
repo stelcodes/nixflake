@@ -37,6 +37,7 @@ in
       pkgs.tailwindcss-language-server
       pkgs.markdown-oxide
       pkgs.marksman
+      pkgs.biome
     ];
     plugins =
       let
@@ -454,6 +455,7 @@ in
                   relnum_in_visual_mode = true,
                 },
               })
+              vim.g.maplocalleader = ","
               vim.opt.swapfile = false          -- turn swapfiles off
               vim.opt.scrolloff = 10            -- keep cursor centered vertically while scrolling
               vim.opt.sidescrolloff = 20        -- How many columns between cursor and edge when scrolling starts horizontally
