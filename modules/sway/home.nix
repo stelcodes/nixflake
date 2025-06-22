@@ -5,7 +5,7 @@
   ...
 }:
 let
-  waycfg = config.wayland.windowManager;
+  waycfg = config.wayland;
   theme = config.theme.set;
   mod = "Mod4";
   # Sway does not support input or output identifier pattern matching so in order to apply settings for every

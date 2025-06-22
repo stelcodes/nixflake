@@ -11,7 +11,7 @@
     ];
   };
 
-  wayland.windowManager.sway = {
+  wayland = {
     mainMonitor = "eDP-1";
     sleep = {
       lockBefore = false;

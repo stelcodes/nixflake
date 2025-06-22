@@ -67,7 +67,7 @@
       inputs.audio.packages.${pkgs.system}.bitwig-studio5-2
     ];
   };
-  wayland.windowManager = {
+  wayland = {
     mainMonitor = "eDP-1";
     sleep = {
       lockBefore = true;

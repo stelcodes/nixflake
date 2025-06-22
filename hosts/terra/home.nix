@@ -66,15 +66,6 @@
         workspace = "5";
       }
     ];
-    mainMonitor = "DP-1";
-    sleep = {
-      lockBefore = false;
-      auto = {
-        enable = true;
-        idleMinutes = 15;
-      };
-    };
-    wallpaper = pkgs.wallpaper.rei-moon;
   };
 }
 

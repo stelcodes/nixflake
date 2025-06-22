@@ -8,7 +8,7 @@
 
   services.wlsunset.systemdTarget = "null.target";
 
-  wayland.windowManager.sway = {
+  wayland = {
     sleep = {
       lockBefore = false;
       auto.enable = false;

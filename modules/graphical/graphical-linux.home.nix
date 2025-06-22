@@ -6,7 +6,7 @@
 }:
 let
   theme = config.theme.set;
-  waycfg = config.wayland.windowManager;
+  waycfg = config.wayland;
   niri-adjust-scale = pkgs.writePythonApplication {
     name = "niri-adjust-scale";
     text = builtins.readFile ./niri-adjust-scale.py;
@@ -189,7 +189,7 @@ in
 {
 
   options = {
-    wayland.windowManager = {
+    wayland = {
       mainMonitor = lib.mkOption {
         type = lib.types.str;
         default = "eDP-1";
@@ -1070,7 +1070,7 @@ in
       gtk4.extraConfig.gtk-application-prefer-dark-theme = 1;
     };
 
-    wayland.windowManager.sessions =
+    wayland.sessions =
       let
         sharedServices = [
           "waybar"
