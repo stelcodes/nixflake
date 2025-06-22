@@ -151,6 +151,40 @@ let
       "x-scheme-handler/https"
     ];
   };
+  chromium-private-desktop = pkgs.makeDesktopItem {
+    desktopName = "Chromium Private";
+    name = "chromium-private";
+    genericName = "Web Browser";
+    # https://superuser.com/questions/1760741/how-to-open-url-in-new-private-window-in-firefox
+    exec = "${pkgs.ungoogled-chromium}/bin/chromium --incognito --new-window %U";
+    icon = "chromium";
+    terminal = false;
+    type = "Application";
+    categories = [
+      "Network"
+      "WebBrowser"
+    ];
+    mimeTypes = [
+      "application/pdf"
+      "application/rdf+xml"
+      "application/rss+xml"
+      "application/xhtml+xml"
+      "application/xhtml_xml"
+      "application/xml"
+      "image/gif"
+      "image/jpeg"
+      "image/png"
+      "image/webp"
+      "text/html"
+      "text/xml"
+      "x-scheme-handler/http"
+      "x-scheme-handler/https"
+      "x-scheme-handler/webcal"
+      "x-scheme-handler/mailto"
+      "x-scheme-handler/about"
+      "x-scheme-handler/unknown"
+    ];
+  };
 in
 {
 
@@ -244,6 +278,7 @@ in
           monitor-power
           wofi-toggle
           librewolf-private-desktop
+          chromium-private-desktop
         ]
         ++ (lib.lists.optionals config.profile.audio [
           pkgs.playerctl
@@ -357,8 +392,9 @@ in
         defaultApplications =
           let
 
-            browser = [ "librewolf-private.desktop" ];
+            browser = [ "chromium-private.desktop" ];
             imageViewer = [ "org.gnome.eog.desktop" ];
+            mpvPlayer = [ "mpv.desktop" ];
           in
           {
             "application/http" = browser;
@@ -375,22 +411,146 @@ in
             "image/png" = imageViewer;
             "image/tiff" = imageViewer;
             "image/webp" = imageViewer;
-            "image/x-bmp" = imageViewer;
-            "image/x-gray" = imageViewer;
-            "image/x-icb" = imageViewer;
-            "image/x-ico" = imageViewer;
-            "image/x-png" = imageViewer;
-            "image/x-portable-anymap" = imageViewer;
-            "image/x-portable-bitmap" = imageViewer;
-            "image/x-portable-graymap" = imageViewer;
-            "image/x-portable-pixmap" = imageViewer;
-            "image/x-xbitmap" = imageViewer;
-            "image/x-xpixmap" = imageViewer;
-            "image/x-pcx" = imageViewer;
+            # "image/x-bmp" = imageViewer;
+            # "image/x-gray" = imageViewer;
+            # "image/x-icb" = imageViewer;
+            # "image/x-ico" = imageViewer;
+            # "image/x-png" = imageViewer;
+            # "image/x-portable-anymap" = imageViewer;
+            # "image/x-portable-bitmap" = imageViewer;
+            # "image/x-portable-graymap" = imageViewer;
+            # "image/x-portable-pixmap" = imageViewer;
+            # "image/x-xbitmap" = imageViewer;
+            # "image/x-xpixmap" = imageViewer;
+            # "image/x-pcx" = imageViewer;
             "image/svg+xml" = imageViewer;
             "image/svg+xml-compressed" = imageViewer;
-            "image/vnd.wap.wbmp" = imageViewer;
-            "image/x-icns" = imageViewer;
+            # "image/vnd.wap.wbmp" = imageViewer;
+            # "image/x-icns" = imageViewer;
+
+            "application/ogg" = mpvPlayer;
+            # "application/x-ogg" = mpvPlayer;
+            # "application/mxf" = mpvPlayer;
+            # "application/sdp" = mpvPlayer;
+            # "application/smil" = mpvPlayer;
+            # "application/x-smil" = mpvPlayer;
+            # "application/streamingmedia" = mpvPlayer;
+            # "application/x-streamingmedia" = mpvPlayer;
+            # "application/vnd.rn-realmedia" = mpvPlayer;
+            # "application/vnd.rn-realmedia-vbr" = mpvPlayer;
+            "audio/aac" = mpvPlayer;
+            # "audio/x-aac" = mpvPlayer;
+            # "audio/vnd.dolby.heaac.1" = mpvPlayer;
+            # "audio/vnd.dolby.heaac.2" = mpvPlayer;
+            "audio/aiff" = mpvPlayer;
+            # "audio/x-aiff" = mpvPlayer;
+            "audio/m4a" = mpvPlayer;
+            # "audio/x-m4a" = mpvPlayer;
+            # "application/x-extension-m4a" = mpvPlayer;
+            # "audio/mp1" = mpvPlayer;
+            # "audio/x-mp1" = mpvPlayer;
+            # "audio/mp2" = mpvPlayer;
+            # "audio/x-mp2" = mpvPlayer;
+            "audio/mp3" = mpvPlayer;
+            # "audio/x-mp3" = mpvPlayer;
+            # "audio/mpeg" = mpvPlayer;
+            # "audio/mpeg2" = mpvPlayer;
+            # "audio/mpeg3" = mpvPlayer;
+            # "audio/mpegurl" = mpvPlayer;
+            # "audio/x-mpegurl" = mpvPlayer;
+            # "audio/mpg" = mpvPlayer;
+            # "audio/x-mpg" = mpvPlayer;
+            # "audio/rn-mpeg" = mpvPlayer;
+            # "audio/musepack" = mpvPlayer;
+            # "audio/x-musepack" = mpvPlayer;
+            "audio/ogg" = mpvPlayer;
+            # "audio/scpls" = mpvPlayer;
+            # "audio/x-scpls" = mpvPlayer;
+            # "audio/vnd.rn-realaudio" = mpvPlayer;
+            "audio/wav" = mpvPlayer;
+            # "audio/x-pn-wav" = mpvPlayer;
+            # "audio/x-pn-windows-pcm" = mpvPlayer;
+            # "audio/x-realaudio" = mpvPlayer;
+            # "audio/x-pn-realaudio" = mpvPlayer;
+            # "audio/x-ms-wma" = mpvPlayer;
+            # "audio/x-pls" = mpvPlayer;
+            # "audio/x-wav" = mpvPlayer;
+            "video/mpeg" = mpvPlayer;
+            # "video/x-mpeg2" = mpvPlayer;
+            # "video/x-mpeg3" = mpvPlayer;
+            # "video/mp4v-es" = mpvPlayer;
+            # "video/x-m4v" = mpvPlayer;
+            "video/mp4" = mpvPlayer;
+            # "application/x-extension-mp4" = mpvPlayer;
+            # "video/divx" = mpvPlayer;
+            # "video/vnd.divx" = mpvPlayer;
+            # "video/msvideo" = mpvPlayer;
+            # "video/x-msvideo" = mpvPlayer;
+            "video/ogg" = mpvPlayer;
+            # "video/quicktime" = mpvPlayer;
+            # "video/vnd.rn-realvideo" = mpvPlayer;
+            # "video/x-ms-afs" = mpvPlayer;
+            # "video/x-ms-asf" = mpvPlayer;
+            # "audio/x-ms-asf" = mpvPlayer;
+            # "application/vnd.ms-asf" = mpvPlayer;
+            # "video/x-ms-wmv" = mpvPlayer;
+            # "video/x-ms-wmx" = mpvPlayer;
+            # "video/x-ms-wvxvideo" = mpvPlayer;
+            # "video/x-avi" = mpvPlayer;
+            "video/avi" = mpvPlayer;
+            # "video/x-flic" = mpvPlayer;
+            # "video/fli" = mpvPlayer;
+            # "video/x-flc" = mpvPlayer;
+            # "video/flv" = mpvPlayer;
+            # "video/x-flv" = mpvPlayer;
+            # "video/x-theora" = mpvPlayer;
+            # "video/x-theora+ogg" = mpvPlayer;
+            # "video/x-matroska" = mpvPlayer;
+            "video/mkv" = mpvPlayer;
+            # "audio/x-matroska" = mpvPlayer;
+            # "application/x-matroska" = mpvPlayer;
+            "video/webm" = mpvPlayer;
+            "audio/webm" = mpvPlayer;
+            "audio/vorbis" = mpvPlayer;
+            # "audio/x-vorbis" = mpvPlayer;
+            # "audio/x-vorbis+ogg" = mpvPlayer;
+            # "video/x-ogm" = mpvPlayer;
+            # "video/x-ogm+ogg" = mpvPlayer;
+            # "application/x-ogm" = mpvPlayer;
+            # "application/x-ogm-audio" = mpvPlayer;
+            # "application/x-ogm-video" = mpvPlayer;
+            # "application/x-shorten" = mpvPlayer;
+            # "audio/x-shorten" = mpvPlayer;
+            # "audio/x-ape" = mpvPlayer;
+            # "audio/x-wavpack" = mpvPlayer;
+            # "audio/x-tta" = mpvPlayer;
+            # "audio/AMR" = mpvPlayer;
+            # "audio/ac3" = mpvPlayer;
+            # "audio/eac3" = mpvPlayer;
+            # "audio/amr-wb" = mpvPlayer;
+            # "video/mp2t" = mpvPlayer;
+            "audio/flac" = mpvPlayer;
+            "audio/mp4" = mpvPlayer;
+            # "application/x-mpegurl" = mpvPlayer;
+            # "video/vnd.mpegurl" = mpvPlayer;
+            # "application/vnd.apple.mpegurl" = mpvPlayer;
+            # "audio/x-pn-au" = mpvPlayer;
+            # "video/3gp" = mpvPlayer;
+            # "video/3gpp" = mpvPlayer;
+            # "video/3gpp2" = mpvPlayer;
+            # "audio/3gpp" = mpvPlayer;
+            # "audio/3gpp2" = mpvPlayer;
+            # "video/dv" = mpvPlayer;
+            # "audio/dv" = mpvPlayer;
+            "audio/opus" = mpvPlayer;
+            # "audio/vnd.dts" = mpvPlayer;
+            # "audio/vnd.dts.hd" = mpvPlayer;
+            # "audio/x-adpcm" = mpvPlayer;
+            # "application/x-cue" = mpvPlayer;
+            "audio/m3u" = mpvPlayer;
+            # "audio/vnd.wave" = mpvPlayer;
+            # "video/vnd.avi" = mpvPlayer;
+
           };
       };
     };
