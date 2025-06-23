@@ -9,6 +9,7 @@
     # nixpkgs.url = "/home/stel/code/nixpkgs/master";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     # nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    # home-manager.url = "/home/stel/code/home-manager";
     home-manager = {
       # url = "github:nix-community/home-manager/release-24.11";
       url = "github:nix-community/home-manager/master";
