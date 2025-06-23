@@ -65,6 +65,7 @@
       pkgs.nvtopPackages.intel # integrated intel gpu usage
       pkgs.gpu-screen-recorder-gtk # super easy screen recorder
       inputs.audio.packages.${pkgs.system}.bitwig-studio5-2
+      pkgs.nixos-anywhere
     ];
   };
   wayland = {
