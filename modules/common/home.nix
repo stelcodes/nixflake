@@ -558,7 +558,6 @@
         {
           enable = true;
           enableCompletion = true;
-          enableVteIntegration = true;
           autocd = true;
           autosuggestion.enable = true;
           cdpath = [ ];
