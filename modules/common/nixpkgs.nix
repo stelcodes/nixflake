@@ -50,7 +50,9 @@
               "vscode"
               "zsh-abbr"
               "reaper"
+              "joypixels"
             ];
+          joypixels.acceptLicense = true;
         };
       in
       {

@@ -108,44 +108,21 @@
     };
 
     fonts = {
-      fontconfig.enable = true;
       enableDefaultPackages = true;
       packages = [
-        # https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/data/fonts/nerdfonts/shas.nix
         pkgs.nerd-fonts.fira-mono
+        pkgs.joypixels # The only emoji font that works in kitty atm
       ];
+      fontconfig = {
+        enable = true;
+        defaultFonts.emoji = [ "JoyPixels" ];
+      };
     };
 
     environment.variables = {
       # https://github.com/thomX75/nixos-modules/tree/main/Glib-Schemas-Fix
       GSETTINGS_SCHEMA_DIR = "${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}/glib-2.0/schemas";
     };
-
-    # xserver.desktopManager.gnome.enable = true;
-    environment.gnome.excludePackages = (
-      with pkgs;
-      [
-        seahorse
-        gnome-backgrounds
-        gnome-shell-extensions
-        gnome-tour # GNOME Shell detects the .desktop file on first log-in.
-        gnome-user-docs
-        epiphany
-        gnome-text-editor
-        gnome-calendar
-        gnome-characters
-        gnome-console
-        gnome-contacts
-        gnome-maps
-        gnome-music
-        gnome-connections
-        simple-scan
-        snapshot
-        totem
-        yelp
-        gnome-software
-      ]
-    );
 
   };
 }
