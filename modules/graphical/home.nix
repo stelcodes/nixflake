@@ -75,7 +75,7 @@ in
         confirm_os_window_close = "-1 count-background";
         enabled_layouts = "fat,tall,horizontal,vertical";
         tab_bar_style = "slant";
-        tab_bar_min_tabs = "1";
+        tab_bar_min_tabs = "2";
         tab_title_max_length = "20";
         shell = "${pkgs.zsh}/bin/zsh";
         # allow_remote_control = "yes";
