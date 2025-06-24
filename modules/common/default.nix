@@ -150,41 +150,37 @@ in
       }
     ];
 
-    # If the host's system public key is in the key registry file, assume the core age secrets are available
-    age.secrets = lib.mkIf (sshPublicKeys.systemKeys ? "${config.networking.hostName}") {
-      admin-password.file = ../../secrets/admin-password.age;
-    };
-
+    # It's *way* simpler to provision new machines when admin password isn't encrypted with agenix
+    # Also using agenix for the admin password risks a lockout if secrets weren't rekeyed
+    # The yescrypt algo is used by default in NixOS but it can be strengthened
+    # A yescrypt hash format looks like this $y$<cost>$<salt>$<hash>
+    # https://unix.stackexchange.com/a/724514
+    # The rounds are derived by 2^(cost)
+    # Default cost is 5 (2^5 = 32 rounds), and should be between 3 and 11
+    # https://github.com/linux-pam/linux-pam/blob/e3b66a60e4209e019cf6a45f521858cec2dbefa1/modules/pam_unix/support.c#L212
+    # Cost can be found in header: j7T=3, j8T=4, j9T=5 (default), jAT=6, jBT=7, jCT=8, jDT=9, jET=10, jFT=11
+    # https://linux-audit.com/authentication/linux-password-security-hashing-rounds/#configuration-pam
+    # This is so undocumented but you can change the yescrypt cost in mkpasswd by supplying a salt
+    # https://relentlesscoding.com/posts/upgrade-linux-password-hashing-method/#:~:text=(Incidentally%2C%20password%20verification%20is%20made,is%20you%20still%20find%20bearable.
+    # mkpasswd -m yescrypt -S '$y$<cost>$<salt>'
+    # First get a random salt by running `mkpasswd`. Run again with chosen cost and salt:
+    # mkpasswd -m yescrypt -S '$y$jBT$Fd7r0SHHauIRYKfbnBSV40'
     users = {
       groups = {
         multimedia = { };
       };
       mutableUsers = false;
-      users = {
-        root =
-          # Default password is "password" unless system ssh key is in the public key registry file
-          # In that case the encrypted age password should be available, use that instead
-          # Override with hashedPasswordFile (use mkpasswd)
-          if (config.age.secrets ? admin-password) then
-            {
-              hashedPasswordFile = config.age.secrets.admin-password.path;
-            }
-          else
-            {
-              password = "password";
-            };
-        ${config.admin.username} =
-          (
-            if (config.age.secrets ? admin-password) then
-              {
-                hashedPasswordFile = config.age.secrets.admin-password.path;
-              }
-            else
-              {
-                password = "password";
-              }
-          )
-          // {
+      users =
+        let
+          adminAccess = {
+            hashedPassword = "$y$jBT$3MSGh9jYkXFUBYaw33l2y0$anHuJV52z5nFur1hfvfGcTgOObxze97UVlF4M4UWJb/";
+            openssh.authorizedKeys.keys = sshPublicKeys.allAdminKeys;
+            shell = pkgs.zsh;
+          };
+        in
+        {
+          root = adminAccess;
+          ${config.admin.username} = adminAccess // {
             isNormalUser = true;
             # https://wiki.archlinux.org/title/Users_and_groups#Group_list
             extraGroups = [
@@ -198,10 +194,8 @@ in
               "multimedia"
               "libvirtd"
             ];
-            openssh.authorizedKeys.keys = sshPublicKeys.allAdminKeys;
-            shell = pkgs.zsh;
           };
-      };
+        };
     };
 
     programs = {
