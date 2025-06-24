@@ -256,8 +256,12 @@ in
       openssh = {
         enable = true;
         settings = {
-          PasswordAuthentication = false;
-          KbdInteractiveAuthentication = false;
+          ClientAliveCountMax = 3; # See below
+          ClientAliveInterval = 600; # 10 min x 3 = 30 min idle timeout
+          DisableForwarding = true; # No X11, ssh_agent, or tcp forwarding by default
+          KbdInteractiveAuthentication = false; # No interactive logins
+          PasswordAuthentication = false; # Extremely important!!!
+          PermitRootLogin = "prohibit-password"; # The default but still worth specifying
         };
       };
 
