@@ -97,7 +97,7 @@ in
         "kitty_mod+space" = "show_scrollback";
         "kitty_mod+shift+space" = "show_first_command_output_on_screen";
         "kitty_mod+x" = "new_window_after";
-        "kitty_mod+q" = "close_window_with_confirmation ignore-shell";
+        "kitty_mod+shift+q" = "close_window_with_confirmation ignore-shell";
         "kitty_mod+n" = "next_window";
         "kitty_mod+j" = "next_window";
         "kitty_mod+k" = "previous_window";
