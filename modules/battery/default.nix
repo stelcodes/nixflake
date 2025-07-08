@@ -8,6 +8,8 @@
 
   config = lib.mkIf config.profile.battery {
 
+    environment.systemPackages = [ pkgs.powertop ];
+
     powerManagement = {
       enable = lib.mkDefault true;
     };
@@ -48,6 +50,9 @@
           USB_AUTOSUSPEND = 1;
           USB_EXCLUDE_AUDIO = 0;
           USB_ALLOWLIST = "32ac:0002"; # Framwork USB HDMI Expansion Card
+          # https://linrunner.de/tlp/settings/radio.html
+          DEVICES_TO_DISABLE_ON_BAT_NOT_IN_USE = "bluetooth";
+          DEVICES_TO_ENABLE_ON_AC = "bluetooth";
         };
       };
     };
