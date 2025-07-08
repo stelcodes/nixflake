@@ -24,6 +24,7 @@ in
     ../bluetooth
     ../virtualisation
     ../pam-parallel
+    ../postgresql
   ];
 
   config = {
