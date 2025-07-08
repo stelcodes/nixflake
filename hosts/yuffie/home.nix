@@ -1,4 +1,9 @@
-{ pkgs, inputs, ... }:
+{
+  pkgs,
+  inputs,
+  config,
+  ...
+}:
 {
 
   home = {
@@ -97,5 +102,20 @@
       $env.PROMPT_INDICATOR_VI_INSERT = ""
       $env.PROMPT_INDICATOR_VI_NORMAL = ""
     '';
+  };
+  services = {
+    syncthing = {
+      enable = false;
+      settings = {
+        options = {
+          localAnnounceEnabled = false;
+        };
+        gui = {
+          tls = true;
+          user = config.admin.username;
+          password = "$2b$05$d8XcRmg/wsYS4hFhFhcyjePNS8rnHLEhU5ZfDNJiV/8gEc8Ks6NUW";
+        };
+      };
+    };
   };
 }

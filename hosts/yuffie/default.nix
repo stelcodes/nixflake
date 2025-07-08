@@ -33,6 +33,7 @@
   # Needed to create Rasp Pi SD images
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
+  # 22000 for Syncthing: https://docs.syncthing.net/users/firewall.html
   networking = {
     firewall = {
       allowedTCPPorts = [ ];

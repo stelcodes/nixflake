@@ -18,7 +18,6 @@ in
     inputs.disko.nixosModules.disko
     ./nixpkgs.nix
     ./options.nix
-    ../syncthing
     ../graphical
     ../battery
     ../audio

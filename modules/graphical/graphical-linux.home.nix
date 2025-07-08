@@ -882,6 +882,7 @@ in
       trayscale.enable = true;
       polkit-gnome.enable = true;
       ssh-agent.enable = true; # Needs DISPLAY, make sure to start after compositor runs systemctl import-environment
+      syncthing.tray.enable = config.services.syncthing.enable;
 
       swayidle = {
         enable = true;
