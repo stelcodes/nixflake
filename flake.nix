@@ -193,7 +193,7 @@
         deployPkgs = import inputs.nixpkgs {
           inherit system;
           overlays = [
-            inputs.deploy-rs.overlay
+            inputs.deploy-rs.overlays.default
             (self: super: {
               deploy-rs = {
                 inherit (pkgs) deploy-rs;
@@ -205,13 +205,13 @@
       in
       {
         sora = {
-          hostname = "5.78.141.196";
+          hostname = "178.156.164.233";
           # hostname = "sora";
           profiles.system = {
+            sshUser = "root";
             user = "root";
             path = deployPkgs.deploy-rs.lib.activate.nixos inputs.self.nixosConfigurations.sora;
-            # interactiveSudo = true;
-            remoteBuild = false; # default is false
+            remoteBuild = false; # build on the target system
           };
         };
       };
