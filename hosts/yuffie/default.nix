@@ -63,7 +63,7 @@
       openFirewall = false;
     };
     tailscale = {
-      enable = true;
+      enable = false;
       useRoutingFeatures = "client";
       extraUpFlags = "--operator=${config.admin.username}"; # For trayscale
     };
@@ -94,6 +94,19 @@
           TIMELINE_LIMIT_MONTHLY = "6"; # # How many monthly snapshots are kept upon cleanup
           TIMELINE_LIMIT_QUARTERLY = "0"; # How many quarterly snapshots are kept upon cleanup
           TIMELINE_LIMIT_YEARLY = "0"; # How many yearly snapshots are kept upon cleanup
+        };
+      };
+    };
+    authelia.instances = {
+      main = {
+        enable = false;
+        secrets.storageEncryptionKeyFile = "/etc/authelia/storageEncryptionKeyFile";
+        secrets.jwtSecretFile = "/etc/authelia/jwtSecretFile";
+        settings = {
+          theme = "light";
+          default_2fa_method = "totp";
+          log.level = "debug";
+          server.disable_healthcheck = true;
         };
       };
     };
