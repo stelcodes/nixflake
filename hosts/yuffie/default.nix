@@ -43,11 +43,13 @@
   programs = {
     sniffnet.enable = true;
     nix-ld.enable = true;
+
   };
 
   fonts.packages = [ pkgs.google-fonts ];
 
   services = {
+    fwupd.enable = true;
     # https://bitsheriff.dev/posts/2025-01-05_how-to-use-the-fingerprint-reader-on-arch/
     # https://wiki.archlinux.org/title/Fprint
     # Use fprintd-enroll to register right index finger

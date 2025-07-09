@@ -14,7 +14,6 @@ in
   imports = [
     inputs.home-manager.nixosModules.home-manager
     inputs.agenix.nixosModules.default
-    inputs.nixos-generators.nixosModules.all-formats
     inputs.disko.nixosModules.disko
     ./nixpkgs.nix
     ./options.nix
@@ -99,7 +98,7 @@ in
     };
 
     # Set your time zone.
-    time.timeZone = lib.mkDefault "America/Los_Angeles";
+    time.timeZone = lib.mkDefault "America/Chicago";
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_US.UTF-8";
@@ -232,8 +231,6 @@ in
     };
 
     services = {
-
-      fwupd.enable = !config.profile.virtual;
 
       # Nice to have, required for gnome-disks to work
       udisks2.enable = true;
