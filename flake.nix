@@ -205,8 +205,8 @@
       in
       {
         sora = {
-          hostname = "178.156.164.233";
-          # hostname = "sora";
+          # hostname = "178.156.164.233";
+          hostname = "sora.stelclementine.com";
           profiles.system = {
             sshUser = "root";
             user = "root";
