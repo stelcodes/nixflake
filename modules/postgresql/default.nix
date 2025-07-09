@@ -13,7 +13,7 @@ in
       basicSetup = {
         enable = lib.mkEnableOption "Setup basic local auth and admin user privileges";
         extraInitialScript = lib.mkOption {
-          type = lib.types.listOf lib.types.string;
+          type = lib.types.listOf lib.types.str;
           default = [ ];
         };
       };
