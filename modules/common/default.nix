@@ -12,21 +12,8 @@ in
 
 {
   imports = [
-    inputs.home-manager.nixosModules.home-manager
-    inputs.agenix.nixosModules.default
-    inputs.disko.nixosModules.disko
-    inputs.nixos-generators.nixosModules.all-formats
-
     ./nixpkgs.nix
     ./options.nix
-    ../graphical
-    ../battery
-    ../audio
-    ../bluetooth
-    ../virtualisation
-    ../pam-parallel
-    ../postgresql
-    ../physical
   ];
 
   config = {
@@ -226,25 +213,6 @@ in
         };
       };
 
-    };
-
-    home-manager = {
-      useGlobalPkgs = true;
-      useUserPackages = true;
-      extraSpecialArgs = {
-        inherit inputs;
-        systemConfig = config;
-      };
-      backupFileExtension = "backup";
-      users.${config.admin.username} = {
-        imports = [
-          ./home.nix
-          ../../hosts/${config.networking.hostName}/home.nix
-        ];
-        config = {
-          inherit (config) activities profile theme;
-        };
-      };
     };
 
     virtualisation.vmVariant = {

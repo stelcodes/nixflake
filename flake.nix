@@ -106,7 +106,7 @@
         pkgs = import inputs.nixpkgs { system = "aarch64-darwin"; };
         modules = [
           ./hosts/marlene/home.nix
-          ./modules/common/home.nix
+          ./modules/home.nix
           # Only need to import this as a hm module in standalone hm configs
           ./modules/common/nixpkgs.nix
         ];
@@ -125,7 +125,7 @@
             specialArgs = { inherit inputs; };
             modules = [
               { networking.hostName = hostName; }
-              ./modules/common
+              ./modules
               ./hosts/${hostName}
             ];
           };
