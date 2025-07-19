@@ -73,6 +73,7 @@
       pkgs.nixos-anywhere
       pkgs.wg-killswitch
       pkgs.wireguard-tools
+      pkgs.usbimager
     ];
   };
   wayland = {
