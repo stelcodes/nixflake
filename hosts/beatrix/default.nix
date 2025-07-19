@@ -18,7 +18,6 @@
     battery = false;
     bluetooth = true;
     graphical = true;
-    virtual = false;
     virtualHost = false;
   };
 

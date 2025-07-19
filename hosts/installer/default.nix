@@ -6,7 +6,6 @@
       battery = false;
       audio = false;
       bluetooth = false;
-      virtual = false;
       virtualHost = false;
     };
     nixpkgs.config.allowUnfree = true; # For broadcom_sta

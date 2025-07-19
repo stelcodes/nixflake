@@ -26,6 +26,7 @@ in
     ../virtualisation
     ../pam-parallel
     ../postgresql
+    ../physical
   ];
 
   config = {
@@ -33,34 +34,7 @@ in
     boot = {
       # NixOS uses latest LTS kernel by default: https://www.kernel.org/category/releases.html
       # kernelPackages = pkgs.linuxPackages_6_6;
-      tmp.cleanOnBoot = lib.mkDefault (!config.profile.virtual); # Only for physical machines
-      tmp.useTmpfs = config.profile.virtual; # Technically better option but has weird implications on hibernation bc tmpfs occupies mem/swap
-      loader = {
-        # Set defaults to allow overrides for installation media creation
-        grub.enable = lib.mkDefault config.profile.virtual;
-        systemd-boot.enable = lib.mkDefault (!config.profile.virtual);
-        efi.canTouchEfiVariables = !config.profile.virtual;
-      };
-      initrd.systemd = {
-        # For booting from hibernation with encrypted swap
-        enable = lib.mkDefault (!config.profile.virtual);
-        # Root login shell if things go awry or if "emergency" is included in boot args
-        emergencyAccess = true;
-        services.cryptsetup-timeout = {
-          # man systemd-cryptsetup@.service
-          # https://github.com/NixOS/nixpkgs/blob/nixos-25.05/nixos/modules/system/boot/systemd/initrd.nix
-          # https://blog.decent.id/post/nixos-systemd-initrd/
-          # https://discourse.nixos.org/t/migrating-to-boot-initrd-systemd-and-debugging-stage-1-systemd-services/54444/7
-          # As root: nix shell nixpkgs#dracut, lsinitrd /boot/EFI/nixos/...
-          wantedBy = [ "sysinit.target" ];
-          bindsTo = [ "systemd-cryptsetup@crypted.service" ];
-          unitConfig.DefaultDependencies = "no";
-          serviceConfig = {
-            Type = "oneshot";
-            ExecStart = "/bin/sh -c 'sleep 180 && systemctl poweroff'";
-          };
-        };
-      };
+      tmp.useTmpfs = lib.mkDefault true;
     };
 
     networking = {
@@ -79,29 +53,16 @@ in
       # Without NetworkManager, machine will still obtain IP address via DHCP
       # Issues:
       # https://github.com/tailscale/tailscale/issues/12936
-      networkmanager = {
-        enable = !config.profile.virtual; # Only for physical machines
-        dns = "systemd-resolved";
-      };
     };
 
-    systemd = {
-      # DefaultLimitNOFILE= defaults to 1024:524288
-      # Set limits for systemd units (not systemd itself).
-      extraConfig = ''
-        [Manager]
-        DefaultTimeoutStopSec=10
-        DefaultTimeoutAbortSec=10
-        DefaultLimitNOFILE=8192:524288
-      '';
-      sleep.extraConfig = ''
-        MemorySleepMode=deep s2idle
-        HibernateDelaySec=1h
-      '';
-    };
-
-    # Set your time zone.
-    time.timeZone = lib.mkDefault "America/Chicago";
+    # DefaultLimitNOFILE= defaults to 1024:524288
+    # Set limits for systemd units (not systemd itself).
+    systemd.extraConfig = ''
+      [Manager]
+      DefaultTimeoutStopSec=10
+      DefaultTimeoutAbortSec=10
+      DefaultLimitNOFILE=8192:524288
+    '';
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_US.UTF-8";
@@ -266,8 +227,6 @@ in
       };
 
     };
-
-    hardware.enableRedistributableFirmware = !config.profile.virtual;
 
     home-manager = {
       useGlobalPkgs = true;

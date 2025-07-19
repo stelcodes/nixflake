@@ -6,7 +6,7 @@
   ];
 
   profile = {
-    virtual = false;
+    physical = true;
     virtualHost = false;
     bluetooth = true;
     audio = true;

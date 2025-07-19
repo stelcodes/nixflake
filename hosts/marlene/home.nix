@@ -3,7 +3,6 @@
   profile = {
     graphical = true;
     battery = true;
-    virtual = false;
     virtualHost = false;
     audio = true;
     bluetooth = true;

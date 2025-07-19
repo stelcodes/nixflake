@@ -16,7 +16,7 @@
       battery = true;
       audio = true;
       bluetooth = true;
-      virtual = false;
+      physical = false;
       virtualHost = false;
     };
 

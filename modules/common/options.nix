@@ -13,7 +13,7 @@
       battery = lib.mkOption {
         type = lib.types.bool;
       };
-      virtual = lib.mkOption {
+      physical = lib.mkOption {
         type = lib.types.bool;
       };
       virtualHost = lib.mkOption {

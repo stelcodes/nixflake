@@ -22,7 +22,6 @@
     graphical = true;
     battery = false;
     virtualHost = true;
-    virtual = false;
   };
 
   activities = {
