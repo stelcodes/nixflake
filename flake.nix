@@ -158,6 +158,10 @@
           hostName = "sora";
           system = "x86_64-linux";
         };
+        luxu = nixosMachine {
+          hostName = "luxu";
+          system = "x86_64-linux";
+        };
         # basic virtual machine for experimenting
         # sandbox = nixosMachine {
         #   hostName = "sandbox";

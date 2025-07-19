@@ -15,6 +15,8 @@ in
     inputs.home-manager.nixosModules.home-manager
     inputs.agenix.nixosModules.default
     inputs.disko.nixosModules.disko
+    inputs.nixos-generators.nixosModules.all-formats
+
     ./nixpkgs.nix
     ./options.nix
     ../graphical
@@ -31,16 +33,17 @@ in
     boot = {
       # NixOS uses latest LTS kernel by default: https://www.kernel.org/category/releases.html
       # kernelPackages = pkgs.linuxPackages_6_6;
-      tmp.cleanOnBoot = !config.profile.virtual; # Only for physical machines
+      tmp.cleanOnBoot = lib.mkDefault (!config.profile.virtual); # Only for physical machines
       tmp.useTmpfs = config.profile.virtual; # Technically better option but has weird implications on hibernation bc tmpfs occupies mem/swap
       loader = {
-        grub.enable = config.profile.virtual;
-        systemd-boot.enable = !config.profile.virtual;
+        # Set defaults to allow overrides for installation media creation
+        grub.enable = lib.mkDefault config.profile.virtual;
+        systemd-boot.enable = lib.mkDefault (!config.profile.virtual);
         efi.canTouchEfiVariables = !config.profile.virtual;
       };
       initrd.systemd = {
         # For booting from hibernation with encrypted swap
-        enable = !config.profile.virtual;
+        enable = lib.mkDefault (!config.profile.virtual);
         # Root login shell if things go awry or if "emergency" is included in boot args
         emergencyAccess = true;
         services.cryptsetup-timeout = {
