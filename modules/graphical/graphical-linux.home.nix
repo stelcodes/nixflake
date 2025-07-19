@@ -1087,11 +1087,11 @@ in
         ];
       in
       {
-        sway = {
-          monitorOn = "${pkgs.sway}/bin/swaymsg 'output ${waycfg.mainMonitor} power on'";
-          monitorOff = "${pkgs.sway}/bin/swaymsg 'output ${waycfg.mainMonitor} power off'";
-          services = sharedServices;
-        };
+        # sway = {
+        #   monitorOn = "${pkgs.sway}/bin/swaymsg 'output ${waycfg.mainMonitor} power on'";
+        #   monitorOff = "${pkgs.sway}/bin/swaymsg 'output ${waycfg.mainMonitor} power off'";
+        #   services = sharedServices;
+        # };
         niri = {
           monitorOn = "${pkgs.niri}/bin/niri msg output ${waycfg.mainMonitor} on";
           monitorOff = "${pkgs.niri}/bin/niri msg output ${waycfg.mainMonitor} off";

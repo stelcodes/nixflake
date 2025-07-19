@@ -9,7 +9,7 @@
     ./neovim/home.nix
     ./tmux/home.nix
     ./graphical/home.nix
-    ./sway/home.nix
+    # ./sway/home.nix
     ./audio/home.nix
   ];
 }
