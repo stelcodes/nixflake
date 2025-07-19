@@ -19,6 +19,10 @@ input {
             options "caps:escape_shifted_capslock,altwin:swap_alt_win"
         }
     }
+    mouse {
+      accel-profile "flat"
+      natural-scroll
+    }
     touchpad {
         tap
         natural-scroll
