@@ -1,5 +1,4 @@
 {
-  lib,
   config,
   ...
 }:
@@ -13,7 +12,7 @@
 
     profile = {
       graphical = true;
-      battery = true;
+      battery = false;
       audio = true;
       bluetooth = true;
       physical = false;
@@ -23,15 +22,6 @@
     boot = {
       kernelModules = [ "wl" ];
       extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];
-      loader.systemd-boot.enable = lib.mkForce false;
-      initrd.systemd.enable = lib.mkForce false;
-      tmp.cleanOnBoot = lib.mkForce false;
-    };
-
-    services.openssh.settings = {
-      # Allow logging into root via password for installation
-      PasswordAuthentication = lib.mkForce true;
-      PermitRootLogin = lib.mkForce "yes";
     };
 
     system.stateVersion = "25.05";
