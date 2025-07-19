@@ -70,6 +70,15 @@
         {
           imports = [ inputs.nixos-generators.nixosModules.all-formats ];
           formatConfigs = {
+            install-iso-minimal =
+              { modulesPath, ... }:
+              {
+                formatAttr = "isoImage";
+                fileExtension = ".iso";
+                imports = [
+                  "${toString modulesPath}/installer/cd-dvd/installation-cd-minimal.nix"
+                ];
+              };
             install-iso-plasma =
               { modulesPath, ... }:
               {
@@ -170,19 +179,18 @@
         installer = inputs.nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
-            inputs.self.nixosModules.generators-custom-formats
             (
               { pkgs, config, ... }:
               {
                 nixpkgs.config.allowUnfree = true;
-                environment.systemPackages = [
-                  pkgs.git
-                  pkgs.neovim
-                ];
                 boot = {
                   kernelModules = [ "wl" ];
                   extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];
                 };
+                environment.systemPackages = [
+                  pkgs.neovim
+                ];
+                services.openssh.enable = true;
               }
             )
           ];
