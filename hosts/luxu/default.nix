@@ -1,5 +1,6 @@
 {
   config,
+  modulesPath,
   ...
 }:
 {
@@ -7,6 +8,11 @@
   # nix build \.#nixosConfigurations.luxu.config.formats.iso
   # nix shell nixpkgs#qemu
   # qemu-system-x86_64 -enable-kvm -m 8192 -cdrom ./result/iso/*.iso
+
+  import = [
+    # For QEMU testing
+    (modulesPath + "/profiles/qemu-guest.nix")
+  ];
 
   config = {
 
