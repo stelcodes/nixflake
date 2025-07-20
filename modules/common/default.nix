@@ -232,17 +232,13 @@ in
       };
     };
 
-    # I could do this to only create generations tied to specific commits but
-    # then I couldn't rebuild from a dirty git repo.
-    # system.nixos.label =
-    #   let
-    #     # Tag each generation with Git hash
-    #     system.configurationRevision =
-    #       if (inputs.self ? rev)
-    #       then inputs.self.shortRev
-    #       else throw "Refusing to build from a dirty Git tree!";
-    #   in
-    #   "GitRev.${config.system.configurationRevision}.Rel.${config.system.nixos.release}";
+    # nixos-rebuild list-generations
+    system.nixos.label =
+      let
+        selfRev = if (inputs.self ? rev) then inputs.self.shortRev else inputs.self.dirtyShortRev;
+      in
+      # 25.11-1fd8bad-d99a35e-dirty
+      "${config.system.nixos.release}-${inputs.nixpkgs.shortRev}-${selfRev}";
 
   };
 }
