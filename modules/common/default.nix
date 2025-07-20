@@ -216,19 +216,9 @@ in
     };
 
     virtualisation.vmVariant = {
-      profile.virtualHost = lib.mkForce false;
       virtualisation = {
         memorySize = 4096;
         cores = 4;
-      };
-      boot.initrd.secrets = lib.mkForce { };
-      services.syncthing.enable = lib.mkForce false;
-      boot.initrd.luks.devices = lib.mkForce { };
-      networking.wg-quick.interfaces = lib.mkForce { };
-      users.users = {
-        root.hashedPassword = lib.mkForce "$y$j9T$GAOQggBNWKTXXoCXQCGiw0$wVVmGFS2rI.9QDGe51MQHYcEr02FqHVJ1alHig9Y475";
-        ${config.admin.username}.hashedPassword =
-          lib.mkForce "$y$j9T$GAOQggBNWKTXXoCXQCGiw0$wVVmGFS2rI.9QDGe51MQHYcEr02FqHVJ1alHig9Y475";
       };
     };
 
