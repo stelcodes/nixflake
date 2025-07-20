@@ -127,6 +127,34 @@
               { networking.hostName = hostName; }
               ./modules
               ./hosts/${hostName}
+              # Home Manager setup
+              (
+                { config, ... }:
+                {
+                  home-manager = {
+                    useGlobalPkgs = true;
+                    useUserPackages = true;
+                    extraSpecialArgs = {
+                      inherit inputs;
+                    };
+                    backupFileExtension = "backup";
+                    users.${config.admin.username} = {
+                      imports = [
+                        ./modules/home.nix
+                        ./hosts/${hostName}/home.nix
+                      ];
+                      config = {
+                        inherit (config)
+                          activities
+                          profile
+                          theme
+                          admin
+                          ;
+                      };
+                    };
+                  };
+                }
+              )
             ];
           };
       in

@@ -1,10 +1,4 @@
-{
-  pkgs,
-  lib,
-  config,
-  inputs,
-  ...
-}:
+{ inputs, ... }:
 
 {
   imports = [
@@ -23,24 +17,5 @@
     ./postgresql
     ./physical
   ];
-
-  config.home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    extraSpecialArgs = {
-      inherit inputs;
-      systemConfig = config;
-    };
-    backupFileExtension = "backup";
-    users.${config.admin.username} = {
-      imports = [
-        ./home.nix
-        ../hosts/${config.networking.hostName}/home.nix
-      ];
-      config = {
-        inherit (config) activities profile theme admin;
-      };
-    };
-  };
 
 }
