@@ -28,14 +28,8 @@ in
       # For resolved DoT resolving
       # https://github.com/curl/curl/wiki/DNS-over-HTTPS
       nameservers = [
-        "76.76.2.11#p0.freedns.controld.com"
-        "2606:1a40::11#p0.freedns.controld.com"
         "9.9.9.9#dns.quad9.net"
         "2620:fe::9#dns.quad9.net"
-        # "116.202.176.26#dot.libredns.gr"
-        # "81.169.136.222#ns3.opennameserver.org"
-        # "185.181.61.24#ns4.opennameserver.org"
-        # dnscry.pt and mullvlad are other options
       ];
       # Without NetworkManager, machine will still obtain IP address via DHCP
       # Issues:
