@@ -28,6 +28,7 @@ in
         ''
       );
       file = {
+        # https://privacytests.org/
         # https://librewolf.net/docs/settings/
         # pref activates upon every librewolf startup but can be changed while running
         ".librewolf/librewolf.overrides.cfg".text = # js

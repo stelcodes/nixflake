@@ -151,7 +151,7 @@ binds {
     Super+Shift+D { spawn "wofi-toggle" "--show" "run"; }
     Super+E { spawn "rofimoji"; }
     Super+Delete { spawn "systemctl" "--user" "start" "gtklock"; }
-    Super+Backspace { spawn "chromium" "--incognito" "--new-window"; }
+    Super+Backspace { spawn "mullvad-browser" "--new-window"; }
     Super+Shift+Backspace { spawn "chromium" "--new-window"; }
     Super+Minus { spawn "niri-adjust-scale" "-0.1"; }
     Super+Equal { spawn "niri-adjust-scale" "+0.1"; }
