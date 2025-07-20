@@ -46,7 +46,7 @@
     };
     admin.username = lib.mkOption {
       type = lib.types.str;
-      default = "stel";
+      default = "admin";
     };
     admin.email = lib.mkOption {
       type = lib.types.str;

@@ -38,7 +38,7 @@
         ../hosts/${config.networking.hostName}/home.nix
       ];
       config = {
-        inherit (config) activities profile theme;
+        inherit (config) activities profile theme admin;
       };
     };
   };

@@ -544,7 +544,7 @@
               swayinputs = "swaymsg -t get_inputs | nvim -R";
               swayoutputs = "swaymsg -t get_outputs | nvim -R";
               play = "audacious --enqueue-to-temp";
-              icon-search = "yazi /etc/profiles/per-user/stel/share/icons/Everforest-Dark/categories/64";
+              icon-search = "yazi /etc/profiles/per-user/${config.admin.username}/share/icons/Everforest-Dark/categories/64";
             };
         in
         {

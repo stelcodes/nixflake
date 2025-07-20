@@ -29,6 +29,8 @@
     jamming = false;
   };
 
+  admin.username = "stel";
+
   # Needed to create Rasp Pi SD images
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 

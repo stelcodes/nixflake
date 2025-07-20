@@ -357,7 +357,7 @@ in
       } // (if config.theme.set ? gtkConfigFiles then config.theme.set.gtkConfigFiles else { }); # catppuccin
       portal = {
         # https://mozilla.github.io/webrtc-landing/gum_test.html
-        # Config files: /etc/profiles/per-user/stel/share/xdg-desktop-portal
+        # Config files: /etc/profiles/per-user/admin/share/xdg-desktop-portal
         enable = true;
         xdgOpenUsePortal = true;
         extraPortals = [
