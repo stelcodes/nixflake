@@ -78,10 +78,10 @@ lib.checkListOfEnum "${pname}: colorVariants" colorVariantList colorVariants lib
     version = "0-unstable-2025-04-24";
 
     src = fetchFromGitHub {
-      owner = "Fausto-Korpsvart";
+      owner = "stelcodes";
       repo = "Everforest-GTK-Theme";
-      rev = "934ca11a4d38d6ef1f3854bb6950fa559e15e65c";
-      hash = "sha256-U5Qsr5RH+MfKuPgexAiyQiQfLfLS4cpSJqc/+jX/53s=";
+      rev = "885e2baf300b712ef4be08bdbf56a2b6b5f55a3f";
+      hash = "sha256-lNF9VCnOyJlGKQmbScRQ1ZN8JkfrrATeO+j4Iwna2sE=";
     };
 
     propagatedUserEnvPkgs = [ gtk-engine-murrine ];
