@@ -40,7 +40,7 @@
       networkmanager.enable = true;
     };
 
-    resolved = {
+    services.resolved = {
       enable = true; # Enables networkmanager.dns automatically
       dnsovertls = "opportunistic";
     };
