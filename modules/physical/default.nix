@@ -46,14 +46,34 @@
 
     time.timeZone = lib.mkDefault "America/Chicago";
 
-    networking.networkmanager = {
-      enable = true;
-      dns = "systemd-resolved";
+    networking = {
+      # https://github.com/curl/curl/wiki/DNS-over-HTTPS
+      # https://dnscheck.tools/
+      # Quad9 shows up as WoodyNet
+      # https://wiki.archlinux.org/title/Systemd-resolved#DNS_over_TLS
+      # Test with `ngrep port 53` and `ngrep port 883`
+      nameservers = lib.mkDefault [
+        # Quad9
+        "9.9.9.9"
+        "2620:fe::9"
+      ];
+      networkmanager.enable = true;
     };
 
     hardware.enableRedistributableFirmware = true;
 
-    services.fwupd.enable = true;
+    services = {
+      fwupd.enable = true;
+      logind = {
+        lidSwitch = "ignore";
+        powerKey = "sleep";
+        powerKeyLongPress = "poweroff";
+      };
+      resolved = {
+        enable = true; # Enables networkmanager.dns automatically
+        dnsovertls = "opportunistic";
+      };
+    };
 
   };
 

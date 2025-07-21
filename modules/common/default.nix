@@ -24,17 +24,7 @@ in
       tmp.useTmpfs = lib.mkDefault true;
     };
 
-    networking = {
-      # For resolved DoT resolving
-      # https://github.com/curl/curl/wiki/DNS-over-HTTPS
-      nameservers = [
-        "9.9.9.9#dns.quad9.net"
-        "2620:fe::9#dns.quad9.net"
-      ];
-      # Without NetworkManager, machine will still obtain IP address via DHCP
-      # Issues:
-      # https://github.com/tailscale/tailscale/issues/12936
-    };
+    # Without NetworkManager, machine will still obtain IP address via DHCP
 
     # DefaultLimitNOFILE= defaults to 1024:524288
     # Set limits for systemd units (not systemd itself).
@@ -171,6 +161,7 @@ in
         pkgs.git
         pkgs.eza
         pkgs.curl
+        pkgs.dig.dnsutils
       ];
       pathsToLink = [ "/share/zsh" ];
     };
@@ -179,21 +170,6 @@ in
 
       # Nice to have, required for gnome-disks to work
       udisks2.enable = true;
-
-      logind = {
-        lidSwitch = "ignore";
-        powerKey = "sleep";
-        powerKeyLongPress = "poweroff";
-      };
-
-      # https://dnscheck.tools/
-      # Quad9 shows up as WoodyNet
-      # https://wiki.archlinux.org/title/Systemd-resolved#DNS_over_TLS
-      # Test with `ngrep port 53` and `ngrep port 883`
-      resolved = {
-        enable = true;
-        dnsovertls = "true";
-      };
 
       openssh = {
         enable = true;
