@@ -44,13 +44,19 @@
         default = false;
       };
     };
-    admin.username = lib.mkOption {
-      type = lib.types.str;
-      default = "admin";
-    };
-    admin.email = lib.mkOption {
-      type = lib.types.str;
-      default = "sysadmin@stelclementine.com";
+    admin = {
+      username = lib.mkOption {
+        type = lib.types.str;
+        default = "admin";
+      };
+      hashedPassword = lib.mkOption {
+        type = lib.types.str;
+        default = "$y$jBT$3MSGh9jYkXFUBYaw33l2y0$anHuJV52z5nFur1hfvfGcTgOObxze97UVlF4M4UWJb/";
+      };
+      email = lib.mkOption {
+        type = lib.types.str;
+        default = "sysadmin@stelclementine.com";
+      };
     };
     theme.name = lib.mkOption {
       type = lib.types.str;

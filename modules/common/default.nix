@@ -107,7 +107,7 @@ in
       users =
         let
           adminAccess = {
-            hashedPassword = lib.mkDefault "$y$jBT$3MSGh9jYkXFUBYaw33l2y0$anHuJV52z5nFur1hfvfGcTgOObxze97UVlF4M4UWJb/";
+            hashedPassword = lib.mkDefault config.admin.hashedPassword;
             openssh.authorizedKeys.keys = sshPublicKeys.allAdminKeys;
             shell = pkgs.zsh;
           };

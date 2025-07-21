@@ -21,6 +21,8 @@
       virtualHost = false;
     };
 
+    admin.hashedPassword = "$y$jBT$V2cnjI9JtnryszC40nsSu1$X.f5ngktZoprbV.SLZnIyWb4BUZUhrj7CWHN7PANWgC";
+
     boot = {
       kernelModules = [
         "wl"
