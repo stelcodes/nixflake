@@ -144,7 +144,7 @@
   ];
 
   security.pam.pam-parallel = {
-    enable = true;
+    enable = false;
     applyToModules = [
       "gtklock"
       "ly"
