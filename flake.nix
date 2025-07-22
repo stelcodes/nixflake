@@ -170,10 +170,10 @@
         #   system = "x86_64-linux";
         # };
         # 2013 macbook air
-        # aerith = nixosMachine {
-        #   hostName = "aerith";
-        #   system = "x86_64-linux";
-        # };
+        aerith = nixosMachine {
+          hostName = "aerith";
+          system = "x86_64-linux";
+        };
         # mac mini 2011 beatrix
         # beatrix = nixosMachine {
         #   hostName = "beatrix";

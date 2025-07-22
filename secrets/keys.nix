@@ -8,7 +8,7 @@ rec {
   };
   systemKeys = {
     yuffie = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBDf8xRlLjwAln+oiJJ0xAiKjIsRauL/kqn044L5atIw";
-    aerith = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHq8GNrmE18CJia7L0vZdTFEBEk2+XSzGp44wQYvH/TG";
+    aerith = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII0gcrRzwgxftyr8HS1slRhsB5TadtFkWm8FVc20xpKw";
     sora = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILehD91ViQ62nG/Fsucel1Evy9wzjhW8IJ+AkR6PQqs3";
   };
   allAdminKeys = builtins.attrValues adminKeys;
