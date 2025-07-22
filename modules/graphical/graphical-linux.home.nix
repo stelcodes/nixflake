@@ -214,6 +214,7 @@ in
           pkgs.libnotify # for notify-send
           pkgs.chafa # images in terminal, telescope-media-files dep
           pkgs.seahorse # pulled in anyway by SSH_ASKPASS confirmation prompt
+          pkgs.ungoogled-chromium
           # pkgs.kooha # Doesn't work with niri atm
           # pkgs.wl-screenrec # https://github.com/russelltg/wl-screenrec
           # pkgs.wlogout

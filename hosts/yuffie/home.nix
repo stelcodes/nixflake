@@ -13,7 +13,6 @@
     stateVersion = "24.11";
     packages = [
       pkgs.signal-desktop
-      pkgs.ungoogled-chromium
       pkgs.gimp3-with-plugins
       pkgs.wineWowPackages.waylandFull
       (pkgs.createBrowserApp {
