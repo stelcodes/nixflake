@@ -79,12 +79,13 @@
         powerKeyLongPress = "poweroff";
       };
       resolved = {
+        # resolvectl status|query|monitor
         # https://mullvad.net/en/help/dns-over-https-and-dns-over-tls
         # Automatically falls back to Cloudflare, Quad9, then Google
-        enable = true; # Enables networkmanager.dns automatically
+        enable = true;
         domains = [ "~." ];
         dnsovertls = "true";
-        dnssec = "allow-downgrade";
+        dnssec = "false"; # Strangely breaks YouTube?
       };
     };
 
