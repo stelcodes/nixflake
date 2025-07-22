@@ -16,7 +16,7 @@ input {
     keyboard {
         xkb {
             layout "us"
-            options "caps:escape_shifted_capslock,altwin:swap_alt_win"
+            options "caps:escape_shifted_capslock"
         }
     }
     mouse {
