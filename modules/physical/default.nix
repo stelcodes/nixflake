@@ -56,16 +56,17 @@
       dhcpcd.enable = false;
       nameservers = lib.mkDefault [
         # Mullvad Base DoH/DoT
-        "194.242.2.4"
-        "2a07:e340::4"
-        # Quad9 DNS/DoH/DoT
-        "9.9.9.9"
-        "2620:fe::9"
-        # Cloudflare DNS/DoH/DoT
-        "1.1.1.1"
-        "2606:4700:4700::1111"
+        "194.242.2.4#base.dns.mullvad.net"
       ];
-      networkmanager.enable = true;
+      networkmanager = {
+        enable = true;
+        settings.main = {
+          # Do NOT tell resolved to use router gateway DNS instead of global nameservers
+          dns = "none";
+          systemd-resolved = "false";
+          rc-manager = "unmanaged";
+        };
+      };
     };
 
     hardware.enableRedistributableFirmware = true;
@@ -78,8 +79,11 @@
         powerKeyLongPress = "poweroff";
       };
       resolved = {
+        # https://mullvad.net/en/help/dns-over-https-and-dns-over-tls
+        # Automatically falls back to Cloudflare, Quad9, then Google
         enable = true; # Enables networkmanager.dns automatically
-        dnsovertls = "opportunistic";
+        domains = [ "~." ];
+        dnsovertls = "true";
         dnssec = "allow-downgrade";
       };
     };
