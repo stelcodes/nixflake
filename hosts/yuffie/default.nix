@@ -34,11 +34,16 @@
   # Needed to create Rasp Pi SD images
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
-  # 22000 for Syncthing: https://docs.syncthing.net/users/firewall.html
+  # Syncthing: https://docs.syncthing.net/users/firewall.html
   networking = {
     firewall = {
-      allowedTCPPorts = [ ];
-      allowedUDPPorts = [ ];
+      allowedTCPPorts = [
+        22000
+      ];
+      allowedUDPPorts = [
+        22000
+        21027
+      ];
     };
   };
 
@@ -51,7 +56,6 @@
   fonts.packages = [ pkgs.google-fonts ];
 
   services = {
-    fwupd.enable = true;
     # https://bitsheriff.dev/posts/2025-01-05_how-to-use-the-fingerprint-reader-on-arch/
     # https://wiki.archlinux.org/title/Fprint
     # Use fprintd-enroll to register right index finger
@@ -98,19 +102,6 @@
           TIMELINE_LIMIT_MONTHLY = "6"; # # How many monthly snapshots are kept upon cleanup
           TIMELINE_LIMIT_QUARTERLY = "0"; # How many quarterly snapshots are kept upon cleanup
           TIMELINE_LIMIT_YEARLY = "0"; # How many yearly snapshots are kept upon cleanup
-        };
-      };
-    };
-    authelia.instances = {
-      main = {
-        enable = false;
-        secrets.storageEncryptionKeyFile = "/etc/authelia/storageEncryptionKeyFile";
-        secrets.jwtSecretFile = "/etc/authelia/jwtSecretFile";
-        settings = {
-          theme = "light";
-          default_2fa_method = "totp";
-          log.level = "debug";
-          server.disable_healthcheck = true;
         };
       };
     };

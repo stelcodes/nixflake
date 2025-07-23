@@ -107,17 +107,9 @@
   };
   services = {
     syncthing = {
-      enable = false;
-      settings = {
-        options = {
-          localAnnounceEnabled = false;
-        };
-        gui = {
-          tls = true;
-          user = config.admin.username;
-          password = "$2b$05$d8XcRmg/wsYS4hFhFhcyjePNS8rnHLEhU5ZfDNJiV/8gEc8Ks6NUW";
-        };
-      };
+      # http://localhost:8384
+      enable = true;
+      tray.enable = true;
     };
   };
 }
