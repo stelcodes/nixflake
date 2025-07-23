@@ -11,5 +11,6 @@
       enable = true;
       tray.enable = true;
     };
+    wayland.keyboardOptions = "caps:escape_shifted_capslock";
   };
 }

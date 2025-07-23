@@ -16,7 +16,7 @@ input {
     keyboard {
         xkb {
             layout "us"
-            options "caps:escape_shifted_capslock"
+            options "@KEYBOARD_OPTIONS@"
         }
     }
     mouse {

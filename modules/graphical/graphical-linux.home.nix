@@ -139,6 +139,11 @@ in
         type = lib.types.str;
         default = "eDP-1";
       };
+      keyboardOptions = lib.mkOption {
+        # Comma separated
+        type = lib.types.str;
+        default = "caps:escape_shifted_capslock,altwin:swap_alt_win";
+      };
       sleep = {
         lockBefore = lib.mkOption {
           type = lib.types.bool;
@@ -267,7 +272,14 @@ in
           checkPhase = ''
             ${lib.getExe pkgs.niri} validate --config "$out"
           '';
-          text = builtins.readFile ./niri.kdl;
+          text = builtins.readFile (
+            pkgs.replaceVars ./niri.kdl {
+              KEYBOARD_OPTIONS = waycfg.keyboardOptions;
+              # Skip these that appear in wpctl commands
+              DEFAULT_AUDIO_SINK = null;
+              DEFAULT_AUDIO_SOURCE = null;
+            }
+          );
         };
         "rofimoji.rc".text = # ini
           ''
