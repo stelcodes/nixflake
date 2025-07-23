@@ -63,8 +63,14 @@
     };
   };
 
-  networking.firewall.allowedTCPPorts = [ ];
-  networking.firewall.allowedUDPPorts = [ ];
+  # source: https://docs.syncthing.net/users/firewall.html
+  networking.firewall.allowedTCPPorts = [
+    22000
+  ];
+  networking.firewall.allowedUDPPorts = [
+    22000
+    21027
+  ];
 
   hardware.facetimehd = {
     enable = true;

@@ -7,5 +7,9 @@
       ];
       stateVersion = "25.05";
     };
+    services.syncthing = {
+      enable = true;
+      tray.enable = true;
+    };
   };
 }
