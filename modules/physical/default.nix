@@ -52,14 +52,14 @@
       # Quad9 shows up as WoodyNet
       # https://wiki.archlinux.org/title/Systemd-resolved#DNS_over_TLS
       # Test with `ngrep port 53` and `ngrep port 883`
-      useDHCP = false;
-      dhcpcd.enable = false;
       nameservers = lib.mkDefault [
         # Mullvad Base DoH/DoT
         "194.242.2.4#base.dns.mullvad.net"
       ];
+      # wireless.iwd.enable = true;
       networkmanager = {
         enable = true;
+        wifi.backend = "iwd";
         settings.main = {
           # Do NOT tell resolved to use router gateway DNS instead of global nameservers
           dns = "none";
