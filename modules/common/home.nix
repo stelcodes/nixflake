@@ -554,7 +554,7 @@
           autosuggestion.enable = true;
           cdpath = [ ];
           defaultKeymap = "viins";
-          dotDir = ".config/zsh";
+          dotDir = "${config.xdg.configHome}/zsh";
           history = {
             append = false;
             extended = true;

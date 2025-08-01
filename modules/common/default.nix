@@ -28,12 +28,11 @@ in
 
     # DefaultLimitNOFILE= defaults to 1024:524288
     # Set limits for systemd units (not systemd itself).
-    systemd.extraConfig = ''
-      [Manager]
-      DefaultTimeoutStopSec=10
-      DefaultTimeoutAbortSec=10
-      DefaultLimitNOFILE=8192:524288
-    '';
+    systemd.settings.Manager = {
+      DefaultTimeoutStopSec = 10;
+      DefaultTimeoutAbortSec = 10;
+      DefaultLimitNOFILE = "8192:524288";
+    };
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_US.UTF-8";
@@ -162,6 +161,9 @@ in
         pkgs.eza
         pkgs.curl
         pkgs.dig.dnsutils
+        pkgs.usbutils # lsusb -v
+        pkgs.pciutils # lspci -a
+        pkgs.unixtools.ifconfig
       ];
       pathsToLink = [ "/share/zsh" ];
     };
