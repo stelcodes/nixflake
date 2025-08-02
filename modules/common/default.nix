@@ -101,6 +101,7 @@ in
     users = {
       groups = {
         multimedia = { };
+        shares = {};
       };
       mutableUsers = false;
       users =
@@ -126,6 +127,7 @@ in
               "cdrom"
               "multimedia"
               "libvirtd"
+              "shares"
             ];
           };
         };

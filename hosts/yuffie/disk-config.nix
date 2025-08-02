@@ -68,6 +68,13 @@
                         "noatime"
                       ];
                     };
+                    "/shares" = {
+                      mountpoint = "/shares";
+                      mountOptions = [
+                        "compress=zstd"
+                        "noatime"
+                      ];
+                    };
                     "/swap" = {
                       mountpoint = "/.swapvol";
                       swap.swapfile.size = "32G";

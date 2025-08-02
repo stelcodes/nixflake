@@ -132,6 +132,7 @@
   # 1 - sticky: All files inside this directory can only be modified by owner (i.e. /tmp)
   systemd.tmpfiles.rules = [
     "d /srv/multimedia 2770 root multimedia -"
+    "d /shares 2770 root shares -"
   ];
 
   security.pam.pam-parallel = {
