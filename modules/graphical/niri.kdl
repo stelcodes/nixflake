@@ -155,8 +155,8 @@ binds {
     // Use wev to find key names
     Super+Shift+Slash { show-hotkey-overlay; }
     Super+Return { spawn "kitty"; }
-    Super+D { spawn "wofi-toggle"; }
-    Super+Shift+D { spawn "wofi-toggle" "--show" "run"; }
+    Super+Space { spawn "wofi-toggle"; }
+    Super+Shift+Space { spawn "wofi-toggle" "--show" "run"; }
     Super+E { spawn "rofimoji"; }
     Super+Delete { spawn "systemctl" "--user" "start" "gtklock"; }
     Super+Backspace { spawn "mullvad-browser" "--new-window"; }
@@ -227,8 +227,8 @@ binds {
     Super+Shift+F { maximize-column; }
     Super+Ctrl+F { expand-column-to-available-width; }
     Super+C { center-column; }
-    Super+Space { switch-focus-between-floating-and-tiling; }
-    Super+Shift+Space { toggle-window-floating; }
+    Super+D { switch-focus-between-floating-and-tiling; }
+    Super+Shift+D { toggle-window-floating; }
     Print { screenshot; }
     Super+Print { screenshot-window; }
     Ctrl+Print { screenshot-screen; }
