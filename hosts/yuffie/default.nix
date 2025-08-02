@@ -71,7 +71,7 @@
       openFirewall = false;
     };
     tailscale = {
-      enable = false;
+      enable = true;
       useRoutingFeatures = "client";
       extraUpFlags = "--operator=${config.admin.username}"; # For trayscale
     };
