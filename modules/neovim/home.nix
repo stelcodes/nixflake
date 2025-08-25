@@ -1,8 +1,7 @@
-{
-  pkgs,
-  lib,
-  config,
-  ...
+{ pkgs
+, lib
+, config
+, ...
 }:
 let
   theme = config.theme.set;
@@ -548,8 +547,9 @@ in
             ''
               let g:mkdp_auto_close = 0
               let g:mkdp_echo_preview_url = 1
-              let g:mkdp_browser = '${lib.getExe pkgs.open-browser-app}'
               let g:mkdp_theme = 'light'
+            '' + lib.optionalString pkgs.stdenv.isLinux ''
+              let g:mkdp_browser = '${lib.getExe pkgs.open-browser-app}'
             '';
         }
 
