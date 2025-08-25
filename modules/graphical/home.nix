@@ -11,6 +11,9 @@ in
   imports = [ ./graphical-linux.home.nix ];
   config = lib.mkIf config.profile.graphical {
     home = {
+      packages = [
+        pkgs.keepassxc
+      ];
       # Need to create aliases because Launchbar doesn't look through symlinks.
       # Enable Other in Spotlight to see Nix apps
       activation.link-apps = lib.mkIf pkgs.stdenv.isDarwin (
