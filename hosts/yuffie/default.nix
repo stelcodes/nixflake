@@ -2,6 +2,7 @@
   pkgs,
   config,
   inputs,
+  lib,
   ...
 }:
 {
@@ -11,6 +12,8 @@
     inputs.nixos-hardware.nixosModules.framework-12th-gen-intel
     ./hardware-configuration.nix
     ./disk-config.nix
+
+    inputs.copyparty.nixosModules.default
   ];
 
   profile = {
@@ -31,11 +34,37 @@
 
   admin.username = "stel";
 
+  users = {
+    users = {
+      copyparty = {
+        description = "Service user for copyparty";
+        group = "copyparty";
+        extraGroups = [
+          "shares"
+        ];
+        home = "/var/lib/copyparty";
+        isSystemUser = true;
+      };
+      jellyfin.extraGroups = [ "shares" ];
+    };
+    groups = {
+      copyparty = { };
+    };
+  };
+
+  nixpkgs.overlays = [ inputs.copyparty.overlays.default ];
+
   # Needed to create Rasp Pi SD images
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
   # Syncthing: https://docs.syncthing.net/users/firewall.html
   networking = {
+    hosts = {
+      "127.0.0.1" = [
+        "files.stelclementine.com"
+        "media.stelclementine.com"
+      ];
+    };
     firewall = {
       allowedTCPPorts = [
         22000
@@ -66,14 +95,13 @@
       basicSetup.enable = true;
     };
     jellyfin = {
-      enable = false;
-      group = "multimedia";
-      openFirewall = false;
+      enable = true;
+      openFirewall = true;
     };
     tailscale = {
       enable = true;
       useRoutingFeatures = "client";
-      extraUpFlags = "--operator=${config.admin.username}"; # For trayscale
+      extraUpFlags = [ "--operator=${config.admin.username}" ]; # For trayscale
     };
     snapper = {
       # Must create btrfs snapshots subvolume manually
@@ -96,16 +124,84 @@
           NUMBER_LIMIT_IMPORTANT = "20"; # How many numbered snapshots marked with "important" are kept upon cleanup
           TIMELINE_CREATE = true; # Should hourly snapshots be taken
           TIMELINE_CLEANUP = true; # Should hourly snapshots be cleaned up
-          TIMELINE_LIMIT_HOURLY = "6"; # How many hourly snapshots are kept upon cleanup
-          TIMELINE_LIMIT_DAILY = "6"; # How many daily snapshots are kept upon cleanup
-          TIMELINE_LIMIT_WEEKLY = "6"; # How many weekly snapshots are kept upon cleanup
-          TIMELINE_LIMIT_MONTHLY = "6"; # # How many monthly snapshots are kept upon cleanup
+          TIMELINE_LIMIT_HOURLY = "7"; # How many hourly snapshots are kept upon cleanup
+          TIMELINE_LIMIT_DAILY = "7"; # How many daily snapshots are kept upon cleanup
+          TIMELINE_LIMIT_WEEKLY = "0"; # How many weekly snapshots are kept upon cleanup
+          TIMELINE_LIMIT_MONTHLY = "0"; # # How many monthly snapshots are kept upon cleanup
           TIMELINE_LIMIT_QUARTERLY = "0"; # How many quarterly snapshots are kept upon cleanup
           TIMELINE_LIMIT_YEARLY = "0"; # How many yearly snapshots are kept upon cleanup
         };
       };
     };
+    copyparty = {
+      enable = true;
+      # directly maps to values in the [global] section of the copyparty config.
+      # see `copyparty --help` for available options
+      # Default port is 3923
+      user = "copyparty";
+      group = "shares";
+      settings = {
+        i = "127.0.0.1";
+      };
+      volumes = {
+        "/" = {
+          path = "/shares";
+          access = {
+            rwmd = "*";
+          };
+        };
+      };
+    };
+    nginx = {
+      enable = true;
+      recommendedGzipSettings = true;
+      recommendedOptimisation = true;
+      recommendedProxySettings = true;
+      recommendedTlsSettings = true;
+      virtualHosts = {
+        "files.stelclementine.com" = {
+          locations."/" = {
+            proxyPass = "http://127.0.0.1:3923";
+          };
+          listenAddresses = [
+            "100.75.57.114"
+            "127.0.0.1"
+          ];
+          extraConfig = ''
+            proxy_redirect off;
+            # disable buffering (next 4 lines)
+            proxy_http_version 1.1;
+            client_max_body_size 0;
+            proxy_buffering off;
+            proxy_request_buffering off;
+            # improve download speed from 600 to 1500 MiB/s
+            proxy_buffers 32 8k;
+            proxy_buffer_size 16k;
+
+            access_log /var/log/nginx/copyparty.access.log;
+          '';
+        };
+        "media.stelclementine.com" = {
+          locations."/" = {
+            proxyPass = "http://127.0.0.1:8096";
+          };
+          listenAddresses = [
+            "100.75.57.114"
+            "127.0.0.1"
+          ];
+        };
+      };
+    };
   };
+
+  systemd.services.copyparty.serviceConfig.UMask = lib.mkForce "0007";
+
+  # security.acme = {
+  #   acceptTerms = true;
+  #   certs = {
+  #     "fileparty.".email = config.admin.email;
+  #   };
+  # };
 
   security.wrappers = {
     # Necessary for burning CDs with k3b

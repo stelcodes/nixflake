@@ -2,6 +2,7 @@
   pkgs,
   inputs,
   config,
+  lib,
   ...
 }:
 {
@@ -80,7 +81,7 @@
     sleep = {
       lockBefore = true;
       auto = {
-        enable = true;
+        enable = false;
         idleMinutes = 15;
       };
     };
@@ -88,7 +89,22 @@
   };
   programs.nushell = {
     enable = true;
+    shellAliases = {
+      ll = "ls -l";
+      la = "ls -a";
+      rm = "rm -i";
+      mv = "mv -pi";
+      r = "rsync -ah"; # use --delete-delay when necessary
+      gs = "git status";
+      gl = "git log";
+      glf = "git log --pretty=format:'%C(yellow)%h%C(reset) %C(blue)%an%C(reset) %C(cyan)%cr%C(reset) %s %C(green)%d%C(reset)' --graph";
+      d = "dua --stay-on-filesystem interactive";
+      ssh-key-create = "ssh-keygen -a 100 -t ed25519 -f ./id_ed25519 -C \"$(whoami)@$(hostname)@$(date +'%Y-%m-%d')\"";
+      date-sortable = "^date +%Y-%m-%dT%H:%M:%S%Z"; # ISO 8601 date format with local timezone
+      date-sortable-utc = "^date -u +%Y-%m-%dT%H:%M:%S%Z"; # ISO 8601 date format with UTC timezone
+    };
     settings = {
+      #  config nu --doc | nu-highlight | less -R
       show_banner = false;
       edit_mode = "vi";
       cursor_shape = {
@@ -99,6 +115,106 @@
         enable = true;
         max_results = 200;
       };
+      buffer_editor = "nvim";
+      history = {
+        file_format = "sqlite";
+        max_size = 100000;
+        sync_on_enter = true; # History is saved immediately
+        isolation = true;
+      };
+      rm.always_trash = true; # trash by default
+      keybindings = [
+        {
+          name = "job_to_foreground";
+          modifier = "control";
+          keycode = "char_z";
+          mode = [
+            "emacs"
+            "vi_insert"
+            "vi_normal"
+          ];
+          event = {
+            send = "executehostcommand";
+            cmd = "job unfreeze";
+          };
+        }
+        {
+          name = "fuzzy_history";
+          modifier = "control";
+          keycode = "char_r";
+          mode = [
+            "emacs"
+            "vi_normal"
+            "vi_insert"
+          ];
+          event = {
+            send = "executehostcommand";
+            cmd = ''
+              commandline edit --replace (
+                history
+                | get command
+                | enumerate
+                | reverse
+                | uniq
+                | each { |it| $"($it.item)" }
+                | str join (char -i 0)
+                | fzf --read0 --layout reverse --query (commandline) --scheme history --preview-window hidden --bind='ctrl-y:execute-silent(echo -n {2..} | wl-copy)+abort' --header 'Press CTRL-Y to copy command into clipboard'
+                | decode utf-8
+                | str trim
+              )
+            '';
+          };
+        }
+        # abbr
+        {
+          name = "abbr_menu";
+          modifier = "none";
+          keycode = "space";
+          mode = [
+            "emacs"
+            "vi_normal"
+            "vi_insert"
+          ];
+          event = [
+            {
+              send = "menu";
+              name = "abbr_menu";
+            }
+            {
+              edit = "insertchar";
+              value = " ";
+            }
+          ];
+        }
+      ];
+      menus = [
+        {
+          name = "abbr_menu";
+          only_buffer_difference = false;
+          marker = "none";
+          type = {
+            layout = "columnar";
+            columns = 1;
+            col_width = 20;
+            col_padding = 2;
+          };
+          style = {
+            text = "green";
+            selected_text = "green_reverse";
+            description_text = "yellow";
+          };
+          source = lib.setType "nushell-inline" {
+            expr =
+              #nu
+              ''
+                { |buffer, position|
+                    let match = (scope aliases | where name == $buffer)
+                    if ($match | is-empty) { {value: $buffer} } else { $match | each { |it| {value: ($it.expansion) }} }
+                }
+              '';
+          };
+        }
+      ];
     };
     envFile.text = ''
       $env.PROMPT_INDICATOR_VI_INSERT = ""
