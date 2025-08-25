@@ -6,6 +6,7 @@
     virtualHost = false;
     audio = true;
     bluetooth = true;
+    physical = true;
   };
   activities = {
     coding = true;
