@@ -55,7 +55,6 @@
         [
           pkgs.trash-cli
           pkgs.fd
-          pkgs.microfetch
           pkgs.wget
           pkgs.ripgrep
           pkgs.unzip
@@ -66,6 +65,7 @@
           # pkgs.unrar
         ]
         ++ (lib.lists.optionals pkgs.stdenv.isLinux [
+          pkgs.microfetch
           pkgs.desktop-entries
           pkgs.toggle-service
           # inputs.nix-alien.packages.${pkgs.system}.nix-alien
