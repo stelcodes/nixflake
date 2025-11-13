@@ -13,7 +13,7 @@
     ./hardware-configuration.nix
     ./disk-config.nix
 
-    inputs.copyparty.nixosModules.default
+    # inputs.copyparty.nixosModules.default
   ];
 
   profile = {
@@ -36,20 +36,20 @@
 
   users = {
     users = {
-      copyparty = {
-        description = "Service user for copyparty";
-        group = "copyparty";
-        extraGroups = [
-          "shares"
-        ];
-        home = "/var/lib/copyparty";
-        isSystemUser = true;
-      };
+      # copyparty = {
+      #   description = "Service user for copyparty";
+      #   group = "copyparty";
+      #   extraGroups = [
+      #     "shares"
+      #   ];
+      #   home = "/var/lib/copyparty";
+      #   isSystemUser = true;
+      # };
       jellyfin.extraGroups = [ "shares" ];
     };
-    groups = {
-      copyparty = { };
-    };
+    # groups = {
+    #   copyparty = { };
+    # };
   };
 
   nixpkgs.overlays = [ inputs.copyparty.overlays.default ];
@@ -61,8 +61,10 @@
   networking = {
     hosts = {
       "127.0.0.1" = [
-        "files.stelclementine.com"
+        # "books.stelclementine.com"
         "media.stelclementine.com"
+        "syncthing-gui.stelclementine.com"
+        # "files.stelclementine.com"
       ];
     };
     firewall = {
@@ -89,7 +91,7 @@
     # https://wiki.archlinux.org/title/Fprint
     # Use fprintd-enroll to register right index finger
     # When enabled, swaylock only accepts fingerprints https://github.com/swaywm/swaylock/issues/61
-    fprintd.enable = true;
+    fprintd.enable = false;
     postgresql = {
       enable = true;
       basicSetup.enable = true;
@@ -102,6 +104,31 @@
       enable = true;
       useRoutingFeatures = "client";
       extraUpFlags = [ "--operator=${config.admin.username}" ]; # For trayscale
+    };
+    syncthing = {
+      enable = true;
+      user = config.admin.username;
+      group = "shares";
+      overrideDevices = false;
+      overrideFolders = false;
+      guiAddress = "127.0.0.1:8384";
+      dataDir = "/home/${config.admin.username}/.local/state/syncthing";
+      settings = {
+        gui = {
+          insecureSkipHostcheck = true;
+        };
+        options = {
+          listenAddresses = [
+            # sync.stelclementine.com:22000
+            "tcp://100.75.57.114:22000"
+            "quic://100.75.57.114:22000"
+          ];
+          urAccepted = -1;
+          localAnnounceEnabled = true;
+          globalAnnounceEnabled = false;
+          natEnabled = false;
+        };
+      };
     };
     snapper = {
       # Must create btrfs snapshots subvolume manually
@@ -133,25 +160,40 @@
         };
       };
     };
-    copyparty = {
-      enable = true;
-      # directly maps to values in the [global] section of the copyparty config.
-      # see `copyparty --help` for available options
-      # Default port is 3923
-      user = "copyparty";
-      group = "shares";
-      settings = {
-        i = "127.0.0.1";
-      };
-      volumes = {
-        "/" = {
-          path = "/shares";
-          access = {
-            rwmd = "*";
-          };
-        };
-      };
-    };
+    # calibre-web = {
+    #   # Default admin credentials: admin, admin123
+    #   enable = true;
+    #   group = "shares";
+    #   listen = {
+    #     ip = "127.0.0.1";
+    #     port = 8083;
+    #   };
+    #   openFirewall = false;
+    #   options = {
+    #     enableBookUploading = true;
+    #     enableBookConversion = true;
+    #     calibreLibrary = "/shares/books";
+    #   };
+    # };
+    # copyparty = {
+    #   enable = false;
+    #   # directly maps to values in the [global] section of the copyparty config.
+    #   # see `copyparty --help` for available options
+    #   # Default port is 3923
+    #   user = "copyparty";
+    #   group = "shares";
+    #   settings = {
+    #     i = "127.0.0.1";
+    #   };
+    #   volumes = {
+    #     "/" = {
+    #       path = "/shares";
+    #       access = {
+    #         r = "*";
+    #       };
+    #     };
+    #   };
+    # };
     nginx = {
       enable = true;
       recommendedGzipSettings = true;
@@ -159,28 +201,28 @@
       recommendedProxySettings = true;
       recommendedTlsSettings = true;
       virtualHosts = {
-        "files.stelclementine.com" = {
-          locations."/" = {
-            proxyPass = "http://127.0.0.1:3923";
-          };
-          listenAddresses = [
-            "100.75.57.114"
-            "127.0.0.1"
-          ];
-          extraConfig = ''
-            proxy_redirect off;
-            # disable buffering (next 4 lines)
-            proxy_http_version 1.1;
-            client_max_body_size 0;
-            proxy_buffering off;
-            proxy_request_buffering off;
-            # improve download speed from 600 to 1500 MiB/s
-            proxy_buffers 32 8k;
-            proxy_buffer_size 16k;
-
-            access_log /var/log/nginx/copyparty.access.log;
-          '';
-        };
+        # "files.stelclementine.com" = {
+        #   locations."/" = {
+        #     proxyPass = "http://127.0.0.1:3923";
+        #   };
+        #   listenAddresses = [
+        #     "100.75.57.114"
+        #     "127.0.0.1"
+        #   ];
+        #   extraConfig = ''
+        #     proxy_redirect off;
+        #     # disable buffering (next 4 lines)
+        #     proxy_http_version 1.1;
+        #     client_max_body_size 0;
+        #     proxy_buffering off;
+        #     proxy_request_buffering off;
+        #     # improve download speed from 600 to 1500 MiB/s
+        #     proxy_buffers 32 8k;
+        #     proxy_buffer_size 16k;
+        #
+        #     access_log /var/log/nginx/copyparty.access.log;
+        #   '';
+        # };
         "media.stelclementine.com" = {
           locations."/" = {
             proxyPass = "http://127.0.0.1:8096";
@@ -190,11 +232,38 @@
             "127.0.0.1"
           ];
         };
+        # "books.stelclementine.com" = {
+        #   locations."/" = {
+        #     proxyPass = "http://127.0.0.1:8083";
+        #   };
+        #   listenAddresses = [
+        #     "100.75.57.114"
+        #   ];
+        # };
+        "sync.stelclementine.com" = {
+          # Syncthing GUI
+          locations."/" = {
+            proxyPass = "http://127.0.0.1:8384";
+          };
+          listenAddresses = [
+            "100.75.57.114"
+          ];
+        };
       };
     };
   };
 
-  systemd.services.copyparty.serviceConfig.UMask = lib.mkForce "0007";
+  # Default umask is 0022 (man systemd.exec) which restricts group and other write access
+  # Umask bits say: "what permissions are DENIED"
+  # 0 (special bit is not affected)
+  # 0 - 000 (no owning user permissions are denied)
+  # 2 - 011 (group write and execute are denied)
+  # 2 - 011 (others write and execute are denied)
+  systemd.services = {
+    # copyparty.serviceConfig.UMask = lib.mkForce "0007";
+    # calibre-web.serviceConfig.UMask = lib.mkForce "0007";
+    syncthing.serviceConfig.UMask = lib.mkForce "0007";
+  };
 
   # security.acme = {
   #   acceptTerms = true;
@@ -202,24 +271,6 @@
   #     "fileparty.".email = config.admin.email;
   #   };
   # };
-
-  security.wrappers = {
-    # Necessary for burning CDs with k3b
-    cdrdao = {
-      setuid = true;
-      owner = "root";
-      group = "cdrom";
-      permissions = "u+wrx,g+x";
-      source = "${pkgs.cdrdao}/bin/cdrdao";
-    };
-    cdrecord = {
-      setuid = true;
-      owner = "root";
-      group = "cdrom";
-      permissions = "u+wrx,g+x";
-      source = "${pkgs.cdrtools}/bin/cdrecord";
-    };
-  };
 
   # man tmpfiles.d
   # Special bits - the x in x770
@@ -231,23 +282,37 @@
     "d /shares 2770 root shares -"
   ];
 
-  security.pam.pam-parallel = {
-    enable = false;
-    applyToModules = [
-      "gtklock"
-      "ly"
+  # lsblk -o name,model,size,type,fstype,mountpoint,uuid
+  # https://blog.pankajraghav.com/2024/09/17/AUTOMOUNT.html
+  fileSystems."/shares/hdd" = {
+    device = "/dev/disk/by-uuid/fabb5a38-c104-4e34-8652-04864df28799";
+    fsType = "btrfs";
+    options = [
+      "defaults"
+      "noatime"
+      "x-systemd.automount"
+      "x-systemd.device-timeout=5"
+      "noauto"
     ];
-    methods = {
-      fprint = {
-        description = "Fingerprint";
-        rule = "auth sufficient ${pkgs.fprintd}/lib/security/pam_fprintd.so";
-      };
-      password = {
-        description = "Password";
-        rule = "auth sufficient ${config.security.pam.package}/lib/security/pam_unix.so likeauth nullok try_first_pass";
-      };
-    };
   };
+
+  # security.pam.pam-parallel = {
+  #   enable = false;
+  #   applyToModules = [
+  #     "gtklock"
+  #     "ly"
+  #   ];
+  #   methods = {
+  #     fprint = {
+  #       description = "Fingerprint";
+  #       rule = "auth sufficient ${pkgs.fprintd}/lib/security/pam_fprintd.so";
+  #     };
+  #     password = {
+  #       description = "Password";
+  #       rule = "auth sufficient ${config.security.pam.package}/lib/security/pam_unix.so likeauth nullok try_first_pass";
+  #     };
+  #   };
+  # };
 
   system.stateVersion = "24.11";
 

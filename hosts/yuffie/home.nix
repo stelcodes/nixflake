@@ -15,7 +15,7 @@
     packages = [
       pkgs.signal-desktop
       pkgs.gimp3-with-plugins
-      pkgs.wineWowPackages.waylandFull
+      # pkgs.wineWowPackages.waylandFull
       (pkgs.createBrowserApp {
         name = "Bandcamp";
         icon = "music";
@@ -51,27 +51,27 @@
       pkgs.deploy-rs
       pkgs.open-browser-app
       pkgs.mgba
-      pkgs.duckstation
+      # pkgs.duckstation
       (pkgs.writePythonApplication {
         name = "vws";
         runtimeInputs = [ pkgs.ffmpeg ];
         text = builtins.readFile ../../misc/video-with-subs.py;
       })
-      pkgs.d-spy
-      pkgs.lollypop
-      pkgs.gnome-podcasts
-      pkgs.fractal
+      # pkgs.d-spy
+      # pkgs.lollypop
+      # pkgs.gnome-podcasts
+      # pkgs.fractal
       pkgs.mkvtoolnix
       pkgs.oniux
-      (pkgs.typst.withPackages (p: [ p.touying ]))
-      pkgs.pympress
-      pkgs.tuba
-      pkgs.inkscape-with-extensions
+      # (pkgs.typst.withPackages (p: [ p.touying ]))
+      # pkgs.pympress
+      # pkgs.tuba
+      # pkgs.inkscape-with-extensions
       pkgs.nvtopPackages.intel # integrated intel gpu usage
-      pkgs.gpu-screen-recorder-gtk # super easy screen recorder
-      inputs.audio.packages.${pkgs.system}.bitwig-studio5-2
-      pkgs.nixos-anywhere
-      pkgs.wg-killswitch
+      # pkgs.gpu-screen-recorder-gtk # super easy screen recorder
+      # inputs.audio.packages.${pkgs.system}.bitwig-studio5-2
+      # pkgs.nixos-anywhere
+      # pkgs.wg-killswitch
       pkgs.wireguard-tools
       pkgs.usbimager
     ];
@@ -86,6 +86,54 @@
       };
     };
     wallpaper = pkgs.wallpaper.anime-girl-coffee;
+  };
+  programs.beets = {
+    enable = true;
+    # package = pkgs.python3.pkgs.beets.override {
+    #   pluginOverrides = {
+    #     # alternatives = {
+    #     #   enable = true;
+    #     #   propagatedBuildInputs = [ pkgs.python3.pkgs.beets-alternatives ];
+    #     # };
+    #     bandcamp = {
+    #       enable = true;
+    #       propagatedBuildInputs = [ (pkgs.python3.pkgs.beetcamp.override { beets = pkgs.beets-minimal; }) ];
+    #     };
+    #   };
+    # };
+    settings = {
+      directory = "/shares/beets/library";
+      library = "/shares/beets/beets.db";
+      import = {
+        move = true;
+      };
+      # https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/development/python-modules/beets/default.nix
+      plugins = [
+        "musicbrainz"
+        "fetchart"
+        "embedart"
+        # "chroma"
+        # "spotify"
+        # "bandcamp"
+      ];
+      permissions = {
+        file = 644;
+        dir = 755;
+      };
+      fetchart = {
+        auto = true;
+        minwidth = 800;
+        maxwidth = 1200;
+      };
+      embedart = {
+        auto = true;
+        maxwidth = 600;
+        quality = 80;
+        # If file has embedded art already, compare to fetched art
+        # Not working, not sure why
+        # compare_threshold = 20;
+      };
+    };
   };
   programs.nushell = {
     enable = true;
@@ -224,8 +272,8 @@
   services = {
     syncthing = {
       # http://localhost:8384
-      enable = true;
-      tray.enable = true;
+      enable = false;
+      tray.enable = false;
     };
   };
 }
