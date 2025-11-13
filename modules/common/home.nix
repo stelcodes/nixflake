@@ -60,7 +60,6 @@
         pkgs.truecolor-test
         pkgs.dua
         pkgs.jq
-        pkgs.tmux-startup
         # pkgs.unrar
       ]
       ++ (lib.lists.optionals pkgs.stdenv.isLinux [

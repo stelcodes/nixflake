@@ -189,8 +189,9 @@
       '';
     };
 
-    tmuxPrimary = green;
-    tmuxSecondary = red;
+    tmuxStatusNormal = green;
+    tmuxStatusMode = red;
+    tmuxStatusSSH = magenta;
 
     btop = "everforest-dark-medium";
 

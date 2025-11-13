@@ -1,9 +1,26 @@
 { pkgs, config, ... }:
-# For images in the terminal, use img2sixel from pkgs.libsixel
 let
   theme = config.theme.set;
+  status-left-normal = "#{?pane_in_mode,#[fg=${theme.bg}#,bg=${theme.tmuxStatusMode}#,bold],#[fg=${theme.bg}#,bg=${theme.tmuxStatusNormal}#,bold]} #S ";
+  status-left-ssh = "#{?pane_in_mode,#[fg=${theme.bg}#,bg=${theme.tmuxStatusMode}#,bold],#[fg=${theme.bg}#,bg=${theme.tmuxStatusSSH}#,bold]} #S ";
+  status-right-normal = "#{?client_prefix,#[fg=${theme.bg}#,bg=${theme.tmuxStatusNormal}] M-a ,}#[fg=${theme.bg4},bg=${theme.bg2}] %I:%M %p #{?pane_in_mode,#[fg=${theme.bg}#,bg=${theme.tmuxStatusMode}#,bold],#[fg=${theme.bg}#,bg=${theme.tmuxStatusNormal}#,bold]} #H ";
+  status-right-ssh = "#{?client_prefix,#[fg=${theme.bg}#,bg=${theme.tmuxStatusSSH}] M-a ,}#[fg=${theme.bg4},bg=${theme.bg2}] %I:%M %p #{?pane_in_mode,#[fg=${theme.bg}#,bg=${theme.tmuxStatusMode}#,bold],#[fg=${theme.bg}#,bg=${theme.tmuxStatusSSH}#,bold]} #H ";
+  tmux-startup = pkgs.writeShellApplication {
+    name = "tmux-startup";
+    # Don't put tmux in runtimeInputs because that PATH is exported to every tmux shell
+    runtimeInputs = [ ];
+    text = # sh
+      ''
+        if tmux run &>/dev/null; then
+          tmux new-session -As config
+        else
+          tmux new-session -ds config -c "$HOME/.config/nixflake"
+        fi
+      '';
+  };
 in
 {
+  home.packages = [ tmux-startup ];
   programs.tmux = {
     enable = true;
     baseIndex = 1;
@@ -38,8 +55,10 @@ in
       # KEYBINDINGS
 
       # tmux doesn't have an option to avoid wrapping around with select-pane :(
-      bind -n M-h select-pane -L
-      bind -n M-l select-pane -R
+      # bind -n M-h select-pane -L
+      bind -n M-h if-shell -F '#{pane_at_left}' 'select-pane -L' 'previous-window'
+      # bind -n M-l select-pane -R
+      bind -n M-l if-shell -F '#{pane_at_right}' 'select-pane -R' 'next-window'
       bind -n M-j select-pane -D
       bind -n M-k select-pane -U
       bind -n M-H previous-window
@@ -87,7 +106,7 @@ in
       set -sg escape-time 10
       set -g focus-events on
       set -g renumber-windows on
-      set -g update-environment "WAYLAND_DISPLAY XDG_CURRENT_DESKTOP SWAYSOCK I3SOCK NIRI_SOCKET DISPLAY"
+      set -g update-environment "WAYLAND_DISPLAY XDG_CURRENT_DESKTOP SWAYSOCK I3SOCK NIRI_SOCKET DISPLAY SSH_CONNECTION SSH_TTY SSH_CLIENT"
       set -g status on
       set -g status-interval 1
       set -g history-limit 8000
@@ -100,6 +119,14 @@ in
       #########################################################################
       # APPEARANCE
 
+      # More robust SSH detection
+
+      set -g @status_normal "${theme.tmuxStatusNormal}"
+      set -g @status_mode "${theme.tmuxStatusMode}"
+      set -g @status_normal "${theme.tmuxStatusSSH}"
+      if-shell 'echo "$SSH_CONNECTION $SSH_TTY $SSH_CLIENT" | grep -q "[^[:space:]]"' {
+          set -g @ssh_session "yes"
+      }
       set -g status-justify left
       set -g status-style bg=${theme.bg1},fg=${theme.fg}
       set -g pane-border-style bg=default,fg=${theme.bg}
@@ -107,12 +134,12 @@ in
       set -g pane-border-indicators arrows
       set -g display-panes-colour black
       set -g display-panes-active-colour black
-      set -g clock-mode-colour '${theme.tmuxPrimary}'
-      set -g message-style bg=${theme.bg},fg=${theme.tmuxPrimary}
-      set -g message-command-style bg=${theme.bg},fg=${theme.tmuxPrimary}
-      set -g status-left "#{?pane_in_mode,#[fg=${theme.bg}#,bg=${theme.tmuxSecondary}#,bold],#[fg=${theme.bg}#,bg=${theme.tmuxPrimary}#,bold]} #S "
+      set -g clock-mode-colour '${theme.tmuxStatusMode}'
+      set -g message-style bg=${theme.bg},fg=${theme.tmuxStatusNormal}
+      set -g message-command-style bg=${theme.bg},fg=${theme.tmuxStatusNormal}
+      set -g status-left "#(if [ -n \"$SSH_TTY\" ]; then echo '${status-left-normal}'; else echo '${status-left-ssh}')"
       set -g status-left-length 25
-      set -g status-right "#{?client_prefix,#[fg=${theme.bg}#,bg=${theme.tmuxPrimary}] M-a ,}#[fg=${theme.bg4},bg=${theme.bg2}] %I:%M %p #{?pane_in_mode,#[fg=${theme.bg}#,bg=${theme.tmuxSecondary}#,bold],#[fg=${theme.bg}#,bg=${theme.tmuxPrimary}#,bold]} #H "
+      set -g status-right "#(if [ -n \"$SSH_TTY\" ]; then echo '${status-right-normal}'; else echo '${status-right-ssh}')"
       set -g status-right-length 50
       set -g window-status-format "#[fg=${theme.bg4},bg=${theme.bg1}] #I #W #F "
       set -g window-status-current-format "#[fg=${theme.fg},bg=${theme.bg2}] #I #W #F "

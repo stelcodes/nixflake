@@ -37,7 +37,6 @@ final: prev: {
   pomo = final.callPackage ./pomo.nix { };
   writeBabashkaScript = final.callPackage ./write-babashka-script.nix { };
   tmux-snapshot = final.callPackage ./tmux-snapshot { };
-  tmux-startup = final.callPackage ./tmux-startup { };
   devflake = final.callPackage ./devflake { };
   truecolor-test = final.writeShellApplication {
     name = "truecolor-test";
