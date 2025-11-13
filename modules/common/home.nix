@@ -117,8 +117,20 @@
         # then it will keep trying the above process 10 iterations (600
         # seconds). If the server still doesn't respond, then the client
         # disconnects the ssh connection.
-        serverAliveInterval = 60;
-        serverAliveCountMax = 10;
+        matchBlocks."*" = {
+          # Previous defaults I've been using that are now required
+          forwardAgent = false;
+          addKeysToAgent = "no";
+          compression = false;
+          hashKnownHosts = false;
+          userKnownHostsFile = "~/.ssh/known_hosts";
+          controlMaster = "no";
+          controlPath = "~/.ssh/master-%r@%n:%p";
+          controlPersist = "no";
+          # Custom settings
+          serverAliveInterval = 60;
+          serverAliveCountMax = 10;
+        };
       };
 
       bat = {
@@ -140,8 +152,6 @@
 
       git = {
         enable = true;
-        userName = "Stel Clementine";
-        userEmail = "dev@stelclementine.com";
         ignores = [
           "*Session.vim"
           "*.DS_Store"
@@ -161,35 +171,35 @@
           "/dist"
           "/out"
         ];
-        extraConfig = {
+        settings = {
+          user.name = "Stel Clementine";
+          user.email = "dev@stelclementine.com";
           core.editor = "nvim";
-          init = {
-            defaultBranch = "main";
-          };
-          merge = {
-            ff = "only";
-          };
+          init.defaultBranch = "main";
+          merge.ff = "only";
           push.autoSetupRemote = true;
           # url = {
           #   "git@github.com:".insteadOf = "https://github.com/";
           # };
           # pull.rebase = "true";
         };
-        delta = {
-          enable = true;
-          options = {
-            decorations = {
-              commit-style = "bold yellow ul";
-              commit-decoration-style = "";
-              file-style = "yellow";
-              file-decoration-style = "";
-              hunk-header-style = "omit";
-              minus-style = "normal #49343a";
-              plus-style = "normal #2f4030";
-              zero-style = "";
-            };
-            features = "decorations";
+      };
+
+      delta = {
+        enable = true;
+        enableGitIntegration = true;
+        options = {
+          decorations = {
+            commit-style = "bold yellow ul";
+            commit-decoration-style = "";
+            file-style = "yellow";
+            file-decoration-style = "";
+            hunk-header-style = "omit";
+            minus-style = "normal #49343a";
+            plus-style = "normal #2f4030";
+            zero-style = "";
           };
+          features = "decorations";
         };
       };
 
@@ -331,6 +341,23 @@
               spans[cx.tabs.idx]:reverse()
               return ui.Line(spans)
             end, 9000, Header.RIGHT)
+
+            -- Show user/group of files in status bar
+            -- https://yazi-rs.github.io/docs/tips/#user-group-in-status
+            Status:children_add(function()
+                local h = cx.active.current.hovered
+                if not h or ya.target_family() ~= "unix" then
+                    return ""
+                end
+
+                return ui.Line {
+                    ui.Span(ya.user_name(h.cha.uid) or tostring(h.cha.uid)):fg("magenta"),
+                    ":",
+                    ui.Span(ya.group_name(h.cha.gid) or tostring(h.cha.gid)):fg("magenta"),
+                    " ",
+                }
+            end, 500, Status.RIGHT)
+
             require("starship"):setup()
             require("git"):setup()
           '';
@@ -485,8 +512,8 @@
 
       zsh =
         let
-          gitName = config.programs.git.userName;
-          gitEmail = config.programs.git.userEmail;
+          gitName = config.programs.git.settings.user.name;
+          gitEmail = config.programs.git.settings.user.email;
           aliases = rec {
             t = "tmux-startup";
             ll = "ls -l";
@@ -543,6 +570,7 @@
             swayoutputs = "swaymsg -t get_outputs | nvim -R";
             play = "audacious --enqueue-to-temp";
             icon-search = "yazi /etc/profiles/per-user/${config.admin.username}/share/icons/Everforest-Dark/categories/64";
+            lb = "lsblk -o name,model,size,type,fstype,mountpoint,uuid";
           };
         in
         {

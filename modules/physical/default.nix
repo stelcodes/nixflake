@@ -71,10 +71,10 @@
 
     services = {
       fwupd.enable = true;
-      logind = {
-        lidSwitch = "ignore";
-        powerKey = "sleep";
-        powerKeyLongPress = "poweroff";
+      logind.settings.Login = {
+        HandleLidSwitch = "ignore";
+        HandlePowerKey = "sleep";
+        HandlePowerKeyLongPress = "poweroff";
       };
       resolved = {
         # resolvectl status|query|monitor
