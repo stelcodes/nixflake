@@ -611,12 +611,9 @@
                 if [ -e /opt/homebrew ]; then
                 export HOMEBREW_NO_AUTO_UPDATE=1
                 export HOMEBREW_NO_ANALYTICS=1
-                  path+=(/opt/homebrew/bin /opt/homebrew/sbin)
+                  path+=(/opt/homebrew/bin /opt/homebrew/sbin /opt/homebrew/opt/rustup/bin)
                 fi
-                # Append local/bin to PATH if it exists
-                if [ -e "$HOME/.local/bin" ]; then
-                  path+=("$HOME/.local/bin")
-                fi
+                path+=("$HOME/.local/bin")
                 # Fix comma falling back to 'nixpkgs' channel when NIX_PATH not set (MacOS)
                 if [ ! -v NIX_PATH ]; then
                   export NIX_PATH='nixpkgs=flake:${inputs.nixpkgs}'
