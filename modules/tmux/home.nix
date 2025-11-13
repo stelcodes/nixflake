@@ -11,11 +11,42 @@ let
     runtimeInputs = [ ];
     text = # sh
       ''
-        if tmux run &>/dev/null; then
-          tmux new-session -As config
-        else
-          tmux new-session -ds config -c "$HOME/.config/nixflake"
-        fi
+        tmux new-session -As config -c "$HOME/.config/nixflake"
+      '';
+  };
+  tmux-session-skip = pkgs.writeShellApplication {
+    name = "tmux-session-skip";
+    runtimeInputs = [ ];
+    text = # sh
+      ''
+        set -x
+
+        direction="''${1:-next}"  # Default to "next" if no argument provided
+
+        sessions=$(tmux list-sessions -F '#{session_name}')
+        current_session=$(tmux display-message -p '#{session_name}')
+
+        # Convert to array
+        readarray -t session_array <<< "$sessions"
+
+        # Find current session index
+        for i in "''${!session_array[@]}"; do
+          if [[ "''${session_array[$i]}" == "$current_session" ]]; then
+            if [[ "$direction" == "next" ]]; then
+              # Next session: move forward, wrap around
+              next_index=$(( (i + 1) % ''${#session_array[@]} ))
+            elif [[ "$direction" == "prev" ]]; then
+              # Previous session: move backward, wrap around
+              next_index=$(( (i - 1 + ''${#session_array[@]}) % ''${#session_array[@]} ))
+            else
+              echo "Invalid direction: $direction. Use 'next' or 'prev'."
+              exit 1
+            fi
+
+            tmux switch-client -t "''${session_array[$next_index]}"
+            break
+          fi
+        done
       '';
   };
 in
@@ -54,15 +85,14 @@ in
       #########################################################################
       # KEYBINDINGS
 
-      # tmux doesn't have an option to avoid wrapping around with select-pane :(
-      # bind -n M-h select-pane -L
-      bind -n M-h if-shell -F '#{pane_at_left}' 'select-pane -L' 'previous-window'
-      # bind -n M-l select-pane -R
-      bind -n M-l if-shell -F '#{pane_at_right}' 'select-pane -R' 'next-window'
+      bind -n M-h if-shell -F "#{pane_at_left}" { previous-window } { select-pane -L }
+      bind -n M-l if-shell -F "#{pane_at_right}" { next-window } { select-pane -R }
       bind -n M-j select-pane -D
       bind -n M-k select-pane -U
       bind -n M-H previous-window
       bind -n M-L next-window
+      bind -n M-J run-shell ${tmux-session-skip}/bin/tmux-session-skip
+      bind -n M-K run-shell ${tmux-session-skip}/bin/tmux-session-skip prev
       bind -n M-Q kill-pane
       bind -n M-s choose-tree -s
       bind -n M-w choose-window -w
@@ -108,7 +138,7 @@ in
       set -g renumber-windows on
       set -g update-environment "WAYLAND_DISPLAY XDG_CURRENT_DESKTOP SWAYSOCK I3SOCK NIRI_SOCKET DISPLAY SSH_CONNECTION SSH_TTY SSH_CLIENT"
       set -g status on
-      set -g status-interval 1
+      set -g status-interval 5
       set -g history-limit 8000
       set -g detach-on-destroy off # Switch to another session when last shell is closed
       set -sa terminal-features ',foot:RGB,xterm-256color:RGB,tmux-256color:RGB'
@@ -121,12 +151,6 @@ in
 
       # More robust SSH detection
 
-      set -g @status_normal "${theme.tmuxStatusNormal}"
-      set -g @status_mode "${theme.tmuxStatusMode}"
-      set -g @status_normal "${theme.tmuxStatusSSH}"
-      if-shell 'echo "$SSH_CONNECTION $SSH_TTY $SSH_CLIENT" | grep -q "[^[:space:]]"' {
-          set -g @ssh_session "yes"
-      }
       set -g status-justify left
       set -g status-style bg=${theme.bg1},fg=${theme.fg}
       set -g pane-border-style bg=default,fg=${theme.bg}
@@ -137,9 +161,9 @@ in
       set -g clock-mode-colour '${theme.tmuxStatusMode}'
       set -g message-style bg=${theme.bg},fg=${theme.tmuxStatusNormal}
       set -g message-command-style bg=${theme.bg},fg=${theme.tmuxStatusNormal}
-      set -g status-left "#(if [ -n \"$SSH_TTY\" ]; then echo '${status-left-normal}'; else echo '${status-left-ssh}')"
+      set -g status-left "#(if [ -n \"$SSH_TTY\" ]; then echo '${status-left-ssh}'; else echo '${status-left-normal}'; fi)"
       set -g status-left-length 25
-      set -g status-right "#(if [ -n \"$SSH_TTY\" ]; then echo '${status-right-normal}'; else echo '${status-right-ssh}')"
+      set -g status-right "#(if [ -n \"$SSH_TTY\" ]; then echo '${status-right-ssh}'; else echo '${status-right-normal}'; fi)"
       set -g status-right-length 50
       set -g window-status-format "#[fg=${theme.bg4},bg=${theme.bg1}] #I #W #F "
       set -g window-status-current-format "#[fg=${theme.fg},bg=${theme.bg2}] #I #W #F "
