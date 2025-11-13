@@ -27,7 +27,7 @@ for input; do
   input_ext="${input##*.}"
   final_input="$input"
   if [ ! -f "$input" ]; then
-    warning "File does not exist, skipping..."
+    warn "File does not exist, skipping..."
     continue
   elif [ "$input_ext" = "wav" ] || [ "$input_ext" = "aif" ] || [ "$input_ext" = "aiff" ]; then
     warn "Converting track to flac format..."
@@ -38,13 +38,13 @@ for input; do
     elif ffmpeg -loglevel error -stats -i "$input" "$final_input"; then
       success "Track converted to flac"
     else
-      warning "Conversion failed, skipping..."
+      warn "Conversion failed, skipping..."
       continue
     fi
   fi
   final_input_ext="${final_input##*.}"
-  if [ "$final_input_ext" != "flac" ] && [ "$final_input_ext" != "mp3" ]; then
-    warn "File isn't flac or mp3 and can't be converted, skipping..."
+  if [ "$final_input_ext" != "flac" ] && [ "$final_input_ext" != "mp3" ] && [ "$final_input_ext" != "m4a" ]; then
+    warn "File isn't flac|mp3|m4a and can't be converted, skipping..."
     continue
   elif [ -f "$final_input" ] && mv -n "$final_input" "$library"; then
     success "Track moved to library"
