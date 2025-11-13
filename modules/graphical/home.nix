@@ -91,7 +91,7 @@ in
         macos_option_as_alt = "left";
         macos_quit_when_last_window_closed = "yes";
         clear_all_shortcuts = "yes";
-        kitty_mod = "alt";
+        kitty_mod = "ctrl+alt";
       };
       keybindings = {
         "kitty_mod+ctrl+u" = "scroll_page_up";
