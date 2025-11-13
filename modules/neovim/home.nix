@@ -408,7 +408,7 @@ in
           type = "lua";
           config = # lua
             ''
-              local notebox = vim.fn.expand("~/sync/notebox")
+              local notebox = vim.fn.expand("~/syncthing/core/notebox")
               require('telekasten').setup({
                 home = notebox,
                 templates = notebox.."/.templates",

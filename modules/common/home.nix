@@ -626,7 +626,7 @@
 
               # Use functions to have better kitty tab names
               function config() { cd ~/.config/nixflake && nvim; }
-              function notebox() { cd ~/sync/notebox && nvim; }
+              function notebox() { cd ~/syncthing/core/notebox && nvim; }
             '';
           plugins = [
             {
