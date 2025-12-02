@@ -104,6 +104,7 @@
       enable = true;
       useRoutingFeatures = "client";
       extraUpFlags = [ "--operator=${config.admin.username}" ]; # For trayscale
+      permitCertUid = "caddy";
     };
     syncthing = {
       enable = true;
@@ -194,6 +195,39 @@
     #     };
     #   };
     # };
+    # caddy = {
+    # # Caddy can automatically use tailscale certs for TLS on *.ts.net domains
+    # # However only one cert can be used per machine
+    #   enable = true;
+    #   virtualHosts = {
+    #     "srv1.snowy-ph.ts.net" = {
+    #       listenAddresses = [
+    #         "100.75.57.114"
+    #         "127.0.0.1"
+    #       ];
+    #       serverAliases = [ "media.stelclementine.com" ];
+    #       extraConfig = ''
+    #         reverse_proxy 127.0.0.1:8096
+    #       '';
+    #     };
+    #     "sync.stelclementine.com" = {
+    #       listenAddresses = [
+    #         "100.75.57.114"
+    #       ];
+    #       extraConfig = ''
+    #         reverse_proxy 127.0.0.1:8384
+    #       '';
+    #     };
+    #   };
+    # };
+    forgejo = {
+      enable = false;
+      settings = {
+        SERVER = {
+
+        };
+      };
+    };
     nginx = {
       enable = true;
       recommendedGzipSettings = true;
@@ -224,6 +258,7 @@
         #   '';
         # };
         "media.stelclementine.com" = {
+          default = true;
           locations."/" = {
             proxyPass = "http://127.0.0.1:8096";
           };

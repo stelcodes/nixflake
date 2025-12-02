@@ -20,6 +20,7 @@
       # pkgs.coreutils-prefixed # coreutils for MacOS prefixed with 'g'
       # pkgs.audacity
       # pkgs.jellyfin-media-player not currently available for M1 :( have to get it from brew
+      pkgs.video-with-subs
     ];
   };
   programs = {
