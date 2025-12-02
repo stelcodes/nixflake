@@ -52,11 +52,7 @@
       pkgs.open-browser-app
       pkgs.mgba
       # pkgs.duckstation
-      (pkgs.writePythonApplication {
-        name = "vws";
-        runtimeInputs = [ pkgs.ffmpeg ];
-        text = builtins.readFile ../../misc/video-with-subs.py;
-      })
+      pkgs.video-with-subs
       # pkgs.d-spy
       # pkgs.lollypop
       # pkgs.gnome-podcasts

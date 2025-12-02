@@ -263,4 +263,5 @@ final: prev: {
       ${final.lib.getExe final.ungoogled-chromium} --new-window --app="$1"
     '';
   };
+  video-with-subs = final.callPackage ./video-with-subs { };
 }
