@@ -24,8 +24,8 @@ if [ "$output_ext" = "mp3" ]; then
 fi
 cmd="$cmd '$output'"
 warn "$cmd"
-read -rp "Convert? [y/N]: " response
-if [ "$response" != "y" ]; then
+read -rp "Convert? [Y/n]: " response
+if [ "$response" != "y" ] && [ "$response" != "Y" ] && [ "$response" != "" ]; then
   error "User aborted conversion"
 fi
 if eval "$cmd"; then
