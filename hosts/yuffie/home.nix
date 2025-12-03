@@ -85,29 +85,48 @@
   };
   programs.beets = {
     enable = true;
-    # package = pkgs.python3.pkgs.beets.override {
-    #   pluginOverrides = {
-    #     # alternatives = {
-    #     #   enable = true;
-    #     #   propagatedBuildInputs = [ pkgs.python3.pkgs.beets-alternatives ];
-    #     # };
-    #     bandcamp = {
-    #       enable = true;
-    #       propagatedBuildInputs = [ (pkgs.python3.pkgs.beetcamp.override { beets = pkgs.beets-minimal; }) ];
-    #     };
-    #   };
-    # };
+    package =
+      (pkgs.python3.pkgs.beets.override {
+        pluginOverrides = {
+          bandcamp = {
+            enable = true;
+            propagatedBuildInputs = [
+              (pkgs.python3.pkgs.beetcamp.overridePythonAttrs {
+                version = "0.23.0";
+                src = pkgs.fetchgit {
+                  url = "https://codeberg.org/stelcodes/beetcamp.git";
+                  rev = "5db1b126313e6408bf008083ef66e30cc439d450";
+                  hash = "sha256-ZXC9PdkeYGYSNWSuUscG1g1cmbBg+SbiciO5gpyMEPo=";
+                };
+                patches = [ ];
+                doCheck = false;
+              })
+            ];
+          };
+        };
+      }).overridePythonAttrs
+        {
+          dontUsePythonCatchConflicts = true;
+          doCheck = false;
+        };
     settings = {
       directory = "/shares/beets/library";
       library = "/shares/beets/beets.db";
       import = {
         move = true;
+        autotag = true; # Disable with -A
+        from_scratch = true; # Erase previous metadata
+        timid = true;
       };
       # https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/development/python-modules/beets/default.nix
       plugins = [
         "musicbrainz"
         "fetchart"
         "embedart"
+        "ftintitle"
+        "duplicates"
+        "badfiles"
+        "bandcamp"
         # "chroma"
         # "spotify"
         # "bandcamp"
@@ -128,6 +147,9 @@
         # If file has embedded art already, compare to fetched art
         # Not working, not sure why
         # compare_threshold = 20;
+      };
+      bandcamp = {
+        art = true;
       };
     };
   };
