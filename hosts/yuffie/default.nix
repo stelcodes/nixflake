@@ -221,10 +221,12 @@
     #   };
     # };
     forgejo = {
-      enable = false;
+      enable = true;
       settings = {
         SERVER = {
-
+          ROOT_URL = "http://git.stelclementine.com";
+          HTTP_PORT = 3022;
+          DOMAIN = "git.stelclementine.com";
         };
       };
     };
@@ -279,6 +281,15 @@
           # Syncthing GUI
           locations."/" = {
             proxyPass = "http://127.0.0.1:8384";
+          };
+          listenAddresses = [
+            "100.75.57.114"
+          ];
+        };
+        "git.stelclementine.com" = {
+          # Forgejo
+          locations."/" = {
+            proxyPass = "http://127.0.0.1:3022";
           };
           listenAddresses = [
             "100.75.57.114"
