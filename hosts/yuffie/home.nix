@@ -3,6 +3,7 @@
   inputs,
   config,
   lib,
+  system,
   ...
 }:
 {
@@ -65,7 +66,7 @@
       # pkgs.inkscape-with-extensions
       pkgs.nvtopPackages.intel # integrated intel gpu usage
       # pkgs.gpu-screen-recorder-gtk # super easy screen recorder
-      # inputs.audio.packages.${pkgs.system}.bitwig-studio5-2
+      # inputs.audio.packages.${system}.bitwig-studio5-2
       # pkgs.nixos-anywhere
       # pkgs.wg-killswitch
       pkgs.wireguard-tools

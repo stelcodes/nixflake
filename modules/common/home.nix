@@ -3,6 +3,7 @@
   lib,
   inputs,
   config,
+  system,
   ...
 }:
 {
@@ -66,7 +67,7 @@
         pkgs.microfetch
         pkgs.desktop-entries
         pkgs.toggle-service
-        # inputs.nix-alien.packages.${pkgs.system}.nix-alien
+        # inputs.nix-alien.packages.${system}.nix-alien
       ])
       ++ (lib.lists.optionals config.activities.coding [
         pkgs.nix-prefetch-github
@@ -81,7 +82,7 @@
         pkgs.devflake
         pkgs.p7zip
         pkgs.mediainfo # for yazi
-        inputs.agenix.packages.${pkgs.system}.default
+        inputs.agenix.packages.${system}.default
         pkgs.git-cliff
         pkgs.nix-inspect
       ]);
