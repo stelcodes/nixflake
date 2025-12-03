@@ -224,7 +224,7 @@
       enable = true;
       useWizard = false;
       settings = {
-        SERVER = {
+        server = {
           ROOT_URL = "http://git.stelclementine.com";
           HTTP_ADDR = "127.0.0.1";
           HTTP_PORT = 3022;
