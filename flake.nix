@@ -133,7 +133,7 @@
                     useGlobalPkgs = true;
                     useUserPackages = true;
                     extraSpecialArgs = {
-                      inherit inputs;
+                      inherit inputs system;
                     };
                     backupFileExtension = "backup";
                     users.${config.admin.username} = {
